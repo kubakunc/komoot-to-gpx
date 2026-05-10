@@ -114,10 +114,10 @@
 <ul class="tours">
   {#each tours as t (t.id)}
     <li>
-      <div class="meta">
+      <a class="meta" href={`/tour/${t.id}`}>
         <strong>{t.name}</strong>
         <span class="sub">{fmtDate(t.date)} · {fmtDist(t.distance)} · {t.sport} · {t.status}</span>
-      </div>
+      </a>
       <button onclick={() => download(t)} disabled={downloading === t.id}>
         {downloading === t.id ? 'pobieram…' : 'GPX'}
       </button>
@@ -140,7 +140,12 @@
     border: 1px solid var(--color-border);
     border-radius: 6px;
   }
-  .meta { flex: 1; min-width: 0; }
+  .meta {
+    flex: 1; min-width: 0;
+    color: inherit; text-decoration: none;
+    display: block;
+  }
+  .meta:hover strong { color: var(--color-accent); }
   .sub { display: block; color: #666; font-size: 0.85rem; }
   .more { margin-top: 1rem; padding: 0.6rem 1rem; }
   button { padding: 0.4rem 0.8rem; background: var(--color-accent); color: white; border: 0; border-radius: 4px; }

@@ -197,12 +197,19 @@ Pokrycie celowe: ~70%, priorytet `gpx.ts` i `komoot.ts`. Komponenty Svelte — m
 - Restart policy: `unless-stopped`.
 - Brak persistent volumes (apka stateless).
 
+## 11a. Rozszerzenie: podgląd trasy na mapie (dodane po MVP)
+
+- Klik na nazwę trasy w liście otwiera `/tour/[id]`.
+- Strona renderuje mapę (Leaflet + tiles OpenStreetMap), polilinię trasy, znacznik startu/końca, podstawowe metadane (data, sport, dystans liczony z punktów, liczba próbek) oraz przycisk "Pobierz GPX".
+- Nowy endpoint: `GET /api/tours/[id]/preview` — zwraca JSON `{ meta, coords: [{lat,lng,alt?}] }`. Endpoint dzieli z `gpx`-owym te same wywołania `getTour` + `getCoordinates`, ale wynik jest cieńszy (bez `t`, bez konwersji do XML).
+- Leaflet i jego CSS importowane dynamicznie (`await import`), żeby nie powiększać bundla strony loginu / listy.
+- Tiles z `tile.openstreetmap.org` z atrybucją OSM. Brak konta, brak api-key. Akceptowalne dla skali "rodzina/znajomi".
+
 ## 11. Co świadomie poza zakresem MVP
 
 - Bulk export wielu tras / ZIP
 - Filtry, wyszukiwanie, paginacja po stronie klienta z infinite scroll
 - Highlights / waypointy w GPX
-- Podgląd trasy na mapie
 - Refresh-token / auto-relogin
 - Internacjonalizacja (UI tylko po polsku)
 - Wsparcie dla wielu kont Komoot na jednej przeglądarce
