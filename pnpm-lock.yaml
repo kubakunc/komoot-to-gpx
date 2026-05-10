@@ -26,6 +26,9 @@ importers:
       '@vite-pwa/sveltekit':
         specifier: ^0.6.0
         version: 0.6.8(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@5.4.21(@types/node@22.19.18)(terser@5.47.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@5.9.3)(vite@5.4.21(@types/node@22.19.18)(terser@5.47.1)))(vite-plugin-pwa@0.21.2(vite@5.4.21(@types/node@22.19.18)(terser@5.47.1))(workbox-build@7.4.1)(workbox-window@7.4.1))
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       eslint:
         specifier: ^9.0.0
         version: 9.39.4
@@ -1397,6 +1400,10 @@ packages:
 
   devalue@5.8.0:
     resolution: {integrity: sha512-2zA9pFEsnp7vWBZbXF5JAgAq0fsUIt/1XPbRiAmRV3lp/2C3upzH+sADiyy66aFCihoLEsrQHxNM5w1gIDfsBg==}
+
+  dotenv@17.4.2:
+    resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
+    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -4053,6 +4060,8 @@ snapshots:
       object-keys: 1.1.1
 
   devalue@5.8.0: {}
+
+  dotenv@17.4.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
