@@ -1,0 +1,12 @@
+node_modules
+.pnpm-store
+.svelte-kit
+build
+.env
+.env.local
+.env.test
+*.log
+.DS_Store
+playwright-report/
+test-results/
+coverage/
