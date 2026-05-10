@@ -124,7 +124,7 @@ komoot-to-gpx/
 ├── Dockerfile
 ├── package.json
 ├── svelte.config.js          # adapter-node
-├── vite.config.ts            # + plugin PWA
+├── vite.config.ts            # + @vite-pwa/sveltekit (auto-generuje service worker)
 ├── static/
 │   ├── manifest.webmanifest
 │   └── icons/
@@ -193,9 +193,7 @@ Pokrycie celowe: ~70%, priorytet `gpx.ts` i `komoot.ts`. Komponenty Svelte — m
 ## 10. Deploy
 
 - `Dockerfile` — multistage: build SvelteKit, runtime tylko Node + zbudowana apka.
-- `docker-compose.yml` — dwie usługi:
-  - `app` — aplikacja SvelteKit, port 3000 (tylko lokalnie, nie publikowany)
-  - `cloudflared` — tunel CF z konfiguracją tokena z env (lub osobny istniejący)
+- `docker-compose.yml` — usługa `app` (SvelteKit, port 3000 tylko lokalnie). Opcjonalnie druga usługa `cloudflared` z tokenem tunelu z env, jeśli użytkownik nie ma już osobnej instalacji `cloudflared` na serwerze.
 - Restart policy: `unless-stopped`.
 - Brak persistent volumes (apka stateless).
 
