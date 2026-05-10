@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    image: komoot-to-gpx:latest
+    container_name: komoot-to-gpx
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      KOMOOT_BASE_URL: ${KOMOOT_BASE_URL:-https://api.komoot.de}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-5}
+      AUTH_RATE_LIMIT_WINDOW_S: ${AUTH_RATE_LIMIT_WINDOW_S:-60}
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # Opcjonalnie: cloudflared. Jeśli masz już cloudflared zainstalowany na serwerze,
+  # usuń tę sekcję i skonfiguruj tunel przez systemową instalację.
+  # cloudflared:
+  #   image: cloudflare/cloudflared:latest
+  #   container_name: komoot-to-gpx-tunnel
+  #   restart: unless-stopped
+  #   command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+  #   environment:
+  #     CLOUDFLARED_TOKEN: ${CLOUDFLARED_TOKEN}
+  #   depends_on:
+  #     - app
