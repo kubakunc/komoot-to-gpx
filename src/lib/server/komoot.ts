@@ -30,7 +30,7 @@ const basic = (email: string, secret: string) =>
 const headers = (auth: string) => ({
   Authorization: auth,
   'User-Agent': USER_AGENT,
-  Accept: 'application/json'
+  Accept: 'application/hal+json,application/json'
 });
 
 async function call(path: string, auth: string): Promise<Response> {
