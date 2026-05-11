@@ -7,7 +7,10 @@
   import { toGpx } from '$lib/client/gpx';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import SavedModal from '$lib/client/SavedModal.svelte';
+  import { maybeShowInterstitial } from '$lib/client/ad-banner';
+  import { PHASE2 } from '$lib/client/ad-config';
 
+  const SAVE_COUNT_KEY = 'gpx-exporter:save-count';
   let savedModalFilename = $state<string | null>(null);
 
   let meta = $state<TourMetadata | null>(null);
@@ -70,6 +73,11 @@
       const xml = toGpx({ name: meta.name, sport: meta.sport, startTimeIso: meta.date }, coords);
       const filename = safeName(meta.name) + '.gpx';
       await saveGpxFile(filename, xml);
+      const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
+      localStorage.setItem(SAVE_COUNT_KEY, String(count));
+      if (count % PHASE2.INTERSTITIAL_EVERY_NTH_SAVE === 0) {
+        void maybeShowInterstitial();
+      }
       savedModalFilename = filename;
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }

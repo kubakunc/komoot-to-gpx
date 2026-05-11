@@ -10,8 +10,10 @@
   import MiniMap from '$lib/client/MiniMap.svelte';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
-  import { showBanner, hideBanner } from '$lib/client/ad-banner';
+  import { showBanner, hideBanner, maybeShowInterstitial } from '$lib/client/ad-banner';
+  import { PHASE2 } from '$lib/client/ad-config';
 
+  const SAVE_COUNT_KEY = 'gpx-exporter:save-count';
   let savedModalFilename = $state<string | null>(null);
 
   let tours = $state<TourSummary[]>([]);
@@ -95,6 +97,11 @@
       );
       const filename = safeName(meta.name) + '.gpx';
       await saveGpxFile(filename, xml);
+      const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
+      localStorage.setItem(SAVE_COUNT_KEY, String(count));
+      if (count % PHASE2.INTERSTITIAL_EVERY_NTH_SAVE === 0) {
+        void maybeShowInterstitial();
+      }
       savedModalFilename = filename;
     } catch (err) {
       if (err instanceof SaveCancelledError) {
