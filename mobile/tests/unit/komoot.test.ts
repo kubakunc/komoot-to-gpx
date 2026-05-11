@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
-  loginWithCookies,
   listTours,
   getTour,
   getCoordinates,
@@ -17,50 +16,6 @@ import { CapacitorHttp } from '@capacitor/core';
 
 const fixture = (name: string) =>
   readFileSync(resolve(__dirname, '../fixtures', name), 'utf8');
-
-describe('komoot.loginWithCookies', () => {
-  beforeEach(() => {
-    vi.mocked(CapacitorHttp.request).mockReset();
-  });
-
-  it('GETs /v006/account/ with provided cookie and returns user info', async () => {
-    vi.mocked(CapacitorHttp.request).mockResolvedValueOnce({
-      status: 200,
-      data: { username: '12345', password: 'TOKEN_XYZ', email: 'me@example.com' },
-      headers: {},
-      url: ''
-    });
-
-    const result = await loginWithCookies('koa_session=abc; other=1');
-
-    expect(CapacitorHttp.request).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.komoot.de/v006/account/',
-      headers: {
-        Cookie: 'koa_session=abc; other=1',
-        Accept: 'application/hal+json,application/json'
-      }
-    });
-    expect(result).toEqual({
-      userId: '12345',
-      token: 'TOKEN_XYZ',
-      email: 'me@example.com'
-    });
-  });
-
-  it('throws KomootError(401) when cookie is rejected', async () => {
-    vi.mocked(CapacitorHttp.request).mockResolvedValueOnce({
-      status: 401,
-      data: '',
-      headers: {},
-      url: ''
-    });
-    await expect(loginWithCookies('bad')).rejects.toMatchObject({
-      name: 'KomootError',
-      status: 401
-    });
-  });
-});
 
 describe('komoot.listTours', () => {
   beforeEach(() => vi.mocked(CapacitorHttp.request).mockReset());

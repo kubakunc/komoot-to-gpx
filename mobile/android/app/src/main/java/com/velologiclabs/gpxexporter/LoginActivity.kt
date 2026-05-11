@@ -3,26 +3,33 @@ package com.velologiclabs.gpxexporter
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import org.json.JSONObject
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class LoginActivity : Activity() {
 
     companion object {
-        const val EXTRA_COOKIES = "cookies"
+        const val EXTRA_USER_ID = "userId"
+        const val EXTRA_TOKEN = "token"
+        const val EXTRA_EMAIL = "email"
         private const val LOGIN_URL = "https://www.komoot.com/signin"
         private const val COOKIE_DOMAIN = "https://www.komoot.com"
+        private const val ACCOUNT_URL = "https://api.komoot.de/v006/account/"
         // Komoot sets these cookies once the user is authenticated.
-        // koa_at = OAuth access token, koa_re = refresh token. Their presence
-        // means login is done regardless of which landing page Komoot picked.
+        // koa_at = OAuth access token, koa_re = refresh token.
         private val POST_LOGIN_COOKIE_KEYS = listOf("koa_at", "koa_re", "fresh_signin")
     }
 
     private lateinit var webView: WebView
     private lateinit var progress: ProgressBar
+    @Volatile private var resolved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,22 +66,61 @@ class LoginActivity : Activity() {
     }
 
     private fun checkForLogin(url: String) {
-        val cookies = CookieManager.getInstance().getCookie(COOKIE_DOMAIN)
-        val cookieNames = cookies?.split(";")?.mapNotNull {
+        if (resolved) return
+        val cookies = CookieManager.getInstance().getCookie(COOKIE_DOMAIN) ?: return
+        val cookieNames = cookies.split(";").mapNotNull {
             it.substringBefore("=").trim().takeIf { n -> n.isNotEmpty() }
-        } ?: emptyList()
-        android.util.Log.d("KomootAuth", "url=$url cookieNames=${cookieNames.joinToString(",")}")
-        // Still on a sign-in/sign-up page, no point looking for the token yet.
+        }
+        Log.d("KomootAuth", "url=$url cookieNames=${cookieNames.joinToString(",")}")
         if (url.contains("/signin") || url.contains("/signup")) return
-        if (cookies == null) return
-        if (POST_LOGIN_COOKIE_KEYS.none { key -> cookieNames.contains(key) }) {
-            android.util.Log.d("KomootAuth", "no post-login cookie yet")
+        if (POST_LOGIN_COOKIE_KEYS.none { cookieNames.contains(it) }) {
+            Log.d("KomootAuth", "no post-login cookie yet")
             return
         }
-        android.util.Log.d("KomootAuth", "login complete, returning cookies")
-        val data = Intent().putExtra(EXTRA_COOKIES, cookies)
-        setResult(Activity.RESULT_OK, data)
-        finish()
+        resolved = true
+        Log.d("KomootAuth", "login complete; calling /v006/account/ in background")
+        progress.visibility = View.VISIBLE
+        Thread { fetchAccountAndFinish(cookies) }.start()
+    }
+
+    private fun fetchAccountAndFinish(cookies: String) {
+        try {
+            val conn = URL(ACCOUNT_URL).openConnection() as HttpsURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("Cookie", cookies)
+            conn.setRequestProperty("Accept", "application/hal+json,application/json")
+            conn.setRequestProperty("User-Agent", "ExportGpxForKomoot/0.1")
+            conn.connectTimeout = 15_000
+            conn.readTimeout = 15_000
+
+            val code = conn.responseCode
+            Log.d("KomootAuth", "/v006/account/ -> HTTP $code")
+            if (code != 200) {
+                conn.disconnect()
+                throw RuntimeException("HTTP $code")
+            }
+            val body = conn.inputStream.bufferedReader().use { it.readText() }
+            conn.disconnect()
+            val json = JSONObject(body)
+            val userId = json.getString("username")
+            val token = json.getString("password")
+            val email = json.optString("email", "")
+            Log.d("KomootAuth", "got userId=$userId, email present=${email.isNotEmpty()}")
+            runOnUiThread {
+                val data = Intent()
+                    .putExtra(EXTRA_USER_ID, userId)
+                    .putExtra(EXTRA_TOKEN, token)
+                    .putExtra(EXTRA_EMAIL, email)
+                setResult(Activity.RESULT_OK, data)
+                finish()
+            }
+        } catch (e: Exception) {
+            Log.e("KomootAuth", "fetchAccount failed", e)
+            runOnUiThread {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
+        }
     }
 
     @Suppress("DEPRECATION")

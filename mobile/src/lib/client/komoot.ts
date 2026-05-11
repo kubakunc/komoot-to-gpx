@@ -26,28 +26,6 @@ function failIfNotOk(status: number, label: string): void {
   throw new KomootError(`${label} failed (komoot returned ${status})`, mapped);
 }
 
-interface AccountResponse {
-  username: string;
-  password: string;
-  email: string;
-}
-
-export async function loginWithCookies(
-  cookieHeader: string
-): Promise<{ userId: string; token: string; email: string }> {
-  const res = await CapacitorHttp.request({
-    method: 'GET',
-    url: `${BASE}/v006/account/`,
-    headers: { Cookie: cookieHeader, Accept: ACCEPT }
-  });
-  failIfNotOk(res.status, 'loginWithCookies');
-  const body = res.data as AccountResponse;
-  if (!body.username || !body.password) {
-    throw new KomootError('loginWithCookies: unexpected response shape', 502);
-  }
-  return { userId: body.username, token: body.password, email: body.email };
-}
-
 export interface TourSummary {
   id: string;
   name: string;

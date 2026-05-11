@@ -22,16 +22,21 @@ class KomootAuthPlugin : Plugin() {
     @ActivityCallback
     private fun onLoginResult(call: PluginCall, result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) {
-            call.reject("Login cancelled")
+            call.reject("Login cancelled or failed")
             return
         }
-        val cookies = result.data?.getStringExtra(LoginActivity.EXTRA_COOKIES)
-        if (cookies.isNullOrBlank()) {
-            call.reject("No cookies captured")
+        val data = result.data
+        val userId = data?.getStringExtra(LoginActivity.EXTRA_USER_ID)
+        val token = data?.getStringExtra(LoginActivity.EXTRA_TOKEN)
+        val email = data?.getStringExtra(LoginActivity.EXTRA_EMAIL) ?: ""
+        if (userId.isNullOrBlank() || token.isNullOrBlank()) {
+            call.reject("Login result missing userId or token")
             return
         }
         val ret = JSObject()
-        ret.put("cookies", cookies)
+        ret.put("userId", userId)
+        ret.put("token", token)
+        ret.put("email", email)
         call.resolve(ret)
     }
 }

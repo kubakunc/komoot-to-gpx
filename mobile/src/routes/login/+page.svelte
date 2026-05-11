@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { nativeLogin, AuthUnsupportedError, AuthCancelledError } from '$lib/client/komoot-auth';
-  import { loginWithCookies, KomootError } from '$lib/client/komoot';
   import { setSession } from '$lib/client/session';
 
   let errorMsg = $state<string | null>(null);
@@ -11,8 +10,7 @@
     errorMsg = null;
     busy = true;
     try {
-      const cookies = await nativeLogin();
-      const { userId, token, email } = await loginWithCookies(cookies);
+      const { userId, token, email } = await nativeLogin();
       await setSession({ userId, token, email });
       await goto('/', { replaceState: true });
     } catch (e) {
@@ -20,10 +18,9 @@
         errorMsg = 'Open this in the Android app to sign in.';
       } else if (e instanceof AuthCancelledError) {
         errorMsg = null;
-      } else if (e instanceof KomootError && e.status === 401) {
-        errorMsg = 'Komoot did not accept the session. Please try again.';
       } else {
-        errorMsg = 'Network error. Please try again.';
+        const msg = (e as Error)?.message ?? 'unknown error';
+        errorMsg = `Sign-in failed: ${msg}`;
       }
     } finally {
       busy = false;

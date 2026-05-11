@@ -1,7 +1,13 @@
 import { registerPlugin, Capacitor } from '@capacitor/core';
 
+export interface NativeLoginResult {
+  userId: string;
+  token: string;
+  email: string;
+}
+
 interface KomootAuthPlugin {
-  login(): Promise<{ cookies: string }>;
+  login(): Promise<NativeLoginResult>;
 }
 
 const KomootAuth = registerPlugin<KomootAuthPlugin>('KomootAuth');
@@ -15,12 +21,13 @@ export class AuthUnsupportedError extends Error {
 }
 
 /**
- * Opens the native WebView at komoot.com/signin and resolves with the captured
- * Komoot session cookie string after the user completes login.
+ * Opens the native WebView at komoot.com/signin and resolves with the user's
+ * Komoot identity (userId, long-lived token, email) after sign-in.
  *
- * Throws AuthUnsupportedError if the platform is not Android (e.g. browser dev).
+ * The native side performs the /v006/account/ call against api.komoot.de so
+ * the very large session-cookie header never crosses the JS bridge.
  */
-export async function nativeLogin(): Promise<string> {
+export async function nativeLogin(): Promise<NativeLoginResult> {
   if (Capacitor.getPlatform() !== 'android') {
     throw new AuthUnsupportedError(
       'Komoot WebView login is only available in the Android app.'
@@ -28,10 +35,10 @@ export async function nativeLogin(): Promise<string> {
   }
   try {
     const result = await KomootAuth.login();
-    if (!result?.cookies) {
+    if (!result?.userId || !result?.token) {
       throw new AuthCancelledError('Login cancelled');
     }
-    return result.cookies;
+    return result;
   } catch (e) {
     if ((e as Error).message?.toLowerCase().includes('cancel')) {
       throw new AuthCancelledError('Login cancelled');
