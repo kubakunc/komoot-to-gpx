@@ -5,15 +5,7 @@ import {
   BannerAdSize,
   AdmobConsentStatus
 } from '@capacitor-community/admob';
-
-// Google's official test units — replace before promoting to production.
-const TEST_BANNER_ID = 'ca-app-pub-3940256099942544/6300978111';
-const TEST_INTERSTITIAL_ID = 'ca-app-pub-3940256099942544/1033173712';
-const TEST_RECT_ID = 'ca-app-pub-3940256099942544/6300978111';
-
-const PROD_BANNER_ID = TEST_BANNER_ID;
-const PROD_INTERSTITIAL_ID = TEST_INTERSTITIAL_ID;
-const PROD_RECT_ID = TEST_RECT_ID;
+import { AD_UNITS, PHASE2 } from './ad-config';
 
 const isAndroid = () => Capacitor.getPlatform() === 'android';
 
@@ -43,7 +35,7 @@ export async function showBanner(): Promise<void> {
     await initAds();
     await hideAllBanners();
     await AdMob.showBanner({
-      adId: __DEV__ ? TEST_BANNER_ID : PROD_BANNER_ID,
+      adId: AD_UNITS.banner,
       adSize: BannerAdSize.ADAPTIVE_BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0
@@ -70,7 +62,7 @@ export async function showModalRectangle(): Promise<void> {
     await initAds();
     await hideAllBanners();
     await AdMob.showBanner({
-      adId: __DEV__ ? TEST_RECT_ID : PROD_RECT_ID,
+      adId: AD_UNITS.rect,
       adSize: BannerAdSize.MEDIUM_RECTANGLE,
       position: BannerAdPosition.CENTER,
       margin: 0
@@ -103,18 +95,18 @@ async function hideAllBanners(): Promise<void> {
 }
 
 /**
- * Show an interstitial if more than 60s have passed since the last one.
- * Caller decides cadence (e.g. every Nth save). Returns true if shown.
+ * Show an interstitial if PHASE2.INTERSTITIAL_ENABLED is true and more than
+ * PHASE2.INTERSTITIAL_MIN_GAP_MS has passed since the last one. Caller decides
+ * cadence (e.g. every Nth save). Returns true if shown.
  */
 export async function maybeShowInterstitial(): Promise<boolean> {
   if (!isAndroid()) return false;
+  if (!PHASE2.INTERSTITIAL_ENABLED) return false;
   const now = Date.now();
-  if (now - lastInterstitialAt < 60_000) return false;
+  if (now - lastInterstitialAt < PHASE2.INTERSTITIAL_MIN_GAP_MS) return false;
   try {
     await initAds();
-    await AdMob.prepareInterstitial({
-      adId: __DEV__ ? TEST_INTERSTITIAL_ID : PROD_INTERSTITIAL_ID
-    });
+    await AdMob.prepareInterstitial({ adId: AD_UNITS.interstitial });
     await AdMob.showInterstitial();
     lastInterstitialAt = now;
     return true;
