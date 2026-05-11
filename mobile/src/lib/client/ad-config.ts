@@ -3,12 +3,11 @@ declare const __DEV__: boolean;
 const TEST_BANNER = 'ca-app-pub-3940256099942544/6300978111';
 const TEST_INTERSTITIAL = 'ca-app-pub-3940256099942544/1033173712';
 
-// Replace with real values from AdMob console once they're issued (Task 7).
-// While these stay equal to the test IDs, production builds will simply show
-// test ads, which is a safer default than empty/null until prod is configured.
-const PROD_BANNER = TEST_BANNER;
-const PROD_RECT = TEST_BANNER;
-const PROD_INTERSTITIAL = TEST_INTERSTITIAL;
+// Production ad unit IDs from AdMob console
+// (publisher: ca-app-pub-2450963113368391, app: Export GPX for Komoot).
+const PROD_BANNER = 'ca-app-pub-2450963113368391/8266206709';        // tour-list-banner
+const PROD_RECT = 'ca-app-pub-2450963113368391/6124248775';          // saved-modal-rect
+const PROD_INTERSTITIAL = 'ca-app-pub-2450963113368391/3684348303';  // post-save-interstitial
 
 export const AD_UNITS = {
   banner: __DEV__ ? TEST_BANNER : PROD_BANNER,

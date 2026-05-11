@@ -34,10 +34,10 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:label="Sign in to Komoot" />
 
-        <!-- Google AdMob: test app id; replace with real id before production release. -->
+        <!-- Google AdMob production app id (VeloLogic Labs / Export GPX for Komoot). -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-2450963113368391~8936674984" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

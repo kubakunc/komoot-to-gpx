@@ -14,9 +14,10 @@ describe('ad-config', () => {
     vi.stubGlobal('__DEV__', false);
     vi.resetModules();
     const { AD_UNITS } = await import('../../src/lib/client/ad-config');
-    // Until production IDs are configured (Task 7), prod resolves to test IDs
-    // as a deliberate safety net. The Task 7 swap will update this assertion.
-    expect(AD_UNITS.banner).toBe('ca-app-pub-3940256099942544/6300978111');
-    expect(typeof AD_UNITS.interstitial).toBe('string');
+    expect(AD_UNITS.banner).toMatch(/^ca-app-pub-\d+\/\d+$/);
+    expect(AD_UNITS.banner).not.toBe('ca-app-pub-3940256099942544/6300978111');
+    expect(AD_UNITS.rect).toMatch(/^ca-app-pub-\d+\/\d+$/);
+    expect(AD_UNITS.interstitial).toMatch(/^ca-app-pub-\d+\/\d+$/);
+    expect(AD_UNITS.interstitial).not.toBe('ca-app-pub-3940256099942544/1033173712');
   });
 });
