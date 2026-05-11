@@ -15,22 +15,39 @@ import java.io.File
 @CapacitorPlugin(name = "GpxSaver")
 class GpxSaverPlugin : Plugin() {
 
+    /**
+     * Persist the GPX content to cacheDir so we don't have to ferry the whole
+     * XML through the PluginCall bundle (Android Binder rejects payloads above
+     * ~1 MB with TransactionTooLargeException, which kills the process between
+     * the picker activity and our callback). Returns the staged file path.
+     */
     @PluginMethod
-    fun save(call: PluginCall) {
-        val filename = call.getString("filename") ?: return call.reject("filename required")
+    fun stage(call: PluginCall) {
         val content = call.getString("content") ?: return call.reject("content required")
         if (content.isBlank()) return call.reject("content empty")
-
-        // Park the content in a cache file so it survives even if the PluginCall
-        // data gets stripped during the Activity round-trip.
         try {
             val cache = File(context.cacheDir, "pending-gpx-${System.currentTimeMillis()}.gpx")
             cache.writeText(content, Charsets.UTF_8)
-            Log.d("GpxSaver", "parked ${cache.length()} bytes at ${cache.absolutePath}")
-            call.data.put("cachePath", cache.absolutePath)
+            Log.d("GpxSaver", "staged ${cache.length()} bytes at ${cache.absolutePath}")
+            val ret = JSObject()
+            ret.put("stagePath", cache.absolutePath)
+            call.resolve(ret)
         } catch (e: Exception) {
-            return call.reject("Could not stage GPX: ${e.message}")
+            Log.e("GpxSaver", "stage failed", e)
+            call.reject(e.message ?: "stage failed")
         }
+    }
+
+    /**
+     * Open the system Save-As picker; on success copy the staged file to the
+     * URI the user picked. The PluginCall now only carries a short string
+     * (filename + stagePath) so the Binder transaction stays well below 1 MB.
+     */
+    @PluginMethod
+    fun save(call: PluginCall) {
+        val filename = call.getString("filename") ?: return call.reject("filename required")
+        val stagePath = call.getString("stagePath") ?: return call.reject("stagePath required")
+        if (!File(stagePath).exists()) return call.reject("staged file missing")
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -42,28 +59,28 @@ class GpxSaverPlugin : Plugin() {
 
     @ActivityCallback
     private fun onPickResult(call: PluginCall, result: ActivityResult) {
-        val cachePath = call.getString("cachePath")
-        val cacheFile = cachePath?.let { File(it) }
-        Log.d("GpxSaver", "onPickResult code=${result.resultCode} cachePath=$cachePath exists=${cacheFile?.exists()}")
+        val stagePath = call.getString("stagePath")
+        val staged = stagePath?.let { File(it) }
+        Log.d("GpxSaver", "onPickResult code=${result.resultCode} staged=${staged?.exists()}")
 
         if (result.resultCode != Activity.RESULT_OK) {
-            cacheFile?.delete()
+            staged?.delete()
             call.reject("save cancelled")
             return
         }
         val uri = result.data?.data
         if (uri == null) {
-            cacheFile?.delete()
+            staged?.delete()
             call.reject("picker returned no uri")
             return
         }
-        if (cacheFile == null || !cacheFile.exists()) {
+        if (staged == null || !staged.exists()) {
             call.reject("staged file missing")
             return
         }
 
         try {
-            val bytes = cacheFile.readBytes()
+            val bytes = staged.readBytes()
             context.contentResolver.openOutputStream(uri)?.use { os ->
                 os.write(bytes)
                 os.flush()
@@ -76,7 +93,7 @@ class GpxSaverPlugin : Plugin() {
             Log.e("GpxSaver", "write failed", e)
             call.reject(e.message ?: "write failed")
         } finally {
-            cacheFile.delete()
+            staged.delete()
         }
     }
 }
