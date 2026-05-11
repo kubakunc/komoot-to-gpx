@@ -1,4 +1,6 @@
-const KEY = 'komoot-to-gpx:session';
+import { Preferences } from '@capacitor/preferences';
+
+const KEY = 'gpx-exporter:session';
 
 export interface Session {
   email: string;
@@ -6,25 +8,24 @@ export interface Session {
   token: string;
 }
 
-export function getSession(): Session | null {
-  if (typeof localStorage === 'undefined') return null;
-  const raw = localStorage.getItem(KEY);
-  if (!raw) return null;
+export async function getSession(): Promise<Session | null> {
+  const { value } = await Preferences.get({ key: KEY });
+  if (!value) return null;
   try {
-    const parsed = JSON.parse(raw) as Session;
+    const parsed = JSON.parse(value) as Session;
     if (parsed.email && parsed.userId && parsed.token) return parsed;
   } catch {
-    /* ignore malformed */
+    /* corrupted */
   }
   return null;
 }
 
-export function setSession(s: Session): void {
-  localStorage.setItem(KEY, JSON.stringify(s));
+export async function setSession(s: Session): Promise<void> {
+  await Preferences.set({ key: KEY, value: JSON.stringify(s) });
 }
 
-export function clearSession(): void {
-  if (typeof localStorage !== 'undefined') localStorage.removeItem(KEY);
+export async function clearSession(): Promise<void> {
+  await Preferences.remove({ key: KEY });
 }
 
 export function authHeader(s: Session): string {
