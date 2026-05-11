@@ -1,21 +1,78 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/inter';
+
 :root {
-  --color-bg: #fafafa;
-  --color-fg: #222;
-  --color-accent: #1a73e8;
-  --color-border: #e0e0e0;
-  --color-error: #c62828;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-paper: #f4eee0;
+  --color-paper-warm: #ebe2cd;
+  --color-paper-edge: #ddd1b7;
+  --color-ink: #1c211a;
+  --color-ink-soft: #4a4f44;
+  --color-sage: #8a907e;
+  --color-terra: #b75941;
+  --color-terra-deep: #8a3e2a;
+  --color-forest: #2d4030;
+  --color-accent: var(--color-terra);
+  --color-error: #8a3e2a;
+
+  --border-subtle: rgba(28, 33, 26, 0.14);
+  --border-strong: rgba(28, 33, 26, 0.28);
+
+  --font-display: 'Fraunces Variable', Fraunces, Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
 }
 
 * { box-sizing: border-box; }
 
+html, body { margin: 0; min-height: 100%; }
+
 body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-fg);
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(circle at 20% 12%, rgba(183, 89, 65, 0.06), transparent 45%),
+    radial-gradient(circle at 85% 88%, rgba(45, 64, 48, 0.05), transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 39px,
+      rgba(28, 33, 26, 0.025) 39px 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 39px,
+      rgba(28, 33, 26, 0.025) 39px 40px
+    );
+  min-height: 100vh;
+  color: var(--color-ink);
 }
 
 button {
   cursor: pointer;
   font: inherit;
+  font-family: var(--font-body);
+}
+
+input, button, select, textarea { font-family: inherit; }
+
+a { color: inherit; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+::selection {
+  background: var(--color-terra);
+  color: var(--color-paper);
 }

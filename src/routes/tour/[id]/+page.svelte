@@ -58,7 +58,7 @@
     await import('leaflet/dist/leaflet.css');
 
     const latlngs = points.map((c) => [c.lat, c.lng] as [number, number]);
-    mapInstance = L.map(el, { scrollWheelZoom: true });
+    mapInstance = L.map(el, { scrollWheelZoom: true, zoomControl: true });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -69,14 +69,22 @@
       return;
     }
 
-    const line = L.polyline(latlngs, { color: '#1a73e8', weight: 4 }).addTo(mapInstance);
-    L.circleMarker(latlngs[0], { color: '#2e7d32', radius: 6, fillOpacity: 1 })
-      .bindTooltip('start')
-      .addTo(mapInstance);
-    L.circleMarker(latlngs[latlngs.length - 1], { color: '#c62828', radius: 6, fillOpacity: 1 })
-      .bindTooltip('koniec')
-      .addTo(mapInstance);
-    mapInstance.fitBounds(line.getBounds(), { padding: [20, 20] });
+    const shadow = L.polyline(latlngs, { color: 'rgba(28,33,26,0.35)', weight: 7, lineCap: 'round' });
+    const line = L.polyline(latlngs, { color: '#b75941', weight: 4, lineCap: 'round' });
+    shadow.addTo(mapInstance);
+    line.addTo(mapInstance);
+
+    L.circleMarker(latlngs[0], {
+      color: 'white', weight: 2,
+      fillColor: '#2d4030', fillOpacity: 1, radius: 7
+    }).bindTooltip('start', { permanent: false }).addTo(mapInstance);
+
+    L.circleMarker(latlngs[latlngs.length - 1], {
+      color: 'white', weight: 2,
+      fillColor: '#8a3e2a', fillOpacity: 1, radius: 7
+    }).bindTooltip('koniec', { permanent: false }).addTo(mapInstance);
+
+    mapInstance.fitBounds(line.getBounds(), { padding: [30, 30] });
   }
 
   function safeName(name: string): string {
@@ -123,7 +131,7 @@
   function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString('pl-PL', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric'
     });
   }
@@ -137,6 +145,16 @@
     return (m / 1000).toFixed(1) + ' km';
   }
 
+  function elevationGain(): string {
+    if (coords.length < 2) return '—';
+    let gain = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const d = (coords[i].alt ?? 0) - (coords[i - 1].alt ?? 0);
+      if (d > 0) gain += d;
+    }
+    return Math.round(gain) + ' m';
+  }
+
   function haversine(a: Coord, b: Coord): number {
     const R = 6371000;
     const toRad = (d: number) => (d * Math.PI) / 180;
@@ -146,6 +164,20 @@
       Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
     return 2 * R * Math.asin(Math.sqrt(x));
+  }
+
+  const sportLabel: Record<string, string> = {
+    racebike: 'szosa',
+    touringbicycle: 'gravel',
+    mtb: 'MTB',
+    hike: 'pieszo',
+    jogging: 'bieg',
+    e_racebike: 'e-szosa',
+    e_mtb: 'e-MTB',
+    e_touringbicycle: 'e-trekking'
+  };
+  function fmtSport(s: string): string {
+    return sportLabel[s] ?? s.replace(/_/g, ' ');
   }
 
   onMount(() => {
@@ -160,57 +192,163 @@
   });
 </script>
 
-<div class="header">
-  <a href="/" class="back">← lista</a>
-  {#if meta}
-    <h1>{meta.name}</h1>
-  {/if}
-</div>
+<a class="back" href="/">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+    <path d="M10 3l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  wróć do listy
+</a>
 
 {#if loading}
-  <p>Ładuję trasę…</p>
+  <p class="status">— Ładuję trasę… —</p>
 {:else if errorMsg}
   <p class="error">{errorMsg}</p>
 {:else if meta}
-  <div class="meta">
-    <span>{fmtDate(meta.date)}</span>
-    <span>·</span>
-    <span>{meta.sport}</span>
-    <span>·</span>
-    <span>{fmtDist()}</span>
-    <span>·</span>
-    <span>{coords.length} punktów</span>
-  </div>
+  <header class="hero">
+    <span class="kicker">{fmtSport(meta.sport)} · {fmtDate(meta.date)}</span>
+    <h1>{meta.name}</h1>
+  </header>
+
+  <dl class="stats">
+    <div>
+      <dt>dystans</dt>
+      <dd>{fmtDist()}</dd>
+    </div>
+    <div>
+      <dt>przewyższenie</dt>
+      <dd>{elevationGain()}</dd>
+    </div>
+    <div>
+      <dt>punkty GPS</dt>
+      <dd>{coords.length.toLocaleString('pl-PL')}</dd>
+    </div>
+    <div>
+      <dt>akcja</dt>
+      <dd>
+        <button class="download" onclick={downloadGpx} disabled={downloading}>
+          {#if downloading}
+            <span class="spinner" aria-hidden="true"></span>
+            pobieram…
+          {:else}
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M8 2v9m0 0l-3-3m3 3l3-3M3 14h10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            pobierz GPX
+          {/if}
+        </button>
+      </dd>
+    </div>
+  </dl>
 
   <div class="map" bind:this={mapEl}></div>
-
-  <button class="download" onclick={downloadGpx} disabled={downloading}>
-    {downloading ? 'pobieram…' : 'Pobierz GPX'}
-  </button>
 {/if}
 
 <style>
-  .header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; }
-  .back { color: var(--color-accent); text-decoration: none; }
-  .back:hover { text-decoration: underline; }
-  h1 { margin: 0; font-size: 1.4rem; }
-  .meta { display: flex; flex-wrap: wrap; gap: 0.4rem; color: #666; font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+  }
+  .back:hover { color: var(--color-terra); }
+
+  .hero { margin-bottom: 1.2rem; }
+  .kicker {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-terra);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  h1 { margin: 0; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1.1rem 0;
+    margin: 1.5rem 0;
+  }
+  .stats > div { display: flex; flex-direction: column; gap: 0.3rem; }
+  dt {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-sage);
+    font-weight: 600;
+  }
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--color-ink);
+    line-height: 1;
+    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  }
+  dd:has(.download) { font-family: var(--font-body); font-size: inherit; }
+
+  .download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border: 0;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .download:hover { background: var(--color-terra); }
+  .download:active { transform: scale(0.97); }
+  .download:disabled { opacity: 0.6; cursor: progress; }
+
   .map {
     width: 100%;
     height: 60vh;
-    min-height: 320px;
-    border: 1px solid var(--color-border);
+    min-height: 360px;
+    border: 1px solid var(--border-subtle);
     border-radius: 6px;
     overflow: hidden;
+    box-shadow: 0 24px 50px -30px rgba(28, 33, 26, 0.35);
   }
-  .download {
-    margin-top: 1rem;
-    padding: 0.6rem 1rem;
-    background: var(--color-accent);
-    color: white;
-    border: 0;
-    border-radius: 4px;
+
+  .spinner {
+    width: 10px; height: 10px;
+    border: 1.5px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
   }
-  .download:disabled { opacity: 0.5; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status, .error {
+    text-align: center;
+    color: var(--color-sage);
+    letter-spacing: 0.06em;
+    margin: 3rem 0;
+  }
   .error { color: var(--color-error); }
+
+  :global(.leaflet-container) {
+    font-family: var(--font-body);
+    background: var(--color-paper-warm) !important;
+  }
+  :global(.leaflet-control-zoom a) {
+    background: var(--color-paper) !important;
+    color: var(--color-ink) !important;
+    border-color: var(--border-subtle) !important;
+  }
 </style>
