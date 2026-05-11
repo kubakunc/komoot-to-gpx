@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { nativeLogin, AuthUnsupportedError, AuthCancelledError } from '$lib/client/komoot-auth';
   import { setSession } from '$lib/client/session';
+  import { consumePendingShare } from '$lib/client/share-intent';
 
   let errorMsg = $state<string | null>(null);
   let busy = $state(false);
@@ -12,7 +13,8 @@
     try {
       const { userId, token, email } = await nativeLogin();
       await setSession({ userId, token, email });
-      await goto('/', { replaceState: true });
+      const pending = consumePendingShare();
+      await goto(pending ? `/tour/${pending}` : '/', { replaceState: true });
     } catch (e) {
       if (e instanceof AuthUnsupportedError) {
         errorMsg = 'Open this in the Android app to sign in.';

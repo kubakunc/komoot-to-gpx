@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
   import { getSession, clearSession } from '$lib/client/session';
   import { initAds } from '$lib/client/ad-banner';
+  import { readShareHash, setPendingShare } from '$lib/client/share-intent';
   import '../app.css';
 
   let { children } = $props();
@@ -12,17 +13,35 @@
   let userLabel = $state<string | null>(null);
   let bootError = $state<string | null>(null);
 
+  async function handleShareHash() {
+    const tourId = readShareHash(window.location.hash);
+    if (!tourId) return false;
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    const s = await getSession();
+    if (s) {
+      await goto(`/tour/${tourId}`);
+    } else {
+      setPendingShare(tourId);
+      await goto('/login', { replaceState: true });
+    }
+    return true;
+  }
+
   onMount(async () => {
     try {
       void initAds();
       const s = await getSession();
       userLabel = s?.email ?? null;
-      const path = $page.url.pathname;
-      if (!s && path !== '/login') {
-        await goto('/login', { replaceState: true });
-      } else if (s && path === '/login') {
-        await goto('/', { replaceState: true });
+      const handled = await handleShareHash();
+      if (!handled) {
+        const path = $page.url.pathname;
+        if (!s && path !== '/login') {
+          await goto('/login', { replaceState: true });
+        } else if (s && path === '/login') {
+          await goto('/', { replaceState: true });
+        }
       }
+      window.addEventListener('hashchange', () => { void handleShareHash(); });
     } catch (e) {
       const err = e as Error;
       bootError = `${err?.name ?? 'Error'}: ${err?.message ?? String(e)}\n${err?.stack ?? ''}`;
