@@ -1,7 +1,10 @@
-import { CapacitorHttp } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
-const BASE = 'https://api.komoot.de';
-const ACCEPT = 'application/hal+json,application/json';
+interface KomootApiPlugin {
+  get(opts: { path: string; token: string }): Promise<{ status: number; body: string }>;
+}
+
+const KomootApi = registerPlugin<KomootApiPlugin>('KomootApi');
 
 export class KomootError extends Error {
   readonly name = 'KomootError';
@@ -18,12 +21,17 @@ export interface KomootAuth {
   token: string;
 }
 
-const basic = (email: string, secret: string) => 'Basic ' + btoa(`${email}:${secret}`);
-
-function failIfNotOk(status: number, label: string): void {
-  if (status >= 200 && status < 300) return;
-  const mapped = status >= 500 ? 502 : status;
-  throw new KomootError(`${label} failed (komoot returned ${status})`, mapped);
+async function apiGet<T>(path: string, token: string, label: string): Promise<T> {
+  const { status, body } = await KomootApi.get({ path, token });
+  if (status < 200 || status >= 300) {
+    const mapped = status >= 500 ? 502 : status;
+    throw new KomootError(`${label} failed (komoot returned ${status})`, mapped);
+  }
+  try {
+    return JSON.parse(body) as T;
+  } catch {
+    throw new KomootError(`${label}: invalid JSON response`, 502);
+  }
 }
 
 export interface TourSummary {
@@ -69,13 +77,11 @@ export async function listTours(
     page: String(opts.page),
     limit: String(limit)
   });
-  const res = await CapacitorHttp.request({
-    method: 'GET',
-    url: `${BASE}/v007/users/${encodeURIComponent(opts.userId)}/tours/?${qs}`,
-    headers: { Authorization: basic(auth.email, auth.token), Accept: ACCEPT }
-  });
-  failIfNotOk(res.status, 'listTours');
-  const body = res.data as ToursResponse;
+  const body = await apiGet<ToursResponse>(
+    `/v007/users/${encodeURIComponent(opts.userId)}/tours/?${qs}`,
+    auth.token,
+    'listTours'
+  );
   return {
     tours: (body._embedded?.tours ?? []).map(toSummary),
     page: body.page?.number ?? opts.page,
@@ -91,13 +97,11 @@ export interface TourMetadata {
 }
 
 export async function getTour(auth: KomootAuth, tourId: string): Promise<TourMetadata> {
-  const res = await CapacitorHttp.request({
-    method: 'GET',
-    url: `${BASE}/v007/tours/${encodeURIComponent(tourId)}`,
-    headers: { Authorization: basic(auth.email, auth.token), Accept: ACCEPT }
-  });
-  failIfNotOk(res.status, 'getTour');
-  const raw = res.data as Record<string, unknown>;
+  const raw = await apiGet<Record<string, unknown>>(
+    `/v007/tours/${encodeURIComponent(tourId)}`,
+    auth.token,
+    'getTour'
+  );
   return {
     id: String(raw.id),
     name: String(raw.name ?? 'untitled'),
@@ -118,13 +122,11 @@ export async function getCoordinates(
   tourId: string,
   startTimeIso: string
 ): Promise<Coordinate[]> {
-  const res = await CapacitorHttp.request({
-    method: 'GET',
-    url: `${BASE}/v007/tours/${encodeURIComponent(tourId)}/coordinates`,
-    headers: { Authorization: basic(auth.email, auth.token), Accept: ACCEPT }
-  });
-  failIfNotOk(res.status, 'getCoordinates');
-  const body = res.data as { items?: Array<Record<string, unknown>> };
+  const body = await apiGet<{ items?: Array<Record<string, unknown>> }>(
+    `/v007/tours/${encodeURIComponent(tourId)}/coordinates`,
+    auth.token,
+    'getCoordinates'
+  );
   if (!body.items) return [];
   const start = Date.parse(startTimeIso);
   return body.items.map((p) => {

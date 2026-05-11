@@ -7,6 +7,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(KomootAuthPlugin.class);
+        registerPlugin(KomootApiPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
