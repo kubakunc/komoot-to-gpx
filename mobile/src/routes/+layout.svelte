@@ -10,21 +10,25 @@
 
   let ready = $state(false);
   let userLabel = $state<string | null>(null);
+  let bootError = $state<string | null>(null);
 
   onMount(async () => {
-    void initAds();
-    const s = await getSession();
-    const path = $page.url.pathname;
-    if (!s && path !== '/login') {
-      goto('/login', { replaceState: true });
-      return;
+    try {
+      void initAds();
+      const s = await getSession();
+      userLabel = s?.email ?? null;
+      const path = $page.url.pathname;
+      if (!s && path !== '/login') {
+        await goto('/login', { replaceState: true });
+      } else if (s && path === '/login') {
+        await goto('/', { replaceState: true });
+      }
+    } catch (e) {
+      const err = e as Error;
+      bootError = `${err?.name ?? 'Error'}: ${err?.message ?? String(e)}\n${err?.stack ?? ''}`;
+    } finally {
+      ready = true;
     }
-    if (s && path === '/login') {
-      goto('/', { replaceState: true });
-      return;
-    }
-    userLabel = s?.email ?? null;
-    ready = true;
   });
 
   async function signOut() {
@@ -54,7 +58,12 @@
   </div>
 </header>
 
-{#if ready}
+{#if bootError}
+  <main>
+    <h2>Boot error</h2>
+    <pre style="white-space: pre-wrap; font-size: 0.75rem; color: #c00; background: #fff5f5; padding: 1rem; border-radius: 4px;">{bootError}</pre>
+  </main>
+{:else if ready}
   <main>
     {@render children()}
   </main>
