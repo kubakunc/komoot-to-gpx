@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <!-- Play Store feature graphic: 1024×500, with Komoot-green brand accent. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f0f0f0" />
+    </linearGradient>
+    <linearGradient id="markBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7BBE26" />
+      <stop offset="100%" stop-color="#5C9319" />
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#bg)" />
+
+  <!-- Green decorative band running diagonally -->
+  <polygon points="0,500 0,420 1024,260 1024,360 200,500" fill="#6AAB1E" opacity="0.10" />
+
+  <!-- Dot grid -->
+  <g fill="rgba(0,0,0,0.06)">
+    <g id="dots">
+      <circle cx="32" cy="32" r="2" /><circle cx="96" cy="32" r="2" /><circle cx="160" cy="32" r="2" />
+      <circle cx="224" cy="32" r="2" /><circle cx="288" cy="32" r="2" /><circle cx="352" cy="32" r="2" />
+      <circle cx="416" cy="32" r="2" /><circle cx="480" cy="32" r="2" /><circle cx="544" cy="32" r="2" />
+      <circle cx="608" cy="32" r="2" /><circle cx="672" cy="32" r="2" /><circle cx="736" cy="32" r="2" />
+      <circle cx="800" cy="32" r="2" /><circle cx="864" cy="32" r="2" /><circle cx="928" cy="32" r="2" />
+      <circle cx="992" cy="32" r="2" />
+    </g>
+    <use href="#dots" y="64" /><use href="#dots" y="128" /><use href="#dots" y="192" />
+    <use href="#dots" y="256" /><use href="#dots" y="320" /><use href="#dots" y="384" />
+    <use href="#dots" y="448" />
+  </g>
+
+  <!-- Left side: brand text -->
+  <g transform="translate(80 0)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif">
+    <!-- Green brand mark (matching app icon) -->
+    <g transform="translate(0 120)">
+      <rect width="72" height="72" rx="16" ry="16" fill="url(#markBg)" />
+      <g transform="translate(36 36)">
+        <path d="M -22 12 C -14 4, -8 18, -2 8 S 12 -10, 18 -6 L 22 -12"
+              fill="none" stroke="#ffffff" stroke-width="3.4"
+              stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="-22" cy="12" r="3" fill="#5C9319" stroke="#ffffff" stroke-width="1.6" />
+        <circle cx="22" cy="-12" r="3" fill="#ffffff" />
+      </g>
+    </g>
+
+    <text x="0" y="270" font-size="68" font-weight="700" fill="#0a0a0a" letter-spacing="-1.5">
+      Export GPX
+    </text>
+    <text x="0" y="335" font-size="40" font-weight="500" fill="#5C9319" letter-spacing="-0.5">
+      for Komoot
+    </text>
+    <text x="0" y="390" font-size="22" fill="#525252">
+      Your private tours, ready for your watch or bike computer.
+    </text>
+  </g>
+
+  <!-- Right side: stylized phone showing a route -->
+  <g transform="translate(680 56)">
+    <rect x="0" y="0" width="240" height="396" rx="32" ry="32"
+          fill="#ffffff" stroke="#d4d4d4" stroke-width="2"
+          filter="drop-shadow(0 10px 30px rgba(0,0,0,0.1))" />
+    <rect x="12" y="12" width="216" height="372" rx="20" ry="20" fill="#fafafa" />
+
+    <rect x="12" y="12" width="216" height="36" rx="20" ry="20" fill="#ffffff" />
+    <rect x="12" y="32" width="216" height="16" fill="#ffffff" />
+    <text x="120" y="36" text-anchor="middle" font-family="-apple-system, sans-serif"
+          font-size="11" font-weight="600" fill="#0a0a0a">Export GPX</text>
+
+    <rect x="22" y="62" width="196" height="200" rx="10" fill="#ffffff" stroke="#e8e8e8" />
+    <rect x="22" y="62" width="196" height="86" rx="10" fill="#f4f4f5" />
+    <g transform="translate(120 105)">
+      <path d="M -64 22 C -38 -8, -10 30, 10 8 S 38 -14, 60 -22"
+            fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="-64" cy="22" r="3.5" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.6" />
+      <circle cx="60" cy="-22" r="3.5" fill="#0a0a0a" />
+    </g>
+    <rect x="36" y="160" width="40" height="14" rx="7" fill="#0a0a0a" />
+    <rect x="80" y="160" width="44" height="14" rx="7" fill="#ffffff" stroke="#6AAB1E" />
+    <text x="56" y="170" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#ffffff">Road</text>
+    <text x="102" y="170" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#6AAB1E">Private</text>
+    <rect x="36" y="184" width="140" height="10" rx="2" fill="#0a0a0a" opacity="0.7" />
+    <rect x="36" y="200" width="100" height="8" rx="2" fill="#737373" opacity="0.5" />
+    <rect x="36" y="232" width="80" height="20" rx="4" fill="#ffffff" stroke="#e5e5e5" />
+    <text x="76" y="246" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#525252">Komoot ↗</text>
+    <rect x="124" y="232" width="56" height="20" rx="4" fill="#0a0a0a" />
+    <text x="152" y="246" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#ffffff">GPX</text>
+
+    <rect x="22" y="280" width="196" height="100" rx="10" fill="#ffffff" stroke="#e8e8e8" />
+    <rect x="22" y="280" width="196" height="60" rx="10" fill="#f4f4f5" />
+    <g transform="translate(120 312)">
+      <path d="M -50 18 C -28 0, -10 14, 8 -8 S 30 -10, 50 -16"
+            fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+</svg>

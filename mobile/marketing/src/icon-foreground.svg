@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 432 432" width="432" height="432">
+  <!--
+    Adaptive icon foreground for Export GPX for Komoot.
+    Background is the Komoot olive green (#6AAB1E) defined in colors.xml.
+    Safe zone: the inner 264×264 centered (Android trims/masks the rest).
+    Foreground: white GPS route across the canvas + white "export" badge.
+  -->
+  <g transform="translate(216 216)">
+    <!-- Route line shadow + main stroke (white on green) -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M -84 38 C -56 12, -32 70, -6 30 S 44 -34, 72 -18 L 92 -42"
+            stroke="rgba(0,0,0,0.18)" stroke-width="24" />
+      <path d="M -84 38 C -56 12, -32 70, -6 30 S 44 -34, 72 -18 L 92 -42"
+            stroke="#ffffff" stroke-width="14" />
+    </g>
+
+    <!-- Start marker (outlined ring) -->
+    <circle cx="-84" cy="38" r="13" fill="#6AAB1E" stroke="#ffffff" stroke-width="6" />
+    <!-- End marker (filled white) -->
+    <circle cx="92" cy="-42" r="13" fill="#ffffff" />
+
+    <!-- Export arrow badge -->
+    <g transform="translate(70 70)">
+      <circle r="34" fill="#ffffff" />
+      <path d="M 0 -14 L 0 12 M -10 2 L 0 14 L 10 2"
+            fill="none" stroke="#6AAB1E" stroke-width="6"
+            stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+</svg>
