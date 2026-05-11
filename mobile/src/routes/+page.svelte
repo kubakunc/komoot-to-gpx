@@ -8,7 +8,7 @@
   } from '$lib/client/komoot';
   import { toGpx } from '$lib/client/gpx';
   import MiniMap from '$lib/client/MiniMap.svelte';
-  import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+  import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
 
   let tours = $state<TourSummary[]>([]);
@@ -91,15 +91,13 @@
         coords
       );
       const filename = safeName(meta.name) + '.gpx';
-      await Filesystem.writeFile({
-        path: filename,
-        data: xml,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-        recursive: true
-      });
-      errorMsg = `Saved to Documents/${filename}`;
+      await saveGpxFile(filename, xml);
+      errorMsg = `Saved ${filename}`;
     } catch (err) {
+      if (err instanceof SaveCancelledError) {
+        errorMsg = null;
+        return;
+      }
       if (err instanceof KomootError && err.status === 401) {
         await clearSession();
         await goto('/login', { replaceState: true });

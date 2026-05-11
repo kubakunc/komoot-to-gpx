@@ -8,6 +8,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(KomootAuthPlugin.class);
         registerPlugin(KomootApiPlugin.class);
+        registerPlugin(GpxSaverPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

@@ -5,7 +5,7 @@
   import { getSession, clearSession } from '$lib/client/session';
   import { getTour, getCoordinates, KomootError, type Coordinate, type TourMetadata } from '$lib/client/komoot';
   import { toGpx } from '$lib/client/gpx';
-  import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+  import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
 
   let meta = $state<TourMetadata | null>(null);
   let coords = $state<Coordinate[]>([]);
@@ -66,15 +66,10 @@
     try {
       const xml = toGpx({ name: meta.name, sport: meta.sport, startTimeIso: meta.date }, coords);
       const filename = safeName(meta.name) + '.gpx';
-      await Filesystem.writeFile({
-        path: filename,
-        data: xml,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-        recursive: true
-      });
-      errorMsg = `Saved to Documents/${filename}`;
-    } catch {
+      await saveGpxFile(filename, xml);
+      errorMsg = `Saved ${filename}`;
+    } catch (err) {
+      if (err instanceof SaveCancelledError) { errorMsg = null; return; }
       errorMsg = 'Download failed.';
     } finally { downloading = false; }
   }
