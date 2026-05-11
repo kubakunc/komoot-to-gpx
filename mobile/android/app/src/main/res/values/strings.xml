@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Export GPX for Komoot</string>
+    <string name="title_activity_main">Export GPX for Komoot</string>
+    <string name="package_name">com.velologiclabs.gpxexporter</string>
+    <string name="custom_url_scheme">com.velologiclabs.gpxexporter</string>
+</resources>
