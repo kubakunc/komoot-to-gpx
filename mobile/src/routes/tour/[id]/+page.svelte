@@ -6,6 +6,9 @@
   import { getTour, getCoordinates, KomootError, type Coordinate, type TourMetadata } from '$lib/client/komoot';
   import { toGpx } from '$lib/client/gpx';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
+  import SavedModal from '$lib/client/SavedModal.svelte';
+
+  let savedModalFilename = $state<string | null>(null);
 
   let meta = $state<TourMetadata | null>(null);
   let coords = $state<Coordinate[]>([]);
@@ -67,7 +70,7 @@
       const xml = toGpx({ name: meta.name, sport: meta.sport, startTimeIso: meta.date }, coords);
       const filename = safeName(meta.name) + '.gpx';
       await saveGpxFile(filename, xml);
-      errorMsg = `Saved ${filename}`;
+      savedModalFilename = filename;
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
       errorMsg = 'Download failed.';
@@ -128,6 +131,10 @@
   </dl>
 
   <div class="map" bind:this={mapEl}></div>
+{/if}
+
+{#if savedModalFilename}
+  <SavedModal filename={savedModalFilename} onClose={() => (savedModalFilename = null)} />
 {/if}
 
 <style>

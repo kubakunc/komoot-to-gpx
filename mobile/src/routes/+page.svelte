@@ -8,8 +8,11 @@
   } from '$lib/client/komoot';
   import { toGpx } from '$lib/client/gpx';
   import MiniMap from '$lib/client/MiniMap.svelte';
+  import SavedModal from '$lib/client/SavedModal.svelte';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
+
+  let savedModalFilename = $state<string | null>(null);
 
   let tours = $state<TourSummary[]>([]);
   let page = $state(0);
@@ -92,7 +95,7 @@
       );
       const filename = safeName(meta.name) + '.gpx';
       await saveGpxFile(filename, xml);
-      errorMsg = `Saved ${filename}`;
+      savedModalFilename = filename;
     } catch (err) {
       if (err instanceof SaveCancelledError) {
         errorMsg = null;
@@ -174,6 +177,10 @@
     </li>
   {/each}
 </ul>
+
+{#if savedModalFilename}
+  <SavedModal filename={savedModalFilename} onClose={() => (savedModalFilename = null)} />
+{/if}
 
 {#if page + 1 < totalPages}
   <button class="more" onclick={() => loadPage(page + 1)} disabled={loading}>
