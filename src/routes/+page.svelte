@@ -38,7 +38,7 @@
         return;
       }
       if (!res.ok) {
-        errorMsg = 'Nie udało się załadować tras.';
+        errorMsg = 'Failed to load tours.';
         return;
       }
       const data = (await res.json()) as { tours: TourSummary[]; totalPages: number; page: number };
@@ -116,7 +116,7 @@
         return;
       }
       if (!res.ok) {
-        errorMsg = 'Pobieranie nie powiodło się.';
+        errorMsg = 'Download failed.';
         return;
       }
       const blob = await res.blob();
@@ -134,19 +134,19 @@
   }
 
   const sportLabel: Record<string, string> = {
-    racebike: 'szosa',
-    touringbicycle: 'gravel',
+    racebike: 'Road',
+    touringbicycle: 'Gravel',
     mtb: 'MTB',
-    hike: 'pieszo',
-    jogging: 'bieg',
-    e_racebike: 'e-szosa',
-    e_mtb: 'e-MTB',
-    e_touringbicycle: 'e-trekking'
+    hike: 'Hike',
+    jogging: 'Run',
+    e_racebike: 'E-Road',
+    e_mtb: 'E-MTB',
+    e_touringbicycle: 'E-Trekking'
   };
 
   function fmtDate(iso: string): string {
     const d = new Date(iso);
-    return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function fmtDist(m: number): string {
@@ -157,75 +157,97 @@
     return sportLabel[s] ?? s.replace(/_/g, ' ');
   }
 
+  const komootUrl = (id: string) => `https://www.komoot.com/tour/${id}`;
+
   onMount(() => loadPage(0));
 </script>
 
 <section class="intro">
-  <span class="kicker">archiwum tras</span>
-  <h1>Twój dziennik wypraw.</h1>
+  <h1>Your tours.</h1>
   <p class="lede">
-    Wszystkie zapisane i zaplanowane trasy z Twojego konta Komoot —
-    gotowe do pobrania jako pliki GPX dla Twojego zegarka, komputera rowerowego lub innej aplikacji.
+    Every recorded and planned route from your Komoot account &mdash; ready to download as
+    GPX for your watch, bike computer, or any other app.
   </p>
 </section>
 
 {#if errorMsg}<p class="error">{errorMsg}</p>{/if}
 
 {#if tours.length === 0 && !loading}
-  <p class="empty">— Brak tras. —</p>
+  <p class="empty">No tours yet.</p>
 {/if}
 
 <ul class="tours">
   {#each tours as t, i (t.id)}
-    <li class="card" style="animation-delay: {Math.min(i, 8) * 35}ms" use:observeCard={t.id}>
-      <a class="card-link" href={`/tour/${t.id}`} aria-label={`Otwórz: ${t.name}`}>
+    <li class="card" style="animation-delay: {Math.min(i, 8) * 30}ms" use:observeCard={t.id}>
+      <a class="card-link" href={`/tour/${t.id}`} aria-label={`Open ${t.name}`}>
         <div class="card-map">
           {#if shapes[t.id] && shapes[t.id] !== 'loading' && shapes[t.id] !== 'error'}
             <MiniMap coords={shapes[t.id] as Coord[]} />
           {:else if shapes[t.id] === 'error'}
-            <div class="map-fallback">trasa niedostępna</div>
+            <div class="map-fallback">preview unavailable</div>
           {:else}
             <div class="map-skeleton" aria-hidden="true"></div>
           {/if}
-          <span class="status-pill" class:public={t.status === 'public'}>{t.status === 'public' ? 'publiczna' : 'prywatna'}</span>
         </div>
         <div class="card-body">
-          <span class="card-eyebrow">{fmtSport(t.sport)} · {t.type === 'tour_planned' ? 'plan' : 'przejechana'}</span>
+          <div class="card-meta">
+            <span class="badge">{fmtSport(t.sport)}</span>
+            <span class="badge badge-status" class:badge-public={t.status === 'public'}>
+              {t.status === 'public' ? 'Public' : 'Private'}
+            </span>
+            <span class="badge badge-light">{t.type === 'tour_planned' ? 'Planned' : 'Completed'}</span>
+          </div>
           <strong class="card-title">{t.name}</strong>
           <div class="card-stats">
             <span class="stat">
               <span class="stat-num">{fmtDist(t.distance)}</span>
-              <span class="stat-lbl">dystans</span>
+              <span class="stat-lbl">Distance</span>
             </span>
             <span class="stat">
               <span class="stat-num">{fmtDate(t.date)}</span>
-              <span class="stat-lbl">data</span>
+              <span class="stat-lbl">Date</span>
             </span>
           </div>
         </div>
       </a>
-      <button class="gpx-btn" onclick={(e) => download(t, e)} disabled={downloading === t.id}>
-        {#if downloading === t.id}
-          <span class="spinner" aria-hidden="true"></span>
-          pobieram
-        {:else}
-          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M8 2v9m0 0l-3-3m3 3l3-3M3 14h10" stroke-linecap="round" stroke-linejoin="round" />
+      <div class="card-actions">
+        <a
+          class="action action-secondary"
+          href={komootUrl(t.id)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick={(e) => e.stopPropagation()}
+          aria-label="Open in Komoot"
+          title="Open in Komoot"
+        >
+          <svg width="13" height="13" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M4 2h6v6M10 2L4 8M2 5v5h5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          GPX
-        {/if}
-      </button>
+          Komoot
+        </a>
+        <button class="action action-primary" onclick={(e) => download(t, e)} disabled={downloading === t.id}>
+          {#if downloading === t.id}
+            <span class="spinner" aria-hidden="true"></span>
+            Downloading
+          {:else}
+            <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M8 2v9m0 0l-3-3m3 3l3-3M3 14h10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            GPX
+          {/if}
+        </button>
+      </div>
     </li>
   {/each}
 </ul>
 
 {#if loading && tours.length === 0}
-  <p class="loading-msg">— Pobieram listę… —</p>
+  <p class="loading-msg">Loading tours…</p>
 {/if}
 
 {#if page + 1 < totalPages}
   <button class="more" onclick={() => loadPage(page + 1)} disabled={loading}>
-    {loading ? 'ładuję…' : 'pokaż starsze trasy'}
+    {loading ? 'Loading…' : 'Show more'}
   </button>
 {/if}
 
@@ -234,21 +256,12 @@
     margin-bottom: 2.5rem;
     max-width: 640px;
   }
-  .kicker {
-    display: inline-block;
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-terra);
-    font-weight: 600;
-    margin-bottom: 0.4rem;
-  }
   .lede {
-    color: var(--color-ink-soft);
+    color: var(--color-fg-muted);
     line-height: 1.55;
-    font-size: 1.02rem;
-    margin: 0.6rem 0 0;
-    max-width: 50ch;
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
+    max-width: 56ch;
   }
 
   .tours {
@@ -262,150 +275,169 @@
 
   .card {
     position: relative;
-    background: var(--color-paper);
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
     overflow: hidden;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    animation: fadeUp 0.5s ease both;
-    box-shadow: 0 1px 0 rgba(28, 33, 26, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    animation: fadeUp 0.4s ease both;
+    display: flex;
+    flex-direction: column;
   }
   .card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-    box-shadow: 0 12px 28px -16px rgba(28, 33, 26, 0.3);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .card-link {
-    display: block;
-    text-decoration: none;
+    display: flex;
+    flex-direction: column;
     color: inherit;
+    flex: 1;
   }
 
-  .card-map {
-    position: relative;
-    background: var(--color-paper-warm);
-    border-bottom: 1px solid var(--border-subtle);
-  }
+  .card-map { position: relative; }
   .map-skeleton {
     width: 100%;
-    aspect-ratio: 320 / 96;
+    aspect-ratio: 320 / 112;
     background:
-      linear-gradient(120deg, transparent 30%, rgba(28, 33, 26, 0.05) 50%, transparent 70%),
-      var(--color-paper-warm);
+      linear-gradient(90deg, transparent 30%, rgba(0, 0, 0, 0.04) 50%, transparent 70%),
+      var(--color-bg-soft);
     background-size: 200% 100%;
     animation: shimmer 1.6s ease-in-out infinite;
+    border-bottom: 1px solid var(--color-border);
   }
   .map-fallback {
     width: 100%;
-    aspect-ratio: 320 / 96;
+    aspect-ratio: 320 / 112;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-sage);
+    color: var(--color-fg-subtle);
     font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    text-transform: lowercase;
-    background: var(--color-paper-warm);
+    background: var(--color-bg-soft);
+    border-bottom: 1px solid var(--color-border);
   }
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
 
-  .status-pill {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(244, 238, 224, 0.94);
-    color: var(--color-terra-deep);
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 600;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    border: 1px solid var(--border-subtle);
-    backdrop-filter: blur(2px);
-  }
-  .status-pill.public {
-    color: var(--color-forest);
-  }
-
   .card-body {
-    padding: 0.9rem 1rem 1.05rem;
+    padding: 0.95rem 1.1rem 0.75rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
-  .card-eyebrow {
-    display: block;
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.55rem;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 0.5rem;
     font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-sage);
-    margin-bottom: 0.35rem;
     font-weight: 500;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-soft);
+    color: var(--color-fg-muted);
+    border: 1px solid var(--color-border);
+    letter-spacing: 0.01em;
+  }
+  .badge-status {
+    background: var(--color-fg);
+    color: var(--color-bg);
+    border-color: var(--color-fg);
+  }
+  .badge-public {
+    background: var(--color-bg);
+    color: var(--color-success);
+    border-color: var(--color-success);
+  }
+  .badge-light {
+    background: var(--color-bg);
   }
   .card-title {
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: 1.15rem;
-    line-height: 1.25;
-    letter-spacing: -0.005em;
-    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--color-fg);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin: 0;
-    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+    margin: 0 0 0.65rem;
   }
   .card-stats {
     display: flex;
     gap: 1.2rem;
-    margin-top: 0.7rem;
+    margin-top: auto;
     padding-top: 0.7rem;
-    border-top: 1px dashed var(--border-subtle);
+    border-top: 1px solid var(--color-border);
   }
-  .stat { display: flex; flex-direction: column; gap: 0.1rem; }
+  .stat { display: flex; flex-direction: column; gap: 0.05rem; }
   .stat-num {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    color: var(--color-ink);
-    font-variation-settings: 'opsz' 36;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-fg);
+    letter-spacing: -0.01em;
   }
   .stat-lbl {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-sage);
+    font-size: 0.7rem;
+    color: var(--color-fg-subtle);
+    font-weight: 500;
   }
 
-  .gpx-btn {
-    position: absolute;
-    bottom: 0.9rem;
-    right: 1rem;
+  .card-actions {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0 1.1rem 1rem;
+  }
+
+  .action {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.35rem;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    border: 0;
-    border-radius: 999px;
-    padding: 0.4rem 0.85rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 600;
-    transition: background 0.15s, transform 0.15s;
+    height: 32px;
+    padding: 0 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+    cursor: pointer;
   }
-  .gpx-btn:hover { background: var(--color-terra); }
-  .gpx-btn:active { transform: scale(0.96); }
-  .gpx-btn:disabled { opacity: 0.6; cursor: progress; }
+  .action-primary {
+    background: var(--color-fg);
+    color: var(--color-bg);
+    flex: 1;
+  }
+  .action-primary:hover { background: var(--color-accent); }
+  .action-primary:active { transform: scale(0.98); }
+  .action-primary:disabled { opacity: 0.6; cursor: progress; }
+  .action-secondary {
+    background: var(--color-bg);
+    color: var(--color-fg-muted);
+    border-color: var(--color-border);
+  }
+  .action-secondary:hover {
+    color: var(--color-fg);
+    border-color: var(--color-fg);
+    background: var(--color-bg-soft);
+  }
 
   .spinner {
     width: 10px; height: 10px;
@@ -419,22 +451,24 @@
   .more {
     display: block;
     margin: 2.5rem auto 0;
-    padding: 0.7rem 1.6rem;
-    background: transparent;
-    color: var(--color-ink);
-    border: 1px solid var(--border-strong);
-    border-radius: 999px;
+    padding: 0.65rem 1.4rem;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
     font-size: 0.85rem;
-    letter-spacing: 0.06em;
-    transition: background 0.15s, color 0.15s;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .more:hover { background: var(--color-ink); color: var(--color-paper); }
+  .more:hover {
+    background: var(--color-bg-soft);
+    border-color: var(--color-border-strong);
+  }
 
   .error { color: var(--color-error); }
   .empty, .loading-msg {
     text-align: center;
-    color: var(--color-sage);
-    letter-spacing: 0.06em;
+    color: var(--color-fg-subtle);
     margin: 3rem 0;
   }
 </style>

@@ -40,14 +40,14 @@
         return;
       }
       if (!res.ok) {
-        errorMsg = 'Nie udało się załadować trasy.';
+        errorMsg = 'Failed to load tour.';
         return;
       }
       const data = (await res.json()) as { meta: Meta; coords: Coord[] };
       meta = data.meta;
       coords = data.coords;
     } catch {
-      errorMsg = 'Brak połączenia.';
+      errorMsg = 'Network error.';
     } finally {
       loading = false;
     }
@@ -69,20 +69,20 @@
       return;
     }
 
-    const shadow = L.polyline(latlngs, { color: 'rgba(28,33,26,0.35)', weight: 7, lineCap: 'round' });
-    const line = L.polyline(latlngs, { color: '#b75941', weight: 4, lineCap: 'round' });
+    const shadow = L.polyline(latlngs, { color: 'rgba(0,0,0,0.18)', weight: 7, lineCap: 'round' });
+    const line = L.polyline(latlngs, { color: '#0a0a0a', weight: 3.5, lineCap: 'round' });
     shadow.addTo(mapInstance);
     line.addTo(mapInstance);
 
     L.circleMarker(latlngs[0], {
-      color: 'white', weight: 2,
-      fillColor: '#2d4030', fillOpacity: 1, radius: 7
-    }).bindTooltip('start', { permanent: false }).addTo(mapInstance);
+      color: '#0a0a0a', weight: 2,
+      fillColor: '#ffffff', fillOpacity: 1, radius: 7
+    }).bindTooltip('Start', { permanent: false }).addTo(mapInstance);
 
     L.circleMarker(latlngs[latlngs.length - 1], {
-      color: 'white', weight: 2,
-      fillColor: '#8a3e2a', fillOpacity: 1, radius: 7
-    }).bindTooltip('koniec', { permanent: false }).addTo(mapInstance);
+      color: '#ffffff', weight: 2,
+      fillColor: '#0a0a0a', fillOpacity: 1, radius: 7
+    }).bindTooltip('Finish', { permanent: false }).addTo(mapInstance);
 
     mapInstance.fitBounds(line.getBounds(), { padding: [30, 30] });
   }
@@ -111,7 +111,7 @@
         return;
       }
       if (!res.ok) {
-        errorMsg = 'Pobieranie nie powiodło się.';
+        errorMsg = 'Download failed.';
         return;
       }
       const blob = await res.blob();
@@ -129,7 +129,7 @@
   }
 
   function fmtDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('pl-PL', {
+    return new Date(iso).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -167,18 +167,20 @@
   }
 
   const sportLabel: Record<string, string> = {
-    racebike: 'szosa',
-    touringbicycle: 'gravel',
+    racebike: 'Road',
+    touringbicycle: 'Gravel',
     mtb: 'MTB',
-    hike: 'pieszo',
-    jogging: 'bieg',
-    e_racebike: 'e-szosa',
-    e_mtb: 'e-MTB',
-    e_touringbicycle: 'e-trekking'
+    hike: 'Hike',
+    jogging: 'Run',
+    e_racebike: 'E-Road',
+    e_mtb: 'E-MTB',
+    e_touringbicycle: 'E-Trekking'
   };
   function fmtSport(s: string): string {
     return sportLabel[s] ?? s.replace(/_/g, ' ');
   }
+
+  const komootUrl = $derived(meta ? `https://www.komoot.com/tour/${meta.id}` : '#');
 
   onMount(() => {
     void load();
@@ -196,47 +198,52 @@
   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
     <path d="M10 3l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round" />
   </svg>
-  wróć do listy
+  Back to tours
 </a>
 
 {#if loading}
-  <p class="status">— Ładuję trasę… —</p>
+  <p class="status">Loading tour…</p>
 {:else if errorMsg}
   <p class="error">{errorMsg}</p>
 {:else if meta}
   <header class="hero">
-    <span class="kicker">{fmtSport(meta.sport)} · {fmtDate(meta.date)}</span>
+    <div class="hero-meta">
+      <span class="kicker">{fmtSport(meta.sport)} · {fmtDate(meta.date)}</span>
+    </div>
     <h1>{meta.name}</h1>
+    <div class="hero-actions">
+      <a class="action action-secondary" href={komootUrl} target="_blank" rel="noopener noreferrer">
+        View on Komoot
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M4 2h6v6M10 2L4 8M2 5v5h5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <button class="action action-primary" onclick={downloadGpx} disabled={downloading}>
+        {#if downloading}
+          <span class="spinner" aria-hidden="true"></span>
+          Downloading…
+        {:else}
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2v9m0 0l-3-3m3 3l3-3M3 14h10" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Download GPX
+        {/if}
+      </button>
+    </div>
   </header>
 
   <dl class="stats">
     <div>
-      <dt>dystans</dt>
+      <dt>Distance</dt>
       <dd>{fmtDist()}</dd>
     </div>
     <div>
-      <dt>przewyższenie</dt>
+      <dt>Elevation gain</dt>
       <dd>{elevationGain()}</dd>
     </div>
     <div>
-      <dt>punkty GPS</dt>
-      <dd>{coords.length.toLocaleString('pl-PL')}</dd>
-    </div>
-    <div>
-      <dt>akcja</dt>
-      <dd>
-        <button class="download" onclick={downloadGpx} disabled={downloading}>
-          {#if downloading}
-            <span class="spinner" aria-hidden="true"></span>
-            pobieram…
-          {:else}
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M8 2v9m0 0l-3-3m3 3l3-3M3 14h10" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            pobierz GPX
-          {/if}
-        </button>
-      </dd>
+      <dt>GPS points</dt>
+      <dd>{coords.length.toLocaleString('en-US')}</dd>
     </div>
   </dl>
 
@@ -248,85 +255,98 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    color: var(--color-ink-soft);
+    color: var(--color-fg-muted);
     text-decoration: none;
     font-size: 0.85rem;
-    letter-spacing: 0.04em;
     margin-bottom: 1.5rem;
     transition: color 0.15s;
   }
-  .back:hover { color: var(--color-terra); }
+  .back:hover { color: var(--color-fg); }
 
-  .hero { margin-bottom: 1.2rem; }
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
   .kicker {
     display: inline-block;
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-terra);
-    font-weight: 600;
-    margin-bottom: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--color-fg-muted);
+    font-weight: 500;
   }
   h1 { margin: 0; }
 
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
-    padding: 1.1rem 0;
+    gap: 1rem 2.5rem;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1.2rem 0;
     margin: 1.5rem 0;
   }
   .stats > div { display: flex; flex-direction: column; gap: 0.3rem; }
   dt {
-    font-size: 0.65rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-sage);
-    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--color-fg-muted);
+    font-weight: 500;
   }
   dd {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: var(--color-ink);
-    line-height: 1;
-    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+    font-size: 1.5rem;
+    color: var(--color-fg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
-  dd:has(.download) { font-family: var(--font-body); font-size: inherit; }
 
-  .download {
+  .action {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.55rem 1rem;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    border: 0;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: background 0.15s, transform 0.15s;
+    height: 38px;
+    padding: 0 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+    cursor: pointer;
   }
-  .download:hover { background: var(--color-terra); }
-  .download:active { transform: scale(0.97); }
-  .download:disabled { opacity: 0.6; cursor: progress; }
+  .action-primary {
+    background: var(--color-fg);
+    color: var(--color-bg);
+  }
+  .action-primary:hover { background: var(--color-accent); }
+  .action-primary:active { transform: scale(0.98); }
+  .action-primary:disabled { opacity: 0.6; cursor: progress; }
+  .action-secondary {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    border-color: var(--color-border);
+  }
+  .action-secondary:hover {
+    background: var(--color-bg-soft);
+    border-color: var(--color-border-strong);
+  }
 
   .map {
     width: 100%;
     height: 60vh;
     min-height: 360px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: 0 24px 50px -30px rgba(28, 33, 26, 0.35);
   }
 
   .spinner {
-    width: 10px; height: 10px;
+    width: 11px; height: 11px;
     border: 1.5px solid currentColor;
     border-right-color: transparent;
     border-radius: 50%;
@@ -336,19 +356,18 @@
 
   .status, .error {
     text-align: center;
-    color: var(--color-sage);
-    letter-spacing: 0.06em;
+    color: var(--color-fg-subtle);
     margin: 3rem 0;
   }
   .error { color: var(--color-error); }
 
   :global(.leaflet-container) {
     font-family: var(--font-body);
-    background: var(--color-paper-warm) !important;
+    background: var(--color-bg-soft) !important;
   }
   :global(.leaflet-control-zoom a) {
-    background: var(--color-paper) !important;
-    color: var(--color-ink) !important;
-    border-color: var(--border-subtle) !important;
+    background: var(--color-bg) !important;
+    color: var(--color-fg) !important;
+    border-color: var(--color-border) !important;
   }
 </style>

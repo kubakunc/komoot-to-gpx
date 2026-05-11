@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Coord { lat: number; lng: number }
 
-  let { coords, height = 96 }: { coords: Coord[]; height?: number } = $props();
+  let { coords, height = 112 }: { coords: Coord[]; height?: number } = $props();
 
   function project(points: Coord[], width: number, h: number) {
     if (points.length === 0) return { path: '', startX: 0, startY: 0, endX: 0, endY: 0 };
@@ -17,14 +17,13 @@
       if (p.lng > maxLng) maxLng = p.lng;
     }
 
-    const pad = 8;
+    const pad = 10;
     const innerW = width - pad * 2;
     const innerH = h - pad * 2;
 
     const dLat = Math.max(maxLat - minLat, 1e-6);
     const dLng = Math.max(maxLng - minLng, 1e-6);
 
-    // Mercator-ish horizontal scaling
     const latMid = (minLat + maxLat) / 2;
     const lngScale = Math.cos((latMid * Math.PI) / 180);
     const dLngScaled = dLng * lngScale;
@@ -64,33 +63,19 @@
     viewBox="0 0 {VIEW_W} {height}"
     preserveAspectRatio="xMidYMid meet"
     role="img"
-    aria-label="Podgląd kształtu trasy"
+    aria-label="Route shape preview"
   >
-    <defs>
-      <pattern id="dots" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
-        <circle cx="1" cy="1" r="0.5" fill="rgba(28,33,26,0.18)" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#dots)" />
     {#if coords.length > 1}
       <path
         d={projected.path}
         fill="none"
-        stroke="rgba(28,33,26,0.25)"
-        stroke-width="4"
+        stroke="var(--color-fg)"
+        stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
-      <path
-        d={projected.path}
-        fill="none"
-        stroke="var(--color-terra)"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <circle cx={projected.startX} cy={projected.startY} r="3.5" fill="var(--color-forest)" />
-      <circle cx={projected.endX} cy={projected.endY} r="3.5" fill="var(--color-terra-deep)" />
+      <circle cx={projected.startX} cy={projected.startY} r="3.5" fill="var(--color-bg)" stroke="var(--color-fg)" stroke-width="1.5" />
+      <circle cx={projected.endX} cy={projected.endY} r="3.5" fill="var(--color-fg)" />
     {/if}
   </svg>
 </div>
@@ -98,10 +83,8 @@
 <style>
   .mini-map {
     width: 100%;
-    background:
-      linear-gradient(135deg, var(--color-paper-warm) 0%, var(--color-paper) 50%, var(--color-paper-warm) 100%);
-    border-radius: 4px;
-    overflow: hidden;
+    background: var(--color-bg-soft);
+    border-bottom: 1px solid var(--color-border);
   }
   svg {
     display: block;
