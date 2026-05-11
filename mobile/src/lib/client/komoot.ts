@@ -67,13 +67,20 @@ function toSummary(raw: Record<string, unknown>): TourSummary {
   };
 }
 
+export type TourFilter = 'all' | 'recorded' | 'planned';
+
 export async function listTours(
   auth: KomootAuth,
-  opts: { userId: string; page: number; limit?: number }
+  opts: { userId: string; page: number; limit?: number; filter?: TourFilter }
 ): Promise<ToursPage> {
   const limit = opts.limit ?? 24;
+  const filter = opts.filter ?? 'all';
+  const typeParam =
+    filter === 'recorded' ? 'tour_recorded'
+    : filter === 'planned' ? 'tour_planned'
+    : 'tour_recorded,tour_planned';
   const qs = new URLSearchParams({
-    type: 'tour_recorded,tour_planned',
+    type: typeParam,
     page: String(opts.page),
     limit: String(limit)
   });

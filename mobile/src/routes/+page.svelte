@@ -4,7 +4,7 @@
   import { getSession, clearSession } from '$lib/client/session';
   import {
     listTours, getTour, getCoordinates, downsample,
-    KomootError, type TourSummary, type Coordinate
+    KomootError, type TourSummary, type Coordinate, type TourFilter
   } from '$lib/client/komoot';
   import { toGpx } from '$lib/client/gpx';
   import MiniMap from '$lib/client/MiniMap.svelte';
@@ -23,6 +23,17 @@
   let errorMsg = $state<string | null>(null);
   let downloading = $state<string | null>(null);
   let shapes = $state<Record<string, Coordinate[] | 'loading' | 'error'>>({});
+  let filter = $state<TourFilter>('all');
+
+  function setFilter(f: TourFilter) {
+    if (f === filter) return;
+    filter = f;
+    tours = [];
+    shapes = {};
+    page = 0;
+    totalPages = 1;
+    void loadPage(0);
+  }
 
   async function loadPage(p: number) {
     const s = await getSession();
@@ -30,7 +41,7 @@
     loading = true;
     errorMsg = null;
     try {
-      const data = await listTours(s, { userId: s.userId, page: p });
+      const data = await listTours(s, { userId: s.userId, page: p, filter });
       tours = p === 0 ? data.tours : [...tours, ...data.tours];
       totalPages = data.totalPages;
       page = data.page;
@@ -143,7 +154,17 @@
   <p class="lede">Every recorded and planned route from your Komoot account — ready to download as GPX.</p>
 </section>
 
+<div class="filters" role="tablist" aria-label="Filter tours">
+  <button class="chip" role="tab" aria-selected={filter === 'all'} class:active={filter === 'all'} onclick={() => setFilter('all')}>All</button>
+  <button class="chip" role="tab" aria-selected={filter === 'recorded'} class:active={filter === 'recorded'} onclick={() => setFilter('recorded')}>Completed</button>
+  <button class="chip" role="tab" aria-selected={filter === 'planned'} class:active={filter === 'planned'} onclick={() => setFilter('planned')}>Planned</button>
+</div>
+
 {#if errorMsg}<p class="error">{errorMsg}</p>{/if}
+
+{#if !loading && tours.length === 0}
+  <p class="empty">No tours in this view.</p>
+{/if}
 
 <ul class="tours">
   {#each tours as t, i (t.id)}
@@ -193,6 +214,12 @@
   <button class="more" onclick={() => loadPage(page + 1)} disabled={loading}>
     {loading ? 'Loading…' : 'Show more'}
   </button>
+{/if}
+
+{#if tours.length > 0}
+  <p class="attribution">
+    Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors
+  </p>
 {/if}
 
 <div id="ad-banner-spacer" style="height: 60px;"></div>
@@ -250,4 +277,15 @@
     background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border);
     border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 500; }
   .error { color: var(--color-error); }
+  .attribution { margin-top: 1.75rem; font-size: 0.7rem; color: var(--color-fg-subtle); text-align: center; }
+  .attribution a { color: inherit; }
+  .filters { display: flex; gap: 0.4rem; margin: 0 0 1.5rem; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; height: 32px; padding: 0 0.95rem;
+    font-size: 0.82rem; font-weight: 500; border-radius: var(--radius-full);
+    background: var(--color-bg); color: var(--color-fg-muted);
+    border: 1px solid var(--color-border); cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .chip:hover { color: var(--color-fg); border-color: var(--color-fg); }
+  .chip.active { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+  .empty { color: var(--color-fg-subtle); text-align: center; padding: 2rem 0; }
 </style>
