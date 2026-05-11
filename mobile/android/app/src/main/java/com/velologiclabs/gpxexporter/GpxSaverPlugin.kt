@@ -10,6 +10,7 @@ import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
+import java.io.File
 
 @CapacitorPlugin(name = "GpxSaver")
 class GpxSaverPlugin : Plugin() {
@@ -17,11 +18,20 @@ class GpxSaverPlugin : Plugin() {
     @PluginMethod
     fun save(call: PluginCall) {
         val filename = call.getString("filename") ?: return call.reject("filename required")
-        if (call.getString("content").isNullOrBlank()) {
-            return call.reject("content required")
+        val content = call.getString("content") ?: return call.reject("content required")
+        if (content.isBlank()) return call.reject("content empty")
+
+        // Park the content in a cache file so it survives even if the PluginCall
+        // data gets stripped during the Activity round-trip.
+        try {
+            val cache = File(context.cacheDir, "pending-gpx-${System.currentTimeMillis()}.gpx")
+            cache.writeText(content, Charsets.UTF_8)
+            Log.d("GpxSaver", "parked ${cache.length()} bytes at ${cache.absolutePath}")
+            call.data.put("cachePath", cache.absolutePath)
+        } catch (e: Exception) {
+            return call.reject("Could not stage GPX: ${e.message}")
         }
-        // Persist the call so we still have the content when the picker returns.
-        call.setKeepAlive(true)
+
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/gpx+xml"
@@ -32,27 +42,41 @@ class GpxSaverPlugin : Plugin() {
 
     @ActivityCallback
     private fun onPickResult(call: PluginCall, result: ActivityResult) {
+        val cachePath = call.getString("cachePath")
+        val cacheFile = cachePath?.let { File(it) }
+        Log.d("GpxSaver", "onPickResult code=${result.resultCode} cachePath=$cachePath exists=${cacheFile?.exists()}")
+
         if (result.resultCode != Activity.RESULT_OK) {
+            cacheFile?.delete()
             call.reject("save cancelled")
             return
         }
-        val uri = result.data?.data ?: return call.reject("picker returned no uri")
-        val content = call.getString("content") ?: return call.reject("content lost")
+        val uri = result.data?.data
+        if (uri == null) {
+            cacheFile?.delete()
+            call.reject("picker returned no uri")
+            return
+        }
+        if (cacheFile == null || !cacheFile.exists()) {
+            call.reject("staged file missing")
+            return
+        }
 
-        Thread {
-            try {
-                context.contentResolver.openOutputStream(uri)?.use { os ->
-                    os.write(content.toByteArray(Charsets.UTF_8))
-                    os.flush()
-                } ?: throw RuntimeException("openOutputStream returned null")
-                Log.d("GpxSaver", "saved ${content.length} chars to $uri")
-                val ret = JSObject()
-                ret.put("uri", uri.toString())
-                call.resolve(ret)
-            } catch (e: Exception) {
-                Log.e("GpxSaver", "save failed", e)
-                call.reject(e.message ?: "write failed")
-            }
-        }.start()
+        try {
+            val bytes = cacheFile.readBytes()
+            context.contentResolver.openOutputStream(uri)?.use { os ->
+                os.write(bytes)
+                os.flush()
+            } ?: throw RuntimeException("openOutputStream returned null")
+            Log.d("GpxSaver", "wrote ${bytes.size} bytes to $uri")
+            val ret = JSObject()
+            ret.put("uri", uri.toString())
+            call.resolve(ret)
+        } catch (e: Exception) {
+            Log.e("GpxSaver", "write failed", e)
+            call.reject(e.message ?: "write failed")
+        } finally {
+            cacheFile.delete()
+        }
     }
 }
