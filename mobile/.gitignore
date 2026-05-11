@@ -1,0 +1,22 @@
+node_modules
+.pnpm-store
+.svelte-kit
+build
+dist
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+
+# Capacitor / Android
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/local.properties
+android/capacitor-cordova-android-plugins/
+android/app/src/main/assets/public/
+**/google-services.json
+*.jks
+*.keystore

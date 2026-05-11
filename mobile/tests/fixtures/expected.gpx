@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="komoot-to-gpx" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Test &amp; ride</name>
+    <time>2026-05-01T08:00:00Z</time>
+  </metadata>
+  <trk>
+    <name>Test &amp; ride</name>
+    <type>racebike</type>
+    <trkseg>
+      <trkpt lat="52.5200000" lon="13.4050000"><ele>34.0</ele><time>2026-05-01T08:00:00Z</time></trkpt>
+      <trkpt lat="52.5210000" lon="13.4060000"><ele>35.5</ele><time>2026-05-01T08:00:30Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

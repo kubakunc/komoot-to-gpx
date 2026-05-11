@@ -1,0 +1,25 @@
+{
+  "_embedded": {
+    "tours": [
+      {
+        "id": 111,
+        "name": "Wieczorny ride",
+        "type": "tour_recorded",
+        "sport": "racebike",
+        "distance": 42500.0,
+        "date": "2026-04-30T17:30:00Z",
+        "status": "private"
+      },
+      {
+        "id": 222,
+        "name": "Weekendowa pętla",
+        "type": "tour_planned",
+        "sport": "touringbicycle",
+        "distance": 88000.0,
+        "date": "2026-05-02T09:00:00Z",
+        "status": "public"
+      }
+    ]
+  },
+  "page": { "size": 24, "totalElements": 2, "totalPages": 1, "number": 0 }
+}
