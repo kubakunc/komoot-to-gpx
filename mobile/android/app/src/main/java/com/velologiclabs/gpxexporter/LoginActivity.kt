@@ -15,8 +15,10 @@ class LoginActivity : Activity() {
         const val EXTRA_COOKIES = "cookies"
         private const val LOGIN_URL = "https://www.komoot.com/signin"
         private const val COOKIE_DOMAIN = "https://www.komoot.com"
-        // Heuristic: when Komoot redirects after sign-in, the URL no longer contains "/signin".
-        private val POST_LOGIN_FRAGMENTS = listOf("/discover", "/user/", "/inspiration", "/plan")
+        // Komoot sets these cookies once the user is authenticated.
+        // koa_at = OAuth access token, koa_re = refresh token. Their presence
+        // means login is done regardless of which landing page Komoot picked.
+        private val POST_LOGIN_COOKIE_KEYS = listOf("koa_at", "koa_re", "fresh_signin")
     }
 
     private lateinit var webView: WebView
@@ -57,10 +59,19 @@ class LoginActivity : Activity() {
     }
 
     private fun checkForLogin(url: String) {
-        if (url.contains("/signin") || url.contains("/login")) return
-        if (POST_LOGIN_FRAGMENTS.none { url.contains(it) }) return
-        val cookies = CookieManager.getInstance().getCookie(COOKIE_DOMAIN) ?: return
-        if (!cookies.contains("koa_") && !cookies.contains("komoot-session")) return
+        val cookies = CookieManager.getInstance().getCookie(COOKIE_DOMAIN)
+        val cookieNames = cookies?.split(";")?.mapNotNull {
+            it.substringBefore("=").trim().takeIf { n -> n.isNotEmpty() }
+        } ?: emptyList()
+        android.util.Log.d("KomootAuth", "url=$url cookieNames=${cookieNames.joinToString(",")}")
+        // Still on a sign-in/sign-up page, no point looking for the token yet.
+        if (url.contains("/signin") || url.contains("/signup")) return
+        if (cookies == null) return
+        if (POST_LOGIN_COOKIE_KEYS.none { key -> cookieNames.contains(key) }) {
+            android.util.Log.d("KomootAuth", "no post-login cookie yet")
+            return
+        }
+        android.util.Log.d("KomootAuth", "login complete, returning cookies")
         val data = Intent().putExtra(EXTRA_COOKIES, cookies)
         setResult(Activity.RESULT_OK, data)
         finish()
