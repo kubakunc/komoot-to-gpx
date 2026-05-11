@@ -126,7 +126,7 @@ Token expiry: if any subsequent call returns 401 → clear stored session → pu
 - Tour data: nothing leaves your device beyond the GPX file you explicitly download.
 - AdMob: Google AdMob collects Advertising ID, IP, ad-related diagnostics (linked Google policy).
 - No analytics, no crash reporting in v1.
-- Consent: re-show UMP consent via Settings → Reset advertising consent.
+- Consent: UMP consent can be reset by clearing app data (Android Settings → Apps → Export GPX for Komoot → Clear storage). A dedicated in-app Settings screen is out of scope for v1.
 - Contact: kunc@chaosgears.com (placeholder — confirm before publishing).
 
 ### Data Safety form on Play (checklist)
