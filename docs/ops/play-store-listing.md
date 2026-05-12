@@ -46,7 +46,7 @@ NOT AFFILIATED WITH KOMOOT
 This app is a third-party tool. "Komoot" is a registered trademark of komoot GmbH. We are not affiliated with komoot GmbH, nor endorsed by them. The app uses your own account on Komoot to retrieve your own data — nothing is scraped from anyone else.
 
 SUPPORT
-Found a bug? Tour not exporting? Email kunc@chaosgears.com — usually a same-day reply.
+Found a bug? Tour not exporting? Email contact@velologic-labs.com — usually a same-day reply.
 
 Privacy policy: https://<owner>.github.io/komoot-to-gpx/privacy-policy/
 ```
@@ -73,7 +73,7 @@ First release.
 
 ## Contact details
 
-- **Email:** kunc@chaosgears.com (or whichever address you want public)
+- **Email:** contact@velologic-labs.com (or whichever address you want public)
 - **Phone:** leave blank (Play allows blank)
 - **Website:** https://github.com/<owner>/komoot-to-gpx (or your own site)
 

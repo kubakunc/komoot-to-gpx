@@ -50,7 +50,7 @@ sections 4.1 and 4.2.
 
 - **Data is encrypted in transit:** Yes
 - **You can request that data is deleted:** Yes — uninstall the app and sign out
-  of your Komoot account in the app, or contact `kunc@chaosgears.com`
+  of your Komoot account in the app, or contact `contact@velologic-labs.com`
 - **Committed to Play Families Policy:** N/A (not targeted at families)
 
 ## 4. Privacy policy URL

@@ -370,7 +370,7 @@ git commit -m "chore(mobile): swap test AdMob app id for production"
 </head>
 <body>
   <h1>Privacy Policy — Export GPX for Komoot</h1>
-  <p class="meta">Last updated: 2026-05-11 · Publisher: VeloLogic Labs · Contact: kunc@chaosgears.com</p>
+  <p class="meta">Last updated: 2026-05-11 · Publisher: VeloLogic Labs · Contact: contact@velologic-labs.com</p>
 
   <h2>1. What we collect</h2>
   <p>
@@ -434,7 +434,7 @@ git commit -m "chore(mobile): swap test AdMob app id for production"
 
   <h2>8. Contact</h2>
   <p>
-    Questions or removal requests: <a href="mailto:kunc@chaosgears.com">kunc@chaosgears.com</a>.
+    Questions or removal requests: <a href="mailto:contact@velologic-labs.com">contact@velologic-labs.com</a>.
   </p>
 </body>
 </html>
@@ -538,7 +538,7 @@ sections 4.1 and 4.2.
 
 - **Data is encrypted in transit:** Yes
 - **You can request that data is deleted:** Yes — uninstall the app and sign out
-  of your Komoot account in the app, or contact `kunc@chaosgears.com`
+  of your Komoot account in the app, or contact `contact@velologic-labs.com`
 - **Committed to Play Families Policy:** N/A (not targeted at families)
 
 ## 4. Privacy policy URL
