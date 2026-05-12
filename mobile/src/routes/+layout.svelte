@@ -94,6 +94,7 @@
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     position: sticky; top: 0; z-index: 10;
+    padding-top: env(safe-area-inset-top);
   }
   .app-header-inner {
     max-width: 1100px; margin: 0 auto;
@@ -123,6 +124,12 @@
     transition: border-color 0.15s, color 0.15s, background 0.15s;
   }
   .logout:hover { border-color: var(--color-fg); color: var(--color-fg); background: var(--color-bg-soft); }
-  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+  main {
+    max-width: 1100px; margin: 0 auto;
+    padding: 1.5rem
+      max(1.25rem, env(safe-area-inset-right))
+      max(4rem, calc(4rem + env(safe-area-inset-bottom)))
+      max(1.25rem, env(safe-area-inset-left));
+  }
   @media (max-width: 560px) { .user { display: none; } }
 </style>
