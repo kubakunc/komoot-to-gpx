@@ -3,6 +3,8 @@ package com.velologiclabs.gpxexporter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +19,10 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(KomootApiPlugin.class);
         registerPlugin(GpxSaverPlugin.class);
         super.onCreate(savedInstanceState);
+        WindowInsetsControllerCompat insets =
+            WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        insets.setAppearanceLightStatusBars(true);
+        insets.setAppearanceLightNavigationBars(true);
         handleShareIntent(getIntent());
     }
 
