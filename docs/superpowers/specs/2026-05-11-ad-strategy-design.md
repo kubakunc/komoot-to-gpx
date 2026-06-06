@@ -62,7 +62,7 @@ Plain-language sections:
 2. **What we don't collect:** Names, emails, GPS data, tour content, contacts, location.
 3. **Where Komoot session lives:** On your device, encrypted via Android Keystore. We never see your password.
 4. **How to opt out / reset:** UMP consent can be reset by clearing app data (Android Settings → Apps → Export GPX for Komoot → Clear storage).
-5. **Contact:** contact@velologic-labs.com (replace with real publisher contact before going live).
+5. **Contact:** contact@velologic-labs.eu (replace with real publisher contact before going live).
 
 ### 4.2 Play Data Safety form (declarations)
 
