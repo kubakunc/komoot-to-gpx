@@ -12,9 +12,12 @@
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import { showBanner, hideBanner, maybeShowInterstitial } from '$lib/client/ad-banner';
   import { PHASE2 } from '$lib/client/ad-config';
+  import { shouldShowShareReminder } from '$lib/client/share-hint';
+  import ShareReminderModal from '$lib/client/ShareReminderModal.svelte';
 
   const SAVE_COUNT_KEY = 'gpx-exporter:save-count';
   let savedModalFilename = $state<string | null>(null);
+  let showShareReminder = $state(false);
 
   let tours = $state<TourSummary[]>([]);
   let page = $state(0);
@@ -143,6 +146,7 @@
   const komootUrl = (id: string) => `https://www.komoot.com/tour/${id}`;
 
   onMount(() => {
+    showShareReminder = shouldShowShareReminder();
     void loadPage(0);
     void showBanner();
     return () => { void hideBanner(); };
@@ -153,6 +157,19 @@
   <h1>Your tours.</h1>
   <p class="lede">Every recorded and planned route from your Komoot account — ready to download as GPX.</p>
 </section>
+
+<aside class="hint">
+  <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
+    <circle cx="17" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+    <circle cx="17" cy="18.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+    <path d="M8.3 10.8 L14.7 6.9 M8.3 13.2 L14.7 17.1" stroke="currentColor" stroke-width="1.8" />
+  </svg>
+  <p class="hint-text">
+    <strong>Tip:</strong> in the Komoot app, open any tour and tap
+    <strong>Share</strong> → <strong>Export GPX</strong> — it opens right here, ready to save.
+  </p>
+</aside>
 
 <div class="filters" role="tablist" aria-label="Filter tours">
   <button class="chip" role="tab" aria-selected={filter === 'all'} class:active={filter === 'all'} onclick={() => setFilter('all')}>All</button>
@@ -210,6 +227,10 @@
   <SavedModal filename={savedModalFilename} onClose={() => (savedModalFilename = null)} />
 {/if}
 
+{#if showShareReminder}
+  <ShareReminderModal onClose={() => (showShareReminder = false)} />
+{/if}
+
 {#if page + 1 < totalPages}
   <button class="more" onclick={() => loadPage(page + 1)} disabled={loading}>
     {loading ? 'Loading…' : 'Show more'}
@@ -227,6 +248,22 @@
 <style>
   .intro { margin-bottom: 2.5rem; max-width: 640px; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 1rem; margin: 0.5rem 0 0; max-width: 56ch; }
+
+  .hint {
+    display: flex; align-items: flex-start; gap: 0.65rem;
+    max-width: 640px;
+    margin: -1.25rem 0 1.75rem;
+    padding: 0.8rem 0.9rem;
+    background: var(--color-bg-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .hint-icon { flex-shrink: 0; margin-top: 0.1rem; color: var(--color-fg-muted); }
+  .hint-text {
+    margin: 0; font-size: 0.85rem; line-height: 1.5;
+    color: var(--color-fg-muted);
+  }
+  .hint-text strong { color: var(--color-fg); font-weight: 600; }
   .tours { list-style: none; padding: 0; margin: 0;
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
   .card { position: relative; background: var(--color-surface); border: 1px solid var(--color-border);
