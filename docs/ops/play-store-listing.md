@@ -13,45 +13,43 @@ Export GPX for Komoot
 ## Short description (≤ 80 chars)
 
 ```
-Download your private Komoot tours as GPX files for your watch or bike computer.
+Export Komoot tours as GPX — for Garmin, Wahoo, any bike computer or GPS watch.
 ```
 
-(80 chars exactly.)
+(79 chars — fits.)
 
 ## Full description (≤ 4000 chars)
 
 ```
-Export GPX for Komoot lets you download your own Komoot tours as standard GPX files — including private ones — so you can load them onto your GPS watch, bike computer, or any other navigation app that speaks GPX.
+Export GPX for Komoot lets you download your own Komoot tours as standard GPX files — including private ones — so you can load them onto your GPS watch, bike computer, or any navigation app that imports GPX.
 
-You sign in to Komoot on their own login page (we never see your password). After that the app reads the tour list straight from your account, draws a small preview of each route, and lets you save any tour to your phone with a single tap.
+You sign in to Komoot on their own login page (we never see your password). The app then lists every tour from your account, shows a real-map preview of each route, and saves any tour to your phone as a GPX file with one tap. You can also share a tour from the Komoot app straight into this one — it opens here, ready to export.
 
 WHAT YOU CAN DO
 • Browse every recorded ride and every planned route on your account.
 • Filter the list to show only Completed or only Planned tours.
 • See a real-map preview of each route before you export.
-• Open any tour at komoot.com in one tap if you want the full view.
-• Save a tour as a standard .gpx file to anywhere on your phone — Downloads, Drive, Dropbox, your cloud of choice.
-• Load that file into Garmin Connect, Wahoo, Hammerhead, Bryton, Coros, Suunto, Apple Watch, OsmAnd, Locus Map, Gaia, or any other app that imports GPX.
+• Share a tour from the Komoot app — it opens here, ready to save (Share → Export GPX).
+• Save a tour as a standard .gpx file anywhere on your phone — Downloads, Drive, Dropbox.
+• Load the GPX file into Garmin Connect, Wahoo, Hammerhead, Bryton, Coros, Suunto, Apple Watch, OsmAnd, Locus Map, Gaia, or any other app that imports GPX.
 
-WHY THIS APP EXISTS
-Komoot lets you record and plan routes for free, but the official apps make it hard to use those routes outside Komoot itself. If you have a bike computer or watch from a different brand, you usually end up either paying for Komoot Premium or copy-pasting points by hand. This app is the simple alternative: bring your own Komoot account, take your own data with you.
+YOUR ROUTES, ANY DEVICE
+A route you planned or recorded is yours. Exporting it as a GPX file means you can navigate with any device you like — a Garmin or Wahoo bike computer, a sports watch, or another mapping app — while you keep planning in Komoot.
 
 PRIVACY
-The app has no backend server. Your Komoot login happens in an in-app browser on komoot.com — we never see your email or password. The session token is stored in the encrypted Android Keystore on your phone. Tour data flows directly between your phone and api.komoot.de; we don't proxy it through our servers (we don't have any).
+The app has no backend server. Your Komoot login happens in an in-app browser on komoot.com — we never see your email or password. Tour data flows directly between your phone and Komoot's servers; we don't proxy or store it.
 
 ADS
-The app is free and shows a small Google AdMob banner. In the EEA the app asks for consent before serving personalized ads (you can decline and still use everything).
+The app is free and shows a small banner ad. In the EEA the app asks for consent before serving personalized ads (you can decline and still use everything).
 
 NOT AFFILIATED WITH KOMOOT
-This app is a third-party tool. "Komoot" is a registered trademark of komoot GmbH. We are not affiliated with komoot GmbH, nor endorsed by them. The app uses your own account on Komoot to retrieve your own data — nothing is scraped from anyone else.
+This is a third-party tool. "Komoot" is a registered trademark of komoot GmbH. We are not affiliated with or endorsed by komoot GmbH. The app uses your own account to retrieve your own data.
 
 SUPPORT
 Found a bug? Tour not exporting? Email contact@velologic-labs.eu — usually a same-day reply.
 
-Privacy policy: https://<owner>.github.io/komoot-to-gpx/privacy-policy/
+Privacy policy: https://kubakunc.github.io/komoot-to-gpx/privacy-policy/
 ```
-
-(Replace `<owner>` with the actual GitHub user before paste.)
 
 Approximate character count: ~2100 / 4000. Plenty of room if you want to add anything.
 
@@ -75,12 +73,12 @@ First release.
 
 - **Email:** contact@velologic-labs.eu (or whichever address you want public)
 - **Phone:** leave blank (Play allows blank)
-- **Website:** https://github.com/<owner>/komoot-to-gpx (or your own site)
+- **Website:** https://velologic-labs.eu
 
 ## Privacy Policy URL
 
 ```
-https://<owner>.github.io/komoot-to-gpx/privacy-policy/
+https://kubakunc.github.io/komoot-to-gpx/privacy-policy/
 ```
 
 Must be live BEFORE you submit for review.
