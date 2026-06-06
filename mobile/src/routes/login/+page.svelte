@@ -1,11 +1,18 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { nativeLogin, AuthUnsupportedError, AuthCancelledError } from '$lib/client/komoot-auth';
   import { setSession } from '$lib/client/session';
   import { consumePendingShare } from '$lib/client/share-intent';
+  import { showBanner, hideBanner } from '$lib/client/ad-banner';
 
   let errorMsg = $state<string | null>(null);
   let busy = $state(false);
+
+  onMount(() => {
+    void showBanner();
+    return () => { void hideBanner(); };
+  });
 
   async function signIn() {
     errorMsg = null;
