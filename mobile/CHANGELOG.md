@@ -9,6 +9,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - After a successful export the app may ask for a quick Play Store rating
   (Google's standard in-app dialog, at most occasionally).
 
+### Fixed
+- Status bar styling on the Komoot sign-in screen no longer relies on a
+  deprecated Android API.
+
 ## [1.0.4] — 2026-06-06
 
 ### Added

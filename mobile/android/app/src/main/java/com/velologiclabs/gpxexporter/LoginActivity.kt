@@ -34,11 +34,6 @@ class LoginActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        // Black status bar matching the info banner below it; white icons.
-        window.statusBarColor = 0xFF0A0A0A.toInt()
-        androidx.core.view.WindowCompat
-            .getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = false
         webView = findViewById(R.id.komootWebView)
         progress = findViewById(R.id.komootProgress)
 
