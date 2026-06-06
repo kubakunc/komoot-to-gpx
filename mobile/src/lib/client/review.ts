@@ -19,7 +19,6 @@ export async function maybeRequestReview(): Promise<void> {
   const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0');
   if (!shouldRequestReview(count)) return;
   try {
-    // @ts-expect-error -- installed in the integration task
     const { InAppReview } = await import('@capacitor-community/in-app-review');
     await InAppReview.requestReview();
   } catch (e) {

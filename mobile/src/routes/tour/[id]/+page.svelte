@@ -9,8 +9,8 @@
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { maybeShowInterstitial } from '$lib/client/ad-banner';
   import { PHASE2 } from '$lib/client/ad-config';
+  import { SAVE_COUNT_KEY, maybeRequestReview } from '$lib/client/review';
 
-  const SAVE_COUNT_KEY = 'gpx-exporter:save-count';
   let savedModalFilename = $state<string | null>(null);
 
   let meta = $state<TourMetadata | null>(null);
@@ -142,7 +142,13 @@
 {/if}
 
 {#if savedModalFilename}
-  <SavedModal filename={savedModalFilename} onClose={() => (savedModalFilename = null)} />
+  <SavedModal
+    filename={savedModalFilename}
+    onClose={() => {
+      savedModalFilename = null;
+      void maybeRequestReview();
+    }}
+  />
 {/if}
 
 <style>

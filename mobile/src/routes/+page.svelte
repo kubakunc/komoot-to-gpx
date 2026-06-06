@@ -14,8 +14,8 @@
   import { PHASE2 } from '$lib/client/ad-config';
   import { shouldShowShareReminder } from '$lib/client/share-hint';
   import ShareReminderModal from '$lib/client/ShareReminderModal.svelte';
+  import { SAVE_COUNT_KEY, maybeRequestReview } from '$lib/client/review';
 
-  const SAVE_COUNT_KEY = 'gpx-exporter:save-count';
   let savedModalFilename = $state<string | null>(null);
   let showShareReminder = $state(false);
 
@@ -224,7 +224,13 @@
 </ul>
 
 {#if savedModalFilename}
-  <SavedModal filename={savedModalFilename} onClose={() => (savedModalFilename = null)} />
+  <SavedModal
+    filename={savedModalFilename}
+    onClose={() => {
+      savedModalFilename = null;
+      void maybeRequestReview();
+    }}
+  />
 {/if}
 
 {#if showShareReminder}
