@@ -55,6 +55,20 @@
 
   {#if errorMsg}<p class="error">{errorMsg}</p>{/if}
 
+  <aside class="hint">
+    <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <circle cx="17" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <circle cx="17" cy="18.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <path d="M8.3 10.8 L14.7 6.9 M8.3 13.2 L14.7 17.1" stroke="currentColor" stroke-width="1.8" />
+    </svg>
+    <p class="hint-text">
+      <strong>Tip:</strong> you can also send a tour here straight from the Komoot app —
+      open any tour and tap <strong>Share</strong> → <strong>Export GPX</strong>.
+      After you sign in once, it opens instantly, ready to save.
+    </p>
+  </aside>
+
   <p class="footnote">
     Don't have a Komoot account?
     <a href="https://www.komoot.com" target="_blank" rel="noopener noreferrer">
@@ -88,6 +102,20 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .error { color: var(--color-error); margin: 1rem 0 0; font-size: 0.9rem; }
+  .hint {
+    display: flex; align-items: flex-start; gap: 0.65rem;
+    margin-top: 1.5rem;
+    padding: 0.8rem 0.9rem;
+    background: var(--color-bg-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  .hint-icon { flex-shrink: 0; margin-top: 0.1rem; color: var(--color-fg-muted); }
+  .hint-text {
+    margin: 0; font-size: 0.85rem; line-height: 1.5;
+    color: var(--color-fg-muted);
+  }
+  .hint-text strong { color: var(--color-fg); font-weight: 600; }
   .footnote { margin-top: 2rem; color: var(--color-fg-subtle); font-size: 0.85rem; }
   .footnote a {
     color: var(--color-fg-muted); text-decoration: underline;
