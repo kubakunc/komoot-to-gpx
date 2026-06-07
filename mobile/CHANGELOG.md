@@ -3,6 +3,13 @@
 User-facing changes to **Export GPX for Komoot** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- Anonymous usage statistics and crash reporting (Google Firebase) to help
+  improve the app. Ad-related Firebase signals are disabled; in the EEA
+  analytics activates only after the consent dialog.
+
 ## [1.0.5] — 2026-06-06
 
 ### Added
