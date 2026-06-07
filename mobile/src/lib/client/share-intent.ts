@@ -21,3 +21,15 @@ export function consumePendingShare(): string | null {
   if (v) localStorage.removeItem(PENDING_KEY);
   return v;
 }
+
+const VIA_SHARE_KEY = 'gpx-exporter:via-share-tour';
+
+/** Remember that this tour was opened via the share intent (for analytics). */
+export function markViaShare(tourId: string): void {
+  sessionStorage.setItem(VIA_SHARE_KEY, tourId);
+}
+
+/** True if the given tour arrived via the share intent. Does not clear. */
+export function wasViaShare(tourId: string): boolean {
+  return sessionStorage.getItem(VIA_SHARE_KEY) === tourId;
+}

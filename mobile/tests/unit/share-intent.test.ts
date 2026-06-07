@@ -8,11 +8,21 @@ vi.stubGlobal('localStorage', {
   clear: () => { store.clear(); }
 });
 
+const sessionStore = new Map<string, string>();
+vi.stubGlobal('sessionStorage', {
+  getItem: (k: string) => sessionStore.get(k) ?? null,
+  setItem: (k: string, v: string) => { sessionStore.set(k, v); },
+  removeItem: (k: string) => { sessionStore.delete(k); },
+  clear: () => { sessionStore.clear(); }
+});
+
 import {
   extractTourId,
   readShareHash,
   setPendingShare,
-  consumePendingShare
+  consumePendingShare,
+  markViaShare,
+  wasViaShare
 } from '../../src/lib/client/share-intent';
 
 describe('extractTourId', () => {
@@ -108,5 +118,25 @@ describe('pending share storage', () => {
 
   it('consume returns null when nothing pending', () => {
     expect(consumePendingShare()).toBeNull();
+  });
+});
+
+describe('via-share source marker', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it('reports true for the marked tour id', () => {
+    markViaShare('123');
+    expect(wasViaShare('123')).toBe(true);
+  });
+
+  it('reports false for a different tour id', () => {
+    markViaShare('123');
+    expect(wasViaShare('456')).toBe(false);
+  });
+
+  it('reports false when nothing was marked', () => {
+    expect(wasViaShare('123')).toBe(false);
   });
 });
