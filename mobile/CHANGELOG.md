@@ -3,7 +3,7 @@
 User-facing changes to **Export GPX for Komoot** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.6] — 2026-06-07
 
 ### Added
 - Anonymous usage statistics and crash reporting (Google Firebase) to help

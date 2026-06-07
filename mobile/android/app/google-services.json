@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "976532744826",
+    "project_id": "export-gpx-for-komoot",
+    "storage_bucket": "export-gpx-for-komoot.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976532744826:android:8caa9648130daf0da669c3",
+        "android_client_info": {
+          "package_name": "com.velologiclabs.gpxexporter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHZrNe-JfzbC7Fv69ePXUx0U7yEu3-x7s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
