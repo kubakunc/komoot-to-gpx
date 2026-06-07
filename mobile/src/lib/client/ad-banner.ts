@@ -6,6 +6,7 @@ import {
   AdmobConsentStatus
 } from '@capacitor-community/admob';
 import { AD_UNITS, PHASE2 } from './ad-config';
+import { applyAnalyticsConsent, decideAnalyticsConsent } from './analytics';
 
 const isAndroid = () => Capacitor.getPlatform() === 'android';
 
@@ -19,10 +20,12 @@ export async function initAds(): Promise<void> {
   initialized = true;
   try {
     await AdMob.initialize({ testingDevices: [], initializeForTesting: __DEV__ });
-    const consentInfo = await AdMob.requestConsentInfo();
+    let consentInfo = await AdMob.requestConsentInfo();
     if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
       await AdMob.showConsentForm();
+      consentInfo = await AdMob.requestConsentInfo();
     }
+    void applyAnalyticsConsent(decideAnalyticsConsent(consentInfo.status));
   } catch (e) {
     console.warn('AdMob init failed:', e);
   }
