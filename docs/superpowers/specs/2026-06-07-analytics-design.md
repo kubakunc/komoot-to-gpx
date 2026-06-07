@@ -57,12 +57,17 @@ catches in both save flows call `recordError` with the failure reason).
 ## 3. Consent (EEA) — Google Consent Mode
 
 The app already runs the UMP consent flow for AdMob (`initAds()` in
-`ad-banner.ts`). After UMP resolves:
+`ad-banner.ts`). UMP reports *whether* consent was resolved, not the user's
+granular choices, so the split is:
 
-- consent obtained or not required → `applyAnalyticsConsent(true)` →
-  `setConsent({ analyticsStorage: 'granted' })`
-- consent denied → `applyAnalyticsConsent(false)` → `analyticsStorage:
-  'denied'` (Firebase then collects only anonymous, ID-less pings).
+- **Ad-related signals always denied for Firebase:** `AD_STORAGE`,
+  `AD_USER_DATA`, `AD_PERSONALIZATION` → `denied` unconditionally. Firebase
+  Analytics then never touches the advertising ID — AdMob handles its own
+  consent separately via UMP.
+- **`ANALYTICS_STORAGE` → granted once the UMP flow resolves** (status
+  `NOT_REQUIRED` or `OBTAINED`); stays denied while consent is unresolved
+  (`REQUIRED`/`UNKNOWN`). Mapping lives in a pure, unit-tested function
+  `decideAnalyticsConsent(status)`.
 
 Crashlytics collection stays always-on (legitimate interest — crash logs,
 no advertising use). No second consent dialog.
