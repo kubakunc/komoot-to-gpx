@@ -28,7 +28,7 @@ TUS RUTAS, CUALQUIER DISPOSITIVO
 Una ruta que tú has planificado o grabado es tuya. Al exportarla como archivo GPX puedes navegar con el dispositivo que prefieras — un ciclocomputador Garmin o Wahoo, un reloj deportivo u otra app de mapas — mientras sigues planificando en Komoot.
 
 PRIVACIDAD
-La app no tiene servidor propio. El inicio de sesión en Komoot ocurre en un navegador integrado en komoot.com — nunca vemos tu correo ni tu contraseña. Los datos de las rutas circulan directamente entre tu teléfono y los servidores de Komoot; no los redirigimos ni los almacenamos.
+La app no tiene servidor propio. El inicio de sesión en Komoot ocurre en un navegador integrado en komoot.com — nunca vemos tu correo ni tu contraseña. Los datos de las rutas circulan directamente entre tu teléfono y los servidores de Komoot; no los redirigimos ni los almacenamos. Las estadísticas de uso anónimas y los informes de fallos (Google Firebase) nos ayudan a mejorar la app; en el EEE la app pide primero tu consentimiento.
 
 PUBLICIDAD
 La app es gratuita y muestra un pequeño banner publicitario. En el EEE la app pide tu consentimiento antes de mostrar anuncios personalizados (puedes rechazarlo y seguir usándolo todo).

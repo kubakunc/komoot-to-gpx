@@ -28,7 +28,7 @@ I TUOI PERCORSI, OGNI DISPOSITIVO
 Un percorso che hai pianificato o registrato è tuo. Esportandolo come file GPX puoi navigare con qualsiasi dispositivo tu preferisca — un ciclocomputer Garmin o Wahoo, un orologio sportivo o un'altra app di mappe — continuando a pianificare in Komoot.
 
 PRIVACY
-L'app non ha alcun server proprio. Il login a Komoot avviene in un browser integrato su komoot.com — noi non vediamo mai la tua email né la tua password. I dati dei tour passano direttamente tra il tuo telefono e i server di Komoot; non li facciamo transitare né li archiviamo.
+L'app non ha alcun server proprio. Il login a Komoot avviene in un browser integrato su komoot.com — noi non vediamo mai la tua email né la tua password. I dati dei tour passano direttamente tra il tuo telefono e i server di Komoot; non li facciamo transitare né li archiviamo. Statistiche d'uso anonime e segnalazioni di arresti anomali (Google Firebase) ci aiutano a migliorare l'app; nel SEE l'app chiede prima il consenso.
 
 PUBBLICITÀ
 L'app è gratuita e mostra un piccolo banner pubblicitario. Nel SEE l'app chiede il consenso prima di mostrare annunci personalizzati (puoi rifiutare e usare comunque tutto).

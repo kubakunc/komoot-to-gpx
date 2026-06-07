@@ -28,7 +28,7 @@ JOUW ROUTES, ELK APPARAAT
 Een route die je hebt gepland of opgenomen is van jou. Door hem als GPX-bestand te exporteren kun je navigeren met elk apparaat dat je wilt — een Garmin- of Wahoo-fietscomputer, een sporthorloge of een andere kaart-app — terwijl je blijft plannen in Komoot.
 
 PRIVACY
-De app heeft geen eigen server. Het inloggen bij Komoot gebeurt in een in-app browser op komoot.com — wij zien je e-mailadres of wachtwoord nooit. Tochtgegevens gaan rechtstreeks tussen je telefoon en de servers van Komoot; wij sturen ze niet door en slaan ze niet op.
+De app heeft geen eigen server. Het inloggen bij Komoot gebeurt in een in-app browser op komoot.com — wij zien je e-mailadres of wachtwoord nooit. Tochtgegevens gaan rechtstreeks tussen je telefoon en de servers van Komoot; wij sturen ze niet door en slaan ze niet op. Anonieme gebruiksstatistieken en crashrapporten (Google Firebase) helpen ons de app te verbeteren; in de EER vraagt de app eerst om toestemming.
 
 ADVERTENTIES
 De app is gratis en toont een kleine banneradvertentie. In de EER vraagt de app om toestemming voordat er gepersonaliseerde advertenties worden getoond (je kunt weigeren en alles blijven gebruiken).

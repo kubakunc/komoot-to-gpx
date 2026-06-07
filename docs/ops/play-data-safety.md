@@ -78,3 +78,19 @@ If Play reviewers push back on any answer here, the trail to verify is:
 - `mobile/src/lib/client/session.ts` — Preferences only, never network.
 - `mobile/android/app/src/main/AndroidManifest.xml` — only INTERNET and
   ACCESS_NETWORK_STATE permissions, no others.
+
+## Update 2026-06-07 — Firebase Analytics + Crashlytics
+
+Add in Play Console → App content → Data safety:
+
+| Data type | Collected | Shared | Purpose |
+|---|---|---|---|
+| App interactions (App activity) | Yes | No | Analytics |
+| Crash logs (App info and performance) | Yes | No | Analytics |
+| Diagnostics (App info and performance) | Yes | No | Analytics |
+| Device or other IDs | Yes | No | Analytics |
+
+All: processed ephemerally = No, optional = No (collected automatically),
+encrypted in transit = Yes, deletion: data auto-expires (Analytics
+retention 14 months); users can reset the device identifier in
+Android settings.

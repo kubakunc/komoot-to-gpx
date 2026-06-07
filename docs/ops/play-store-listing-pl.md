@@ -28,7 +28,7 @@ TWOJE TRASY, KAŻDE URZĄDZENIE
 Trasa, którą zaplanowałeś lub zarejestrowałeś, należy do ciebie. Eksportując ją jako plik GPX, możesz nawigować na dowolnym urządzeniu — liczniku rowerowym Garmin lub Wahoo, zegarku sportowym albo w innej aplikacji z mapami — i dalej planować w Komoot.
 
 PRYWATNOŚĆ
-Aplikacja nie ma własnego serwera. Logowanie do Komoot odbywa się w przeglądarce wbudowanej w aplikację, na komoot.com — nigdy nie widzimy twojego e-maila ani hasła. Dane tras przepływają bezpośrednio między twoim telefonem a serwerami Komoot; nie pośredniczymy w nich ani ich nie przechowujemy.
+Aplikacja nie ma własnego serwera. Logowanie do Komoot odbywa się w przeglądarce wbudowanej w aplikację, na komoot.com — nigdy nie widzimy twojego e-maila ani hasła. Dane tras przepływają bezpośrednio między twoim telefonem a serwerami Komoot; nie pośredniczymy w nich ani ich nie przechowujemy. Anonimowe statystyki użycia i raporty błędów (Google Firebase) pomagają nam ulepszać aplikację; w EOG aplikacja najpierw pyta o zgodę.
 
 REKLAMY
 Aplikacja jest bezpłatna i wyświetla mały baner reklamowy. W EOG aplikacja prosi o zgodę przed wyświetlaniem spersonalizowanych reklam (możesz odmówić i nadal korzystać ze wszystkiego).

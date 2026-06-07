@@ -28,7 +28,7 @@ DEINE ROUTEN, JEDES GERÄT
 Eine Route, die du geplant oder aufgezeichnet hast, gehört dir. Als GPX-Datei exportiert kannst du mit jedem Gerät navigieren — Garmin oder Wahoo Radcomputer, Sportuhr oder eine andere Karten-App — während du weiter mit Komoot planst.
 
 DATENSCHUTZ
-Die App hat keinen eigenen Server. Dein Komoot-Login passiert in einem In-App-Browser auf komoot.com — wir sehen E-Mail und Passwort nie. Tourdaten fließen direkt zwischen deinem Handy und den Komoot-Servern.
+Die App hat keinen eigenen Server. Dein Komoot-Login passiert in einem In-App-Browser auf komoot.com — wir sehen E-Mail und Passwort nie. Tourdaten fließen direkt zwischen deinem Handy und den Komoot-Servern. Anonyme Nutzungsstatistiken und Absturzberichte (Google Firebase) helfen uns, die App zu verbessern; im EWR fragt die App zuerst nach deiner Einwilligung.
 
 WERBUNG
 Die App ist kostenlos und zeigt ein kleines Werbebanner. Im EWR fragt die App vor personalisierter Werbung nach deiner Einwilligung.

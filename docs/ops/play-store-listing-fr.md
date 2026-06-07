@@ -28,7 +28,7 @@ VOS ITINÉRAIRES, TOUS VOS APPAREILS
 Un itinéraire que vous avez planifié ou enregistré vous appartient. En l'exportant en fichier GPX, vous pouvez naviguer avec l'appareil de votre choix — un compteur vélo Garmin ou Wahoo, une montre de sport ou une autre appli de cartographie — tout en continuant à planifier dans Komoot.
 
 CONFIDENTIALITÉ
-L'appli n'a aucun serveur dédié. Votre connexion à Komoot se fait dans un navigateur intégré sur komoot.com — nous ne voyons jamais votre e-mail ni votre mot de passe. Les données des itinéraires circulent directement entre votre téléphone et les serveurs de Komoot ; nous ne les relayons ni ne les stockons.
+L'appli n'a aucun serveur dédié. Votre connexion à Komoot se fait dans un navigateur intégré sur komoot.com — nous ne voyons jamais votre e-mail ni votre mot de passe. Les données des itinéraires circulent directement entre votre téléphone et les serveurs de Komoot ; nous ne les relayons ni ne les stockons. Des statistiques d'utilisation anonymes et des rapports de plantage (Google Firebase) nous aident à améliorer l'appli ; dans l'EEE, l'appli demande d'abord votre consentement.
 
 PUBLICITÉ
 L'appli est gratuite et affiche une petite bannière publicitaire. Dans l'EEE, l'appli demande votre consentement avant de diffuser des publicités personnalisées (vous pouvez refuser et continuer à tout utiliser).
