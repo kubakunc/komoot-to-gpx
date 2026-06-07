@@ -10,6 +10,8 @@
   import { maybeShowInterstitial } from '$lib/client/ad-banner';
   import { PHASE2 } from '$lib/client/ad-config';
   import { SAVE_COUNT_KEY, maybeRequestReview } from '$lib/client/review';
+  import { track, EVENTS } from '$lib/client/analytics';
+  import { wasViaShare } from '$lib/client/share-intent';
 
   let savedModalFilename = $state<string | null>(null);
 
@@ -79,8 +81,12 @@
         void maybeShowInterstitial();
       }
       savedModalFilename = filename;
+      void track(EVENTS.EXPORT_SUCCESS, {
+        source: wasViaShare($page.params.id) ? 'share' : 'detail'
+      });
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
+      void track(EVENTS.EXPORT_FAIL, { reason: 'save' });
       errorMsg = 'Download failed.';
     } finally { downloading = false; }
   }

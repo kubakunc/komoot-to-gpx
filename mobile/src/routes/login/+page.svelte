@@ -5,6 +5,7 @@
   import { setSession } from '$lib/client/session';
   import { consumePendingShare } from '$lib/client/share-intent';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
+  import { track, EVENTS } from '$lib/client/analytics';
 
   let errorMsg = $state<string | null>(null);
   let busy = $state(false);
@@ -20,6 +21,7 @@
     try {
       const { userId, token, email } = await nativeLogin();
       await setSession({ userId, token, email });
+      void track(EVENTS.LOGIN_SUCCESS);
       const pending = consumePendingShare();
       await goto(pending ? `/tour/${pending}` : '/', { replaceState: true });
     } catch (e) {
@@ -27,9 +29,11 @@
         errorMsg = 'Open this in the Android app to sign in.';
       } else if (e instanceof AuthCancelledError) {
         errorMsg = null;
+        void track(EVENTS.LOGIN_FAIL, { reason: 'cancelled' });
       } else {
         const msg = (e as Error)?.message ?? 'unknown error';
         errorMsg = `Sign-in failed: ${msg}`;
+        void track(EVENTS.LOGIN_FAIL, { reason: 'error' });
       }
     } finally {
       busy = false;

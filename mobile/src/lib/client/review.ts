@@ -18,6 +18,8 @@ export async function maybeRequestReview(): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
   const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0');
   if (!shouldRequestReview(count)) return;
+  const { track, EVENTS } = await import('./analytics');
+  void track(EVENTS.REVIEW_PROMPT_SHOWN);
   try {
     const { InAppReview } = await import('@capacitor-community/in-app-review');
     await InAppReview.requestReview();

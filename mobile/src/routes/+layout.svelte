@@ -4,7 +4,8 @@
   import { page } from '$app/stores';
   import { getSession, clearSession } from '$lib/client/session';
   import { initAds } from '$lib/client/ad-banner';
-  import { readShareHash, setPendingShare } from '$lib/client/share-intent';
+  import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
+  import { track, EVENTS } from '$lib/client/analytics';
   import '../app.css';
 
   let { children } = $props();
@@ -18,6 +19,8 @@
     if (!tourId) return false;
     history.replaceState(null, '', window.location.pathname + window.location.search);
     const s = await getSession();
+    void track(EVENTS.SHARE_INTENT_RECEIVED, { signed_in: !!s });
+    markViaShare(tourId);
     if (s) {
       await goto(`/tour/${tourId}`);
     } else {

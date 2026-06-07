@@ -15,6 +15,7 @@
   import { shouldShowShareReminder } from '$lib/client/share-hint';
   import ShareReminderModal from '$lib/client/ShareReminderModal.svelte';
   import { SAVE_COUNT_KEY, maybeRequestReview } from '$lib/client/review';
+  import { track, EVENTS } from '$lib/client/analytics';
 
   let savedModalFilename = $state<string | null>(null);
   let showShareReminder = $state(false);
@@ -31,6 +32,7 @@
   function setFilter(f: TourFilter) {
     if (f === filter) return;
     filter = f;
+    void track(EVENTS.FILTER_CHANGE, { filter: f });
     tours = [];
     shapes = {};
     page = 0;
@@ -117,16 +119,19 @@
         void maybeShowInterstitial();
       }
       savedModalFilename = filename;
+      void track(EVENTS.EXPORT_SUCCESS, { source: 'list' });
     } catch (err) {
       if (err instanceof SaveCancelledError) {
         errorMsg = null;
         return;
       }
       if (err instanceof KomootError && err.status === 401) {
+        void track(EVENTS.EXPORT_FAIL, { reason: 'auth' });
         await clearSession();
         await goto('/login', { replaceState: true });
         return;
       }
+      void track(EVENTS.EXPORT_FAIL, { reason: 'api' });
       errorMsg = 'Download failed.';
     } finally {
       downloading = null;
