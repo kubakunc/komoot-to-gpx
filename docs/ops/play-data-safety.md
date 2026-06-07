@@ -40,11 +40,12 @@ sections 4.1 and 4.2.
 - Messages, photos and videos, audio files, files and docs: **None**
 - Calendar, contacts: **None**
 - App activity (interactions, search history, installed apps, user-generated
-  content, other actions): **None** (no analytics SDK; AdMob may log page views
-  for ad attribution but that is covered under "Device or other IDs" above)
+  content, other actions): **App interactions — Yes** (Firebase Analytics; see
+  the 2026-06-07 update below for the full declaration)
 - Web browsing: **None**
 - App info and performance (crash logs, diagnostics, other app performance
-  data): **None** (no Crashlytics, no Firebase Performance)
+  data): **Crash logs + Diagnostics — Yes** (Firebase Crashlytics; see the
+  2026-06-07 update below)
 
 ## 3. Security practices
 
