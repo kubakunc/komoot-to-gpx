@@ -10,6 +10,7 @@
   import MiniMap from '$lib/client/MiniMap.svelte';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
+  import { gpxFilename } from '$lib/client/gpx-filename';
   import { showBanner, hideBanner, maybeShowInterstitial } from '$lib/client/ad-banner';
   import { PHASE2 } from '$lib/client/ad-config';
   import { shouldShowShareReminder } from '$lib/client/share-hint';
@@ -118,10 +119,6 @@
     return { destroy() { io.disconnect(); } };
   }
 
-  function safeName(name: string): string {
-    return name.replace(/[^\p{L}\p{N}\-_ ]+/gu, '').trim().replace(/\s+/g, '_') || 'tour';
-  }
-
   async function download(t: ActivitySummary, e: MouseEvent) {
     e.preventDefault(); e.stopPropagation();
     const s = await getProviderSession(activeProviderId);
@@ -130,7 +127,7 @@
     errorMsg = null;
     try {
       const xml = await provider.getGpx(s, t.id);
-      const filename = safeName(t.name) + '.gpx';
+      const filename = gpxFilename(t.name);
       await saveGpxFile(filename, xml);
       const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
       localStorage.setItem(SAVE_COUNT_KEY, String(count));

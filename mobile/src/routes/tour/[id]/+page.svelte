@@ -9,6 +9,7 @@
   import { KomootError, type Coordinate } from '$lib/client/komoot';
   import { StravaError } from '$lib/client/strava';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
+  import { gpxFilename } from '$lib/client/gpx-filename';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { maybeShowInterstitial } from '$lib/client/ad-banner';
   import { PHASE2 } from '$lib/client/ad-config';
@@ -81,10 +82,6 @@
     mapInstance.fitBounds(line.getBounds(), { padding: [30, 30] });
   }
 
-  function safeName(name: string): string {
-    return (name.replace(/[^\p{L}\p{N}\-_ ]+/gu, '').trim().replace(/\s+/g, '_') || 'tour');
-  }
-
   async function downloadGpx() {
     if (!meta) return;
     const s = await getProviderSession(activeProvider);
@@ -93,7 +90,7 @@
     errorMsg = null;
     try {
       const xml = await provider.getGpx(s, meta.id);
-      const filename = safeName(meta.name) + '.gpx';
+      const filename = gpxFilename(meta.name);
       await saveGpxFile(filename, xml);
       const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
       localStorage.setItem(SAVE_COUNT_KEY, String(count));
