@@ -2,11 +2,12 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
+  import { getConnectedProviders, getProviderSession } from '$lib/client/session';
   import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
   import { initAds } from '$lib/client/ad-banner';
   import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
   import { track, EVENTS } from '$lib/client/analytics';
+  import SourceMenu from '$lib/client/SourceMenu.svelte';
   import '../app.css';
 
   let { children } = $props();
@@ -66,12 +67,6 @@
     }
   });
 
-  async function signOut() {
-    // Sign out of every connected provider.
-    for (const p of await getConnectedProviders()) await clearProviderSession(p);
-    userLabel = null;
-    goto('/login', { replaceState: true });
-  }
 </script>
 
 <header class="app-header">
@@ -83,12 +78,8 @@
       <span>Export GPX</span>
     </a>
     <nav class="nav">
-      <a class="nav-link" href="https://www.komoot.com" target="_blank" rel="noopener noreferrer">
-        Komoot
-      </a>
       {#if userLabel}
-        <span class="user">{userLabel}</span>
-        <button class="logout" onclick={signOut}>Sign out</button>
+        <SourceMenu onSignedOut={() => { userLabel = null; goto('/login', { replaceState: true }); }} />
       {/if}
     </nav>
   </div>
@@ -123,24 +114,6 @@
     font-weight: 600; font-size: 0.95rem; color: var(--color-fg);
   }
   .nav { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
-  .nav-link {
-    font-size: 0.85rem; color: var(--color-fg-muted);
-    padding: 0.4rem 0.7rem; border-radius: var(--radius-sm);
-    transition: color 0.15s, background 0.15s;
-  }
-  .nav-link:hover { color: var(--color-fg); background: var(--color-bg-soft); }
-  .user {
-    color: var(--color-fg-muted); font-size: 0.85rem;
-    max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    padding-left: 0.75rem; border-left: 1px solid var(--color-border);
-  }
-  .logout {
-    background: transparent; color: var(--color-fg-muted);
-    border: 1px solid var(--color-border); border-radius: var(--radius-full);
-    padding: 0.35rem 0.85rem; font-size: 0.82rem;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
-  }
-  .logout:hover { border-color: var(--color-fg); color: var(--color-fg); background: var(--color-bg-soft); }
   main {
     max-width: 1100px; margin: 0 auto;
     padding: 1.5rem
@@ -148,5 +121,4 @@
       max(4rem, calc(4rem + env(safe-area-inset-bottom)))
       max(1.25rem, env(safe-area-inset-left));
   }
-  @media (max-width: 560px) { .user { display: none; } }
 </style>
