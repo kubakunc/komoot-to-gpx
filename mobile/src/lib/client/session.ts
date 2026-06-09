@@ -5,8 +5,8 @@ const LEGACY_KEY = 'gpx-exporter:session';
 const keyFor = (p: ProviderId) => `gpx-exporter:session:${p}`;
 const ALL: ProviderId[] = ['komoot', 'strava'];
 
-/** Legacy shape kept for backward-compatible wrappers. */
-export interface Session {
+/** Shape of the pre-multi-provider session, only read during migration. */
+interface LegacySession {
   email: string;
   userId: string;
   token: string;
@@ -21,7 +21,7 @@ async function migrateLegacy(): Promise<void> {
   const { value } = await Preferences.get({ key: LEGACY_KEY });
   if (!value) return;
   try {
-    const old = JSON.parse(value) as Session;
+    const old = JSON.parse(value) as LegacySession;
     if (old.email && old.userId && old.token) {
       const migrated: ProviderSession = {
         provider: 'komoot', userId: old.userId, displayName: old.email, token: old.token
@@ -60,27 +60,4 @@ export async function getConnectedProviders(): Promise<ProviderId[]> {
     if (await getProviderSession(p)) out.push(p);
   }
   return out;
-}
-
-// ---- Legacy compatibility wrappers (Komoot slot) -------------------------
-// Existing pages call these; they keep working unchanged until the UI is
-// rewired to the provider abstraction.
-
-export async function getSession(): Promise<Session | null> {
-  const s = await getProviderSession('komoot');
-  return s ? { email: s.displayName, userId: s.userId, token: s.token } : null;
-}
-
-export async function setSession(s: Session): Promise<void> {
-  await setProviderSession({
-    provider: 'komoot', userId: s.userId, displayName: s.email, token: s.token
-  });
-}
-
-export async function clearSession(): Promise<void> {
-  await clearProviderSession('komoot');
-}
-
-export function authHeader(s: Session): string {
-  return 'Basic ' + btoa(`${s.email}:${s.token}`);
 }

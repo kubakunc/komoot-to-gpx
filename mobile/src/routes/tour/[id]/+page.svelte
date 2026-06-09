@@ -5,6 +5,7 @@
   import { getProviderSession, clearProviderSession, getConnectedProviders } from '$lib/client/session';
   import { getActiveProvider, setActiveProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
+  import { stravaWebUrl } from '$lib/client/strava-id';
   import type { ProviderId, ActivityMeta } from '$lib/client/provider';
   import { type Coordinate } from '$lib/client/komoot';
   import { isProviderAuthError } from '$lib/client/auth-errors';
@@ -143,7 +144,7 @@
   const externalUrl = $derived(
     meta
       ? activeProvider === 'strava'
-        ? `https://www.strava.com/activities/${meta.id}`
+        ? stravaWebUrl(meta.id)
         : `https://www.komoot.com/tour/${meta.id}`
       : '#'
   );

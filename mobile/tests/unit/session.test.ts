@@ -12,7 +12,7 @@ vi.mock('@capacitor/preferences', () => ({
 
 import {
   getProviderSession, setProviderSession, clearProviderSession,
-  getConnectedProviders, getSession
+  getConnectedProviders
 } from '../../src/lib/client/session';
 
 describe('multi-provider session store', () => {
@@ -40,10 +40,5 @@ describe('multi-provider session store', () => {
     const s = await getProviderSession('komoot');
     expect(s).toMatchObject({ provider: 'komoot', userId: '42', displayName: 'old@b.c', token: 'OLD' });
     expect(store.has('gpx-exporter:session')).toBe(false); // legacy key removed
-  });
-
-  it('legacy getSession() returns the Komoot session in the old shape', async () => {
-    await setProviderSession({ provider: 'komoot', userId: '1', displayName: 'a@b.c', token: 'K' });
-    expect(await getSession()).toEqual({ email: 'a@b.c', userId: '1', token: 'K' });
   });
 });

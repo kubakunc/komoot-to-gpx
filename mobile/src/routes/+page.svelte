@@ -4,6 +4,7 @@
   import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
   import { getActiveProvider, setActiveProvider, activeProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
+  import { stravaWebUrl } from '$lib/client/strava-id';
   import type { ProviderId, ActivitySummary } from '$lib/client/provider';
   import { downsample, type Coordinate } from '$lib/client/komoot';
   import { isProviderAuthError } from '$lib/client/auth-errors';
@@ -160,11 +161,7 @@
   function fmtDist(m: number): string { return (m / 1000).toFixed(1) + ' km'; }
   function fmtSport(s: string): string { return sportLabel[s] ?? s.replace(/_/g, ' '); }
   function activityUrl(id: string): string {
-    if (activeProviderId !== 'strava') return `https://www.komoot.com/tour/${id}`;
-    const raw = id.replace(/^(activity|route)-/, '');
-    return id.startsWith('route-')
-      ? `https://www.strava.com/routes/${raw}`
-      : `https://www.strava.com/activities/${raw}`;
+    return activeProviderId === 'strava' ? stravaWebUrl(id) : `https://www.komoot.com/tour/${id}`;
   }
 
   onMount(() => {

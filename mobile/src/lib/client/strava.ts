@@ -100,7 +100,8 @@ export async function getActivityName(id: string): Promise<string> {
     if (status < 200 || status >= 300) return '';
     const m = /<title>([^<]+)<\/title>/i.exec(body);
     if (!m) return '';
-    return m[1].replace(/\s*[|·]\s*Strava\s*$/i, '').trim();
+    // Strava titles look like "Name | … | Strava"; keep the first segment.
+    return m[1].split(/\s+[|·]\s+/)[0].trim();
   } catch {
     return '';
   }

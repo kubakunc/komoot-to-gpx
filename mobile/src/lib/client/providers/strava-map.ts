@@ -22,7 +22,7 @@ const SPORT_LABEL: Record<string, string> = {
 };
 
 function mapSport(s?: string): string {
-  if (!s) return 'activity';
+  if (typeof s !== 'string' || !s) return 'activity';
   return SPORT_LABEL[s] ?? s.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 

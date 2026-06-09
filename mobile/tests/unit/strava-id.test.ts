@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stravaId, parseStravaId } from '../../src/lib/client/strava-id';
+import { stravaId, parseStravaId, stravaWebUrl } from '../../src/lib/client/strava-id';
 
 describe('strava-id', () => {
   it('builds prefixed ids', () => {
@@ -12,5 +12,9 @@ describe('strava-id', () => {
   });
   it('defaults bare ids to activity (back-compat)', () => {
     expect(parseStravaId('555')).toEqual({ type: 'activity', rawId: '555' });
+  });
+  it('builds the correct strava.com web URL per type (raw id, no prefix)', () => {
+    expect(stravaWebUrl('route-77')).toBe('https://www.strava.com/routes/77');
+    expect(stravaWebUrl('activity-9')).toBe('https://www.strava.com/activities/9');
   });
 });

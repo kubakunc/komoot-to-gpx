@@ -87,7 +87,7 @@ class StravaApiPlugin : Plugin() {
                 if (idx >= 0) html.substring(idx, minOf(idx + 90, html.length)).replace("\n", " ") else "-"
             }")
         }
-        cachedCsrf = ""
+        // Don't poison the cache with an empty token — leave it so the next call re-scrapes.
         return ""
     }
 
