@@ -41,6 +41,13 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:label="Sign in to Komoot" />
 
+        <activity
+            android:name=".StravaLoginActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.Login"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:label="Sign in to Strava" />
+
         <!-- Google AdMob production app id (VeloLogic Labs / Export GPX for Komoot). -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
