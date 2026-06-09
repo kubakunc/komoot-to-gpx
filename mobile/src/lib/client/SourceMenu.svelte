@@ -30,9 +30,17 @@
     labels = next;
   }
 
-  $effect(() => { void refresh(); });
+  // Re-sync connected providers + labels whenever the active source changes
+  // (after connect/switch) so rows never show a stale connect-vs-switch state.
+  $effect(() => {
+    void $activeProvider;
+    void refresh();
+  });
 
-  function toggle() { open = !open; }
+  function toggle() {
+    open = !open;
+    if (open) void refresh(); // always fresh when shown
+  }
 
   function switchTo(id: ProviderId) {
     open = false;
