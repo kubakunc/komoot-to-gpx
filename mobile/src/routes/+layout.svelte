@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { getConnectedProviders, getProviderSession } from '$lib/client/session';
-  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
+  import { getActiveProvider, setActiveProvider, activeProvider } from '$lib/client/active-provider';
   import { initAds } from '$lib/client/ad-banner';
   import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
   import { track, EVENTS } from '$lib/client/analytics';
@@ -48,7 +48,6 @@
     try {
       void initAds();
       const connected = await getConnectedProviders();
-      await refreshUserLabel();
       const handled = await handleShareHash();
       if (!handled) {
         const path = $page.url.pathname;
@@ -67,6 +66,12 @@
     }
   });
 
+  // Keep the header menu's label in sync whenever the active source changes
+  // (e.g. after signing in on /login, which does not re-run onMount).
+  $effect(() => {
+    void $activeProvider;
+    void refreshUserLabel();
+  });
 </script>
 
 <header class="app-header">

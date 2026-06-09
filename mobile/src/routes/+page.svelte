@@ -202,10 +202,6 @@
 </section>
 
 {#if bootstrapped}
-{#if activeProviderId === 'strava'}
-  <p class="powered">Powered by Strava</p>
-{/if}
-
 {#if activeProviderId === 'komoot'}
   <aside class="hint">
     <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -307,14 +303,18 @@
   </p>
 {/if}
 
+{#if bootstrapped && activeProviderId === 'strava'}
+  <p class="powered">Powered by Strava</p>
+{/if}
+
 <div id="ad-banner-spacer" style="height: 60px;"></div>
 
 <style>
   .intro { margin-bottom: 2.5rem; max-width: 640px; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 1rem; margin: 0.5rem 0 0; max-width: 56ch; }
 
-  .powered { margin: 0 0 1.25rem; font-size: 0.72rem; color: var(--color-fg-subtle);
-    letter-spacing: 0.02em; text-transform: uppercase; }
+  .powered { margin: 1.5rem 0 0; text-align: center; font-size: 0.7rem; color: var(--color-fg-subtle);
+    letter-spacing: 0.04em; text-transform: uppercase; }
 
   .hint {
     display: flex; align-items: flex-start; gap: 0.65rem;
