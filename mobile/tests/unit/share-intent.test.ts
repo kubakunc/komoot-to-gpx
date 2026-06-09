@@ -21,6 +21,7 @@ import {
   readShareHash,
   setPendingShare,
   consumePendingShare,
+  peekPendingShare,
   markViaShare,
   wasViaShare
 } from '../../src/lib/client/share-intent';
@@ -109,6 +110,13 @@ describe('pending share (provider-aware)', () => {
     setPendingShare({ provider: 'strava', id: 'route-123' });
     expect(consumePendingShare()).toEqual({ provider: 'strava', id: 'route-123' });
     expect(consumePendingShare()).toBeNull();
+  });
+
+  it('peek reads without clearing', () => {
+    setPendingShare({ provider: 'komoot', id: '7' });
+    expect(peekPendingShare()).toEqual({ provider: 'komoot', id: '7' });
+    expect(peekPendingShare()).toEqual({ provider: 'komoot', id: '7' }); // still there
+    expect(consumePendingShare()).toEqual({ provider: 'komoot', id: '7' });
   });
 
   it('returns null on missing or corrupt', () => {

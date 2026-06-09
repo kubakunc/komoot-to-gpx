@@ -27,10 +27,10 @@ export function setPendingShare(target: ShareTarget): void {
   localStorage.setItem(PENDING_KEY, JSON.stringify(target));
 }
 
-export function consumePendingShare(): ShareTarget | null {
+/** Read the pending share without clearing it (e.g. to show a hint on /login). */
+export function peekPendingShare(): ShareTarget | null {
   const v = localStorage.getItem(PENDING_KEY);
   if (!v) return null;
-  localStorage.removeItem(PENDING_KEY);
   try {
     const t = JSON.parse(v) as ShareTarget;
     if ((t.provider === 'komoot' || t.provider === 'strava') && t.id) return t;
@@ -38,6 +38,12 @@ export function consumePendingShare(): ShareTarget | null {
     /* corrupt */
   }
   return null;
+}
+
+export function consumePendingShare(): ShareTarget | null {
+  const t = peekPendingShare();
+  localStorage.removeItem(PENDING_KEY);
+  return t;
 }
 
 const VIA_SHARE_KEY = 'gpx-exporter:via-share-tour';

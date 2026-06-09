@@ -5,14 +5,24 @@
   import type { ProviderId } from '$lib/client/provider';
   import { setProviderSession } from '$lib/client/session';
   import { setActiveProvider } from '$lib/client/active-provider';
-  import { consumePendingShare, setPendingShare } from '$lib/client/share-intent';
+  import { consumePendingShare, setPendingShare, peekPendingShare } from '$lib/client/share-intent';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
   import { track, EVENTS } from '$lib/client/analytics';
 
   let errorMsg = $state<string | null>(null);
   let busy = $state<ProviderId | null>(null);
+  let shareNote = $state<{ provider: ProviderId; label: string; kind: string } | null>(null);
 
   onMount(() => {
+    const pending = peekPendingShare();
+    if (pending) {
+      const kind = pending.id.startsWith('route-')
+        ? 'route'
+        : pending.provider === 'komoot'
+          ? 'tour'
+          : 'activity';
+      shareNote = { provider: pending.provider, label: getProvider(pending.provider).label, kind };
+    }
     void showBanner();
     return () => { void hideBanner(); };
   });
@@ -55,6 +65,13 @@
     Sign in to Komoot or Strava. A secure login page opens inside the app — we never see your
     password. Your activities stay on your device.
   </p>
+
+  {#if shareNote}
+    <p class="share-note">
+      You shared a {shareNote.kind} from <strong>{shareNote.label}</strong> — sign in with
+      {shareNote.label} below and it'll open here, ready to export.
+    </p>
+  {/if}
 
   <button onclick={() => signIn('komoot')} disabled={busy !== null} class="cta cta-komoot">
     {#if busy === 'komoot'}
@@ -104,6 +121,12 @@
 <style>
   .auth { max-width: 380px; margin: 3rem auto 0; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 0.95rem; margin: 0.5rem 0 2rem; }
+  .share-note {
+    margin: 0 0 1.25rem; padding: 0.8rem 0.9rem;
+    background: var(--color-bg-soft); border: 1px solid var(--color-border);
+    border-radius: var(--radius); font-size: 0.88rem; line-height: 1.5; color: var(--color-fg);
+  }
+  .share-note strong { font-weight: 600; }
   .cta {
     width: 100%; height: 48px; padding: 0 1.1rem;
     background: var(--color-fg); color: var(--color-bg);
