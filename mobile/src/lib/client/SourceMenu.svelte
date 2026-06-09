@@ -11,6 +11,14 @@
   let connected = $state<ProviderId[]>([]);
   let labels = $state<Record<string, string>>({});
   let busy = $state<ProviderId | null>(null);
+  let root = $state<HTMLElement | undefined>(undefined);
+
+  // Close when tapping anywhere outside the menu. A fixed-position scrim can't
+  // be used here: the header's backdrop-filter makes `position: fixed` resolve
+  // against the header, so it would only cover the header bar.
+  function onWindowPointerDown(e: Event) {
+    if (open && root && !root.contains(e.target as Node)) open = false;
+  }
 
   async function refresh() {
     connected = await getConnectedProviders();
@@ -58,14 +66,15 @@
   }
 </script>
 
-<div class="menu">
+<svelte:window onpointerdown={onWindowPointerDown} />
+
+<div class="menu" bind:this={root}>
   <button class="trigger" onclick={toggle} aria-haspopup="menu" aria-expanded={open}>
     {getProvider($activeProvider).label}
     <span class="caret" aria-hidden="true">▾</span>
   </button>
 
   {#if open}
-    <button class="scrim" aria-label="Close menu" onclick={() => (open = false)}></button>
     <div class="dropdown" role="menu">
       {#each availableProviders() as p (p.id)}
         {#if connected.includes(p.id)}
@@ -96,7 +105,6 @@
   }
   .trigger:hover { border-color: var(--color-fg); }
   .caret { font-size: 0.7rem; color: var(--color-fg-muted); }
-  .scrim { position: fixed; inset: 0; z-index: 20; background: transparent; border: 0; }
   .dropdown {
     position: absolute; right: 0; top: calc(100% + 0.4rem); z-index: 21;
     min-width: 220px; background: var(--color-surface);
