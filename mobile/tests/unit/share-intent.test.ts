@@ -82,41 +82,38 @@ describe('extractTourId', () => {
 });
 
 describe('readShareHash', () => {
-  it('reads #share-tour=N', () => {
-    expect(readShareHash('#share-tour=12345')).toBe('12345');
+  it('parses a provider-namespaced share hash', () => {
+    expect(readShareHash('#share=komoot:456')).toEqual({ provider: 'komoot', id: '456' });
+    expect(readShareHash('#share=strava:route-123')).toEqual({ provider: 'strava', id: 'route-123' });
+    expect(readShareHash('#share=strava:activity-9')).toEqual({ provider: 'strava', id: 'activity-9' });
   });
 
-  it('returns null for empty hash', () => {
+  it('accepts the legacy komoot hash', () => {
+    expect(readShareHash('#share-tour=456')).toEqual({ provider: 'komoot', id: '456' });
+  });
+
+  it('returns null for anything else', () => {
     expect(readShareHash('')).toBeNull();
-  });
-
-  it('returns null for unrelated hash', () => {
     expect(readShareHash('#about')).toBeNull();
-  });
-
-  it('returns null for malformed hash', () => {
+    expect(readShareHash('#share=garmin:1')).toBeNull();
     expect(readShareHash('#share-tour=')).toBeNull();
-    expect(readShareHash('#share-tour=abc')).toBeNull();
   });
 });
 
-describe('pending share storage', () => {
+describe('pending share (provider-aware)', () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
-  it('sets and consumes', () => {
-    setPendingShare('555');
-    expect(consumePendingShare()).toBe('555');
-  });
-
-  it('consume clears the entry', () => {
-    setPendingShare('555');
-    consumePendingShare();
+  it('round-trips a target and clears on consume', () => {
+    setPendingShare({ provider: 'strava', id: 'route-123' });
+    expect(consumePendingShare()).toEqual({ provider: 'strava', id: 'route-123' });
     expect(consumePendingShare()).toBeNull();
   });
 
-  it('consume returns null when nothing pending', () => {
+  it('returns null on missing or corrupt', () => {
+    expect(consumePendingShare()).toBeNull();
+    localStorage.setItem('gpx-exporter:pending-share-tour', 'not json');
     expect(consumePendingShare()).toBeNull();
   });
 });

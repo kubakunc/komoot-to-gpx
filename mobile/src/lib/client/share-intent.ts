@@ -1,5 +1,13 @@
+import type { ProviderId } from './provider';
+
 const PENDING_KEY = 'gpx-exporter:pending-share-tour';
 const TOUR_REGEX = /komoot\.(?:com|de)\/(?:[^/?#\s]+\/)?tour\/(\d+)/i;
+
+/** A shared item to open: which provider, and the (namespaced for Strava) id. */
+export interface ShareTarget {
+  provider: ProviderId;
+  id: string;
+}
 
 export function extractTourId(text: string | null | undefined): string | null {
   if (!text) return null;
@@ -7,19 +15,29 @@ export function extractTourId(text: string | null | undefined): string | null {
   return m ? m[1] : null;
 }
 
-export function readShareHash(hash: string): string | null {
-  const m = /^#share-tour=(\d+)$/.exec(hash);
-  return m ? m[1] : null;
+export function readShareHash(hash: string): ShareTarget | null {
+  const m = /^#share=(komoot|strava):([A-Za-z0-9-]+)$/.exec(hash);
+  if (m) return { provider: m[1] as ProviderId, id: m[2] };
+  const legacy = /^#share-tour=(\d+)$/.exec(hash);
+  if (legacy) return { provider: 'komoot', id: legacy[1] };
+  return null;
 }
 
-export function setPendingShare(tourId: string): void {
-  localStorage.setItem(PENDING_KEY, tourId);
+export function setPendingShare(target: ShareTarget): void {
+  localStorage.setItem(PENDING_KEY, JSON.stringify(target));
 }
 
-export function consumePendingShare(): string | null {
+export function consumePendingShare(): ShareTarget | null {
   const v = localStorage.getItem(PENDING_KEY);
-  if (v) localStorage.removeItem(PENDING_KEY);
-  return v;
+  if (!v) return null;
+  localStorage.removeItem(PENDING_KEY);
+  try {
+    const t = JSON.parse(v) as ShareTarget;
+    if ((t.provider === 'komoot' || t.provider === 'strava') && t.id) return t;
+  } catch {
+    /* corrupt */
+  }
+  return null;
 }
 
 const VIA_SHARE_KEY = 'gpx-exporter:via-share-tour';
