@@ -25,3 +25,13 @@ export function setActiveProvider(id: ProviderId): void {
   }
   activeProvider.set(id);
 }
+
+/**
+ * The effective active source: the requested one if it's connected, otherwise
+ * the first connected provider. When nothing is connected, returns the request
+ * unchanged (the caller redirects to /login).
+ */
+export function resolveActiveProvider(connected: ProviderId[], requested: ProviderId): ProviderId {
+  if (connected.length === 0) return requested;
+  return connected.includes(requested) ? requested : connected[0];
+}

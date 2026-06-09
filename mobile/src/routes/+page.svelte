@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
-  import { getActiveProvider, setActiveProvider, activeProvider } from '$lib/client/active-provider';
+  import { getActiveProvider, setActiveProvider, activeProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
   import type { ProviderId, ActivitySummary } from '$lib/client/provider';
   import { downsample, type Coordinate } from '$lib/client/komoot';
@@ -176,9 +176,8 @@
     const id = $activeProvider;
     void (async () => {
       connected = await getConnectedProviders();
-      let active = id;
-      if (connected.length > 0 && !connected.includes(active)) {
-        active = connected[0];
+      const active = resolveActiveProvider(connected, id);
+      if (connected.length > 0 && active !== id) {
         setActiveProvider(active); // re-enters this effect with the corrected id
         return;
       }

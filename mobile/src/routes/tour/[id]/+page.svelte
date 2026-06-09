@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { getProviderSession, clearProviderSession, getConnectedProviders } from '$lib/client/session';
-  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
+  import { getActiveProvider, setActiveProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
   import type { ProviderId, ActivityMeta } from '$lib/client/provider';
   import { type Coordinate } from '$lib/client/komoot';
@@ -39,10 +39,8 @@
     // Reconcile the active source against what's actually connected — guards a
     // cold-start deep link landing on the wrong provider.
     const connected = await getConnectedProviders();
-    if (connected.length > 0 && !connected.includes(activeProvider)) {
-      activeProvider = connected[0];
-      setActiveProvider(activeProvider);
-    }
+    const resolved = resolveActiveProvider(connected, activeProvider);
+    if (resolved !== activeProvider) { activeProvider = resolved; setActiveProvider(resolved); }
     const s = await getProviderSession(activeProvider);
     if (!s) { await goto('/login', { replaceState: true }); return; }
     try {

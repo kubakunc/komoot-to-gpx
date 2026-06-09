@@ -8,7 +8,7 @@ vi.stubGlobal('sessionStorage', {
   removeItem: (k: string) => void store.delete(k)
 });
 
-import { getActiveProvider, setActiveProvider, activeProvider } from '../../src/lib/client/active-provider';
+import { getActiveProvider, setActiveProvider, activeProvider, resolveActiveProvider } from '../../src/lib/client/active-provider';
 
 describe('active-provider', () => {
   beforeEach(() => store.clear());
@@ -18,5 +18,17 @@ describe('active-provider', () => {
     setActiveProvider('strava');
     expect(getActiveProvider()).toBe('strava');
     expect(get(activeProvider)).toBe('strava');
+  });
+});
+
+describe('resolveActiveProvider', () => {
+  it('keeps the requested provider when it is connected', () => {
+    expect(resolveActiveProvider(['komoot', 'strava'], 'strava')).toBe('strava');
+  });
+  it('falls back to the first connected when the requested one is not connected', () => {
+    expect(resolveActiveProvider(['strava'], 'komoot')).toBe('strava');
+  });
+  it('returns the requested provider unchanged when nothing is connected', () => {
+    expect(resolveActiveProvider([], 'komoot')).toBe('komoot');
   });
 });

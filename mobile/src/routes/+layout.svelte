@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { getConnectedProviders, getProviderSession } from '$lib/client/session';
-  import { getActiveProvider, setActiveProvider, activeProvider } from '$lib/client/active-provider';
+  import { getActiveProvider, setActiveProvider, activeProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { initAds } from '$lib/client/ad-banner';
   import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
   import { track, EVENTS } from '$lib/client/analytics';
@@ -20,8 +20,8 @@
   async function refreshUserLabel() {
     const connected = await getConnectedProviders();
     if (connected.length === 0) { userLabel = null; return; }
-    let active = getActiveProvider();
-    if (!connected.includes(active)) { active = connected[0]; setActiveProvider(active); }
+    const active = resolveActiveProvider(connected, getActiveProvider());
+    if (active !== getActiveProvider()) setActiveProvider(active);
     const s = await getProviderSession(active);
     userLabel = s?.displayName ?? null;
   }
