@@ -14,6 +14,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   between Komoot and Strava, connect the other account without signing out, or
   sign out.
 - Strava activities now show **elevation gain**.
+- **Share from Strava.** In the Strava app, tap Share → Export GPX on any
+  activity or route — it opens here ready to save. Works signed out too: the
+  login screen tells you what's waiting, and it opens right after you sign in
+  to Strava.
 
 ## [1.0.6] — 2026-06-07
 
