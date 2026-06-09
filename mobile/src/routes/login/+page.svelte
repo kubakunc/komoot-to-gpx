@@ -5,7 +5,7 @@
   import type { ProviderId } from '$lib/client/provider';
   import { setProviderSession } from '$lib/client/session';
   import { setActiveProvider } from '$lib/client/active-provider';
-  import { consumePendingShare } from '$lib/client/share-intent';
+  import { consumePendingShare, setPendingShare } from '$lib/client/share-intent';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
   import { track, EVENTS } from '$lib/client/analytics';
 
@@ -25,9 +25,13 @@
       await setProviderSession(session);
       setActiveProvider(providerId);
       void track(EVENTS.LOGIN_SUCCESS, { provider: providerId });
-      // A pending share only ever comes from Komoot.
-      const pending = providerId === 'komoot' ? consumePendingShare() : null;
-      await goto(pending ? `/tour/${pending}` : '/', { replaceState: true });
+      const pending = consumePendingShare();
+      if (pending && pending.provider === providerId) {
+        await goto(`/tour/${pending.id}`, { replaceState: true });
+      } else {
+        if (pending) setPendingShare(pending); // keep it for the matching provider
+        await goto('/', { replaceState: true });
+      }
     } catch (e) {
       const err = e as Error;
       if (err?.name === 'AuthUnsupportedError') {
