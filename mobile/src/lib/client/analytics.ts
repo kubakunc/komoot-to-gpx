@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import type { ConsentType as ConsentTypeEnum } from '@capacitor-firebase/analytics';
 
 const isAndroid = () => Capacitor.getPlatform() === 'android';
 
@@ -52,7 +53,7 @@ export async function applyAnalyticsConsent(granted: boolean): Promise<void> {
   if (!isAndroid()) return;
   try {
     const { FirebaseAnalytics, ConsentType, ConsentStatus } = await import('@capacitor-firebase/analytics');
-    const set = (type: ConsentType, ok: boolean) =>
+    const set = (type: ConsentTypeEnum, ok: boolean) =>
       FirebaseAnalytics.setConsent({
         type,
         status: ok ? ConsentStatus.Granted : ConsentStatus.Denied

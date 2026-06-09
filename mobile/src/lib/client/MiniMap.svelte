@@ -25,8 +25,7 @@
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false,
-      touchZoom: false,
-      tap: false
+      touchZoom: false
     });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
