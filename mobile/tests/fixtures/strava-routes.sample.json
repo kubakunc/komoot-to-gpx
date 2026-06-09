@@ -1,0 +1,46 @@
+{
+  "me": {
+    "id": "1000000000000",
+    "measurementPreference": "Metric",
+    "searchRoutes": {
+      "nodes": [
+        {
+          "title": "Sample Lake Loop",
+          "id": "3000000000000000001",
+          "isStarred": true,
+          "elevationGain": 62.89,
+          "length": 59508,
+          "estimatedTime": { "expectedTime": 8486 },
+          "creationTime": "2026-06-09T14:53:38Z",
+          "themedMapImages": [
+            { "lightUrl": "https://example-cdn.invalid/v6/maps/SCRUBBED_A" }
+          ],
+          "routeType": "Ride",
+          "athlete": { "id": "1000000000000" },
+          "isPrivate": false
+        },
+        {
+          "title": "Sample Private Hill",
+          "id": "3000000000000000002",
+          "isStarred": false,
+          "elevationGain": 1248.99,
+          "length": 89230.54,
+          "estimatedTime": { "expectedTime": 12725 },
+          "creationTime": "2026-05-19T12:05:09Z",
+          "themedMapImages": [
+            { "lightUrl": "https://example-cdn.invalid/v6/maps/SCRUBBED_B" }
+          ],
+          "routeType": "GravelRide",
+          "athlete": { "id": "1000000000000" },
+          "isPrivate": true
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "15",
+        "startCursor": "0",
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      }
+    }
+  }
+}
