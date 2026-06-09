@@ -27,18 +27,17 @@
   }
 
   async function handleShareHash() {
-    const tourId = readShareHash(window.location.hash);
-    if (!tourId) return false;
+    const target = readShareHash(window.location.hash);
+    if (!target) return false;
     history.replaceState(null, '', window.location.pathname + window.location.search);
-    // Shares only arrive from Komoot, so switch the active source to Komoot.
-    const s = await getProviderSession('komoot');
-    void track(EVENTS.SHARE_INTENT_RECEIVED, { signed_in: !!s });
-    markViaShare(tourId);
-    setActiveProvider('komoot');
+    setActiveProvider(target.provider);
+    const s = await getProviderSession(target.provider);
+    void track(EVENTS.SHARE_INTENT_RECEIVED, { provider: target.provider, signed_in: !!s });
+    markViaShare(target.id);
     if (s) {
-      await goto(`/tour/${tourId}`);
+      await goto(`/tour/${target.id}`);
     } else {
-      setPendingShare(tourId);
+      setPendingShare(target);
       await goto('/login', { replaceState: true });
     }
     return true;
