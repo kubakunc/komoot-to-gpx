@@ -5,7 +5,12 @@ import { nativeStravaLogin } from '../strava-auth';
 export const stravaProvider: Provider = {
   id: 'strava',
   label: 'Strava',
-  capabilities: { planned: false },
+  capabilities: {
+    filters: [
+      { id: 'activities', label: 'Activities' },
+      { id: 'routes', label: 'Routes' }
+    ]
+  },
 
   async login(): Promise<ProviderSession> {
     const r = await nativeStravaLogin();
@@ -19,7 +24,7 @@ export const stravaProvider: Provider = {
   },
 
   async listActivities(_session, opts): Promise<ActivityPage> {
-    return listActivities(opts.page, opts.filter ?? 'all');
+    return listActivities(opts.page, opts.filter ?? 'activities');
   },
 
   async getActivity(_session, id): Promise<ActivityDetail> {

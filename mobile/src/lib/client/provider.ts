@@ -10,7 +10,12 @@ export interface ProviderSession {
   token: string;       // long-lived JWT (Komoot) / session marker (Strava)
 }
 
-export type ActivityFilter = 'all' | 'recorded' | 'planned';
+export type ActivityFilter = string;
+
+export interface ProviderFilter {
+  id: string;
+  label: string;
+}
 
 export interface ActivitySummary {
   id: string;
@@ -43,7 +48,7 @@ export interface ActivityDetail {
 export interface Provider {
   readonly id: ProviderId;
   readonly label: string;
-  readonly capabilities: { planned: boolean };
+  readonly capabilities: { filters: ProviderFilter[] };
   login(): Promise<ProviderSession>;
   listActivities(
     session: ProviderSession,

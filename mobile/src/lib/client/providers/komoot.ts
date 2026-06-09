@@ -1,7 +1,7 @@
 import type {
-  Provider, ProviderSession, ActivityPage, ActivityDetail, ActivityFilter, ActivitySummary
+  Provider, ProviderSession, ActivityPage, ActivityDetail, ActivitySummary
 } from '../provider';
-import { listTours, getTour, getCoordinates, type TourSummary } from '../komoot';
+import { listTours, getTour, getCoordinates, type TourSummary, type TourFilter } from '../komoot';
 import { nativeLogin } from '../komoot-auth';
 import { toGpx } from '../gpx';
 
@@ -20,7 +20,13 @@ function toSummary(t: TourSummary): ActivitySummary {
 export const komootProvider: Provider = {
   id: 'komoot',
   label: 'Komoot',
-  capabilities: { planned: true },
+  capabilities: {
+    filters: [
+      { id: 'all', label: 'All' },
+      { id: 'recorded', label: 'Completed' },
+      { id: 'planned', label: 'Planned' }
+    ]
+  },
 
   async login(): Promise<ProviderSession> {
     const { userId, token, email } = await nativeLogin();
@@ -28,7 +34,7 @@ export const komootProvider: Provider = {
   },
 
   async listActivities(session, opts): Promise<ActivityPage> {
-    const filter: ActivityFilter = opts.filter ?? 'all';
+    const filter = (opts.filter ?? 'all') as TourFilter;
     const data = await listTours(
       { email: session.displayName, token: session.token },
       { userId: session.userId, page: opts.page, filter }

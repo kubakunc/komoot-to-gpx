@@ -20,9 +20,9 @@ const session: ProviderSession = { provider: 'komoot', userId: '42', displayName
 describe('komootProvider', () => {
   beforeEach(() => { listTours.mockReset(); getTour.mockReset(); getCoordinates.mockReset(); nativeLogin.mockReset(); toGpx.mockReset(); });
 
-  it('declares planned capability and a label', () => {
+  it('declares its filters and a label', () => {
     expect(komootProvider.id).toBe('komoot');
-    expect(komootProvider.capabilities.planned).toBe(true);
+    expect(komootProvider.capabilities.filters.map((f) => f.id)).toEqual(['all', 'recorded', 'planned']);
     expect(komootProvider.label).toBe('Komoot');
   });
 

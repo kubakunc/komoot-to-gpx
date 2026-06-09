@@ -24,8 +24,8 @@ describe('provider registry', () => {
     expect(ids).toEqual(['komoot', 'strava']);
   });
 
-  it('Strava has no planned capability', () => {
-    expect(getProvider('strava').capabilities.planned).toBe(false);
+  it('Strava exposes activities + routes filters', () => {
+    expect(getProvider('strava').capabilities.filters.map((f) => f.id)).toEqual(['activities', 'routes']);
   });
 
   it('throws on an unknown provider id', () => {
