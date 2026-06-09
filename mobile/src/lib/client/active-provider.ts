@@ -1,12 +1,20 @@
+import { writable } from 'svelte/store';
 import type { ProviderId } from './provider';
 
 const KEY = 'gpx-exporter:active-provider';
 
-/** The source the list/detail screens are currently showing. Defaults to Komoot. */
-export function getActiveProvider(): ProviderId {
+function read(): ProviderId {
   if (typeof sessionStorage === 'undefined') return 'komoot';
   const v = sessionStorage.getItem(KEY);
   return v === 'strava' || v === 'komoot' ? v : 'komoot';
+}
+
+/** Reactive active source; components subscribe to react to switches. */
+export const activeProvider = writable<ProviderId>(read());
+
+/** Non-reactive read for one-shot callers (e.g. the detail page on mount). */
+export function getActiveProvider(): ProviderId {
+  return read();
 }
 
 export function setActiveProvider(id: ProviderId): void {
@@ -15,4 +23,5 @@ export function setActiveProvider(id: ProviderId): void {
   } catch {
     /* sessionStorage unavailable — fall back to the default on next read */
   }
+  activeProvider.set(id);
 }
