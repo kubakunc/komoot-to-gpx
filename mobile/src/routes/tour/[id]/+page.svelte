@@ -2,9 +2,12 @@
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getSession, clearSession } from '$lib/client/session';
-  import { getTour, getCoordinates, KomootError, type Coordinate, type TourMetadata } from '$lib/client/komoot';
-  import { toGpx } from '$lib/client/gpx';
+  import { getProviderSession, clearProviderSession } from '$lib/client/session';
+  import { getActiveProvider } from '$lib/client/active-provider';
+  import { getProvider } from '$lib/client/providers/registry';
+  import type { ProviderId, ActivityMeta } from '$lib/client/provider';
+  import { KomootError, type Coordinate } from '$lib/client/komoot';
+  import { StravaError } from '$lib/client/strava';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { maybeShowInterstitial } from '$lib/client/ad-banner';
@@ -15,7 +18,10 @@
 
   let savedModalFilename = $state<string | null>(null);
 
-  let meta = $state<TourMetadata | null>(null);
+  const activeProvider: ProviderId = getActiveProvider();
+  const provider = getProvider(activeProvider);
+
+  let meta = $state<ActivityMeta | null>(null);
   let coords = $state<Coordinate[]>([]);
   let loading = $state(true);
   let errorMsg = $state<string | null>(null);
@@ -28,21 +34,26 @@
     if (mapEl && coords.length > 0 && !mapInstance) void renderMap(mapEl, coords);
   });
 
+  function isAuthError(e: unknown): boolean {
+    return (e instanceof KomootError && e.status === 401) || (e instanceof StravaError && e.status === 401);
+  }
+
   async function load() {
-    const s = await getSession();
+    const s = await getProviderSession(activeProvider);
     if (!s) { await goto('/login', { replaceState: true }); return; }
     try {
       const id = $page.params.id;
-      if (!id) { errorMsg = 'Missing tour id.'; return; }
-      meta = await getTour(s, id);
-      coords = await getCoordinates(s, id, meta.date);
+      if (!id) { errorMsg = 'Missing activity id.'; return; }
+      const detail = await provider.getActivity(s, id);
+      meta = detail.meta;
+      coords = detail.preview;
     } catch (e) {
-      if (e instanceof KomootError && e.status === 401) {
-        await clearSession();
+      if (isAuthError(e)) {
+        await clearProviderSession(activeProvider);
         await goto('/login', { replaceState: true });
         return;
       }
-      errorMsg = 'Failed to load tour.';
+      errorMsg = 'Failed to load activity.';
     } finally { loading = false; }
   }
 
@@ -69,10 +80,12 @@
 
   async function downloadGpx() {
     if (!meta) return;
+    const s = await getProviderSession(activeProvider);
+    if (!s) { await goto('/login', { replaceState: true }); return; }
     downloading = true;
     errorMsg = null;
     try {
-      const xml = toGpx({ name: meta.name, sport: meta.sport, startTimeIso: meta.date }, coords);
+      const xml = await provider.getGpx(s, meta.id);
       const filename = safeName(meta.name) + '.gpx';
       await saveGpxFile(filename, xml);
       const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
@@ -82,17 +95,27 @@
       }
       savedModalFilename = filename;
       void track(EVENTS.EXPORT_SUCCESS, {
-        source: wasViaShare($page.params.id) ? 'share' : 'detail'
+        provider: activeProvider,
+        source: wasViaShare(meta.id) ? 'share' : 'detail'
       });
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
-      void track(EVENTS.EXPORT_FAIL, { reason: 'save' });
-      errorMsg = 'Download failed.';
+      if (isAuthError(err)) {
+        void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'auth' });
+        await clearProviderSession(activeProvider);
+        await goto('/login', { replaceState: true });
+        return;
+      }
+      void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'save' });
+      errorMsg = (err as Error)?.message ?? 'Download failed.';
     } finally { downloading = false; }
   }
 
   function fmtDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '—'
+      : d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
   function fmtDist(): string {
     if (coords.length < 2) return '—';
@@ -103,11 +126,14 @@
   function elevationGain(): string {
     if (coords.length < 2) return '—';
     let gain = 0;
+    let hasAlt = false;
     for (let i = 1; i < coords.length; i++) {
+      if (coords[i].alt === undefined) continue;
+      hasAlt = true;
       const d = (coords[i].alt ?? 0) - (coords[i - 1].alt ?? 0);
       if (d > 0) gain += d;
     }
-    return Math.round(gain) + ' m';
+    return hasAlt ? Math.round(gain) + ' m' : '—';
   }
   function haversine(a: Coordinate, b: Coordinate): number {
     const R = 6371000;
@@ -116,21 +142,27 @@
     const x = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
     return 2 * R * Math.asin(Math.sqrt(x));
   }
-  const komootUrl = $derived(meta ? `https://www.komoot.com/tour/${meta.id}` : '#');
+  const externalUrl = $derived(
+    meta
+      ? activeProvider === 'strava'
+        ? `https://www.strava.com/activities/${meta.id}`
+        : `https://www.komoot.com/tour/${meta.id}`
+      : '#'
+  );
 
   onMount(() => void load());
   onDestroy(() => { if (mapInstance) { mapInstance.remove(); mapInstance = null; } });
 </script>
 
-<a class="back" href="/">← Back to tours</a>
+<a class="back" href="/">← Back to activities</a>
 
-{#if loading}<p class="status">Loading tour…</p>
+{#if loading}<p class="status">Loading activity…</p>
 {:else if errorMsg && !meta}<p class="error">{errorMsg}</p>
 {:else if meta}
   <header class="hero">
     <h1>{meta.name}</h1>
     <div class="hero-actions">
-      <a class="action action-secondary" href={komootUrl} target="_blank" rel="noopener noreferrer">View on Komoot</a>
+      <a class="action action-secondary" href={externalUrl} target="_blank" rel="noopener noreferrer">View on {provider.label}</a>
       <button class="action action-primary" onclick={downloadGpx} disabled={downloading}>
         {downloading ? 'Saving…' : 'Download GPX'}
       </button>

@@ -3,6 +3,13 @@
 User-facing changes to **Export GPX for Komoot** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- **Strava support.** Sign in with Strava and export your activities as GPX —
+  the same one-tap save you already have for Komoot, right from your phone.
+  When you're signed in to both, switch between Komoot and Strava with a tap.
+
 ## [1.0.6] — 2026-06-07
 
 ### Added

@@ -1,59 +1,72 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { nativeLogin, AuthUnsupportedError, AuthCancelledError } from '$lib/client/komoot-auth';
-  import { setSession } from '$lib/client/session';
+  import { getProvider } from '$lib/client/providers/registry';
+  import type { ProviderId } from '$lib/client/provider';
+  import { setProviderSession } from '$lib/client/session';
+  import { setActiveProvider } from '$lib/client/active-provider';
   import { consumePendingShare } from '$lib/client/share-intent';
   import { showBanner, hideBanner } from '$lib/client/ad-banner';
   import { track, EVENTS } from '$lib/client/analytics';
 
   let errorMsg = $state<string | null>(null);
-  let busy = $state(false);
+  let busy = $state<ProviderId | null>(null);
 
   onMount(() => {
     void showBanner();
     return () => { void hideBanner(); };
   });
 
-  async function signIn() {
+  async function signIn(providerId: ProviderId) {
     errorMsg = null;
-    busy = true;
+    busy = providerId;
     try {
-      const { userId, token, email } = await nativeLogin();
-      await setSession({ userId, token, email });
-      void track(EVENTS.LOGIN_SUCCESS);
-      const pending = consumePendingShare();
+      const session = await getProvider(providerId).login();
+      await setProviderSession(session);
+      setActiveProvider(providerId);
+      void track(EVENTS.LOGIN_SUCCESS, { provider: providerId });
+      // A pending share only ever comes from Komoot.
+      const pending = providerId === 'komoot' ? consumePendingShare() : null;
       await goto(pending ? `/tour/${pending}` : '/', { replaceState: true });
     } catch (e) {
-      if (e instanceof AuthUnsupportedError) {
+      const err = e as Error;
+      if (err?.name === 'AuthUnsupportedError') {
         errorMsg = 'Open this in the Android app to sign in.';
-      } else if (e instanceof AuthCancelledError) {
+      } else if (err?.name === 'AuthCancelledError') {
         errorMsg = null;
-        void track(EVENTS.LOGIN_FAIL, { reason: 'cancelled' });
+        void track(EVENTS.LOGIN_FAIL, { provider: providerId, reason: 'cancelled' });
       } else {
-        const msg = (e as Error)?.message ?? 'unknown error';
-        errorMsg = `Sign-in failed: ${msg}`;
-        void track(EVENTS.LOGIN_FAIL, { reason: 'error' });
+        errorMsg = `Sign-in failed: ${err?.message ?? 'unknown error'}`;
+        void track(EVENTS.LOGIN_FAIL, { provider: providerId, reason: 'error' });
       }
     } finally {
-      busy = false;
+      busy = null;
     }
   }
 </script>
 
 <section class="auth">
-  <h1>Sign in with Komoot.</h1>
+  <h1>Export your tours as GPX.</h1>
   <p class="lede">
-    A secure Komoot login page will open inside the app. We never see your password — we only
-    receive a session cookie after you finish signing in.
+    Sign in to Komoot or Strava. A secure login page opens inside the app — we never see your
+    password. Your activities stay on your device.
   </p>
 
-  <button onclick={signIn} disabled={busy} class="cta">
-    {#if busy}
+  <button onclick={() => signIn('komoot')} disabled={busy !== null} class="cta cta-komoot">
+    {#if busy === 'komoot'}
       <span class="spinner" aria-hidden="true"></span>
       Opening Komoot…
     {:else}
       Sign in with Komoot
+    {/if}
+  </button>
+
+  <button onclick={() => signIn('strava')} disabled={busy !== null} class="cta cta-strava">
+    {#if busy === 'strava'}
+      <span class="spinner" aria-hidden="true"></span>
+      Opening Strava…
+    {:else}
+      Sign in with Strava
     {/if}
   </button>
 
@@ -67,21 +80,20 @@
       <path d="M8.3 10.8 L14.7 6.9 M8.3 13.2 L14.7 17.1" stroke="currentColor" stroke-width="1.8" />
     </svg>
     <p class="hint-text">
-      <strong>Tip:</strong> you can also send a tour here straight from the Komoot app —
+      <strong>Tip:</strong> from the Komoot app you can also send a tour here —
       open any tour and tap <strong>Share</strong> → <strong>Export GPX</strong>.
       After you sign in once, it opens instantly, ready to save.
     </p>
   </aside>
 
   <p class="footnote">
-    Don't have a Komoot account?
-    <a href="https://www.komoot.com" target="_blank" rel="noopener noreferrer">
-      Get one at komoot.com
-    </a>
+    Google, Apple and Facebook sign-in don't work inside embedded browsers —
+    use your email and password.
   </p>
 
   <p class="disclaimer">
-    Not affiliated with komoot GmbH. "Komoot" is a trademark of komoot GmbH.
+    Not affiliated with, endorsed by, or sponsored by komoot GmbH or Strava Inc.
+    "Komoot" and "Strava" are trademarks of their respective owners.
   </p>
 </section>
 
@@ -96,9 +108,12 @@
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
     transition: background 0.15s, transform 0.15s;
   }
+  .cta + .cta { margin-top: 0.75rem; }
   .cta:hover { background: var(--color-accent); }
   .cta:active { transform: scale(0.99); }
   .cta:disabled { opacity: 0.65; cursor: progress; }
+  .cta-strava { background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border-strong); }
+  .cta-strava:hover { background: var(--color-bg-soft); }
   .spinner {
     width: 14px; height: 14px;
     border: 1.5px solid currentColor; border-right-color: transparent;
@@ -120,11 +135,6 @@
     color: var(--color-fg-muted);
   }
   .hint-text strong { color: var(--color-fg); font-weight: 600; }
-  .footnote { margin-top: 2rem; color: var(--color-fg-subtle); font-size: 0.85rem; }
-  .footnote a {
-    color: var(--color-fg-muted); text-decoration: underline;
-    text-decoration-color: var(--color-border-strong); text-underline-offset: 2px;
-  }
-  .footnote a:hover { color: var(--color-fg); }
+  .footnote { margin-top: 2rem; color: var(--color-fg-subtle); font-size: 0.85rem; line-height: 1.45; }
   .disclaimer { margin-top: 2.5rem; color: var(--color-fg-subtle); font-size: 0.72rem; line-height: 1.4; }
 </style>

@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getSession, clearSession } from '$lib/client/session';
+  import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
+  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
   import { initAds } from '$lib/client/ad-banner';
   import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
   import { track, EVENTS } from '$lib/client/analytics';
@@ -14,13 +15,25 @@
   let userLabel = $state<string | null>(null);
   let bootError = $state<string | null>(null);
 
+  /** Sync the header label to the active provider's session (falls back to the first connected). */
+  async function refreshUserLabel() {
+    const connected = await getConnectedProviders();
+    if (connected.length === 0) { userLabel = null; return; }
+    let active = getActiveProvider();
+    if (!connected.includes(active)) { active = connected[0]; setActiveProvider(active); }
+    const s = await getProviderSession(active);
+    userLabel = s?.displayName ?? null;
+  }
+
   async function handleShareHash() {
     const tourId = readShareHash(window.location.hash);
     if (!tourId) return false;
     history.replaceState(null, '', window.location.pathname + window.location.search);
-    const s = await getSession();
+    // Shares only arrive from Komoot, so switch the active source to Komoot.
+    const s = await getProviderSession('komoot');
     void track(EVENTS.SHARE_INTENT_RECEIVED, { signed_in: !!s });
     markViaShare(tourId);
+    setActiveProvider('komoot');
     if (s) {
       await goto(`/tour/${tourId}`);
     } else {
@@ -33,14 +46,14 @@
   onMount(async () => {
     try {
       void initAds();
-      const s = await getSession();
-      userLabel = s?.email ?? null;
+      const connected = await getConnectedProviders();
+      await refreshUserLabel();
       const handled = await handleShareHash();
       if (!handled) {
         const path = $page.url.pathname;
-        if (!s && path !== '/login') {
+        if (connected.length === 0 && path !== '/login') {
           await goto('/login', { replaceState: true });
-        } else if (s && path === '/login') {
+        } else if (connected.length > 0 && path === '/login') {
           await goto('/', { replaceState: true });
         }
       }
@@ -54,7 +67,8 @@
   });
 
   async function signOut() {
-    await clearSession();
+    // Sign out of every connected provider.
+    for (const p of await getConnectedProviders()) await clearProviderSession(p);
     userLabel = null;
     goto('/login', { replaceState: true });
   }

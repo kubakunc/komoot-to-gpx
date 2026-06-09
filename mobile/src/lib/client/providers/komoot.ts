@@ -1,11 +1,9 @@
 import type {
   Provider, ProviderSession, ActivityPage, ActivityDetail, ActivityFilter, ActivitySummary
 } from '../provider';
-import { listTours, getTour, getCoordinates, downsample, type TourSummary } from '../komoot';
+import { listTours, getTour, getCoordinates, type TourSummary } from '../komoot';
 import { nativeLogin } from '../komoot-auth';
 import { toGpx } from '../gpx';
-
-const PREVIEW_POINTS = 160;
 
 function toSummary(t: TourSummary): ActivitySummary {
   return {
@@ -42,9 +40,11 @@ export const komootProvider: Provider = {
     const auth = { email: session.displayName, token: session.token };
     const meta = await getTour(auth, id);
     const coords = await getCoordinates(auth, id, meta.date);
+    // Full-resolution track; the list downsamples for the card thumbnail, the
+    // detail screen uses the full set for the map and distance/elevation stats.
     return {
       meta: { id: meta.id, name: meta.name, sport: meta.sport, date: meta.date },
-      preview: downsample(coords, PREVIEW_POINTS)
+      preview: coords
     };
   },
 

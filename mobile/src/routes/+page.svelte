@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { getSession, clearSession } from '$lib/client/session';
-  import {
-    listTours, getTour, getCoordinates, downsample,
-    KomootError, type TourSummary, type Coordinate, type TourFilter
-  } from '$lib/client/komoot';
-  import { toGpx } from '$lib/client/gpx';
+  import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
+  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
+  import { getProvider } from '$lib/client/providers/registry';
+  import type { ProviderId, ActivitySummary, ActivityFilter } from '$lib/client/provider';
+  import { downsample, KomootError, type Coordinate } from '$lib/client/komoot';
+  import { StravaError } from '$lib/client/strava';
   import MiniMap from '$lib/client/MiniMap.svelte';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
@@ -20,43 +20,74 @@
   let savedModalFilename = $state<string | null>(null);
   let showShareReminder = $state(false);
 
-  let tours = $state<TourSummary[]>([]);
+  let activeProvider = $state<ProviderId>('komoot');
+  let connected = $state<ProviderId[]>([]);
+  let tours = $state<ActivitySummary[]>([]);
   let page = $state(0);
   let totalPages = $state(1);
   let loading = $state(false);
   let errorMsg = $state<string | null>(null);
   let downloading = $state<string | null>(null);
   let shapes = $state<Record<string, Coordinate[] | 'loading' | 'error'>>({});
-  let filter = $state<TourFilter>('all');
+  let filter = $state<ActivityFilter>('all');
 
-  function setFilter(f: TourFilter) {
-    if (f === filter) return;
-    filter = f;
-    void track(EVENTS.FILTER_CHANGE, { filter: f });
+  const provider = $derived(getProvider(activeProvider));
+
+  function isAuthError(e: unknown): boolean {
+    return (e instanceof KomootError && e.status === 401) || (e instanceof StravaError && e.status === 401);
+  }
+
+  async function onAuthFail() {
+    await clearProviderSession(activeProvider);
+    connected = await getConnectedProviders();
+    if (connected.length === 0) {
+      await goto('/login', { replaceState: true });
+      return;
+    }
+    switchTo(connected[0]);
+  }
+
+  function resetList() {
     tours = [];
     shapes = {};
     page = 0;
     totalPages = 1;
+  }
+
+  function switchTo(id: ProviderId) {
+    activeProvider = id;
+    setActiveProvider(id);
+    if (!getProvider(id).capabilities.planned) filter = 'all';
+    resetList();
+    void loadPage(0);
+  }
+
+  function setSource(id: ProviderId) {
+    if (id === activeProvider) return;
+    switchTo(id);
+  }
+
+  function setFilter(f: ActivityFilter) {
+    if (f === filter) return;
+    filter = f;
+    void track(EVENTS.FILTER_CHANGE, { provider: activeProvider, filter: f });
+    resetList();
     void loadPage(0);
   }
 
   async function loadPage(p: number) {
-    const s = await getSession();
-    if (!s) return;
+    const s = await getProviderSession(activeProvider);
+    if (!s) { await onAuthFail(); return; }
     loading = true;
     errorMsg = null;
     try {
-      const data = await listTours(s, { userId: s.userId, page: p, filter });
-      tours = p === 0 ? data.tours : [...tours, ...data.tours];
+      const data = await provider.listActivities(s, { page: p, filter });
+      tours = p === 0 ? data.items : [...tours, ...data.items];
       totalPages = data.totalPages;
       page = data.page;
     } catch (e) {
-      if (e instanceof KomootError && e.status === 401) {
-        await clearSession();
-        await goto('/login', { replaceState: true });
-        return;
-      }
-      errorMsg = 'Failed to load tours.';
+      if (isAuthError(e)) { await onAuthFail(); return; }
+      errorMsg = 'Failed to load activities.';
     } finally {
       loading = false;
     }
@@ -64,13 +95,12 @@
 
   async function loadShape(id: string) {
     if (shapes[id]) return;
-    const s = await getSession();
+    const s = await getProviderSession(activeProvider);
     if (!s) return;
     shapes = { ...shapes, [id]: 'loading' };
     try {
-      const meta = await getTour(s, id);
-      const coords = await getCoordinates(s, id, meta.date);
-      shapes = { ...shapes, [id]: downsample(coords, 160) };
+      const detail = await provider.getActivity(s, id);
+      shapes = { ...shapes, [id]: downsample(detail.preview, 160) };
     } catch {
       shapes = { ...shapes, [id]: 'error' };
     }
@@ -93,25 +123,18 @@
   }
 
   function safeName(name: string): string {
-    return (
-      name.replace(/[^\p{L}\p{N}\-_ ]+/gu, '').trim().replace(/\s+/g, '_') || 'tour'
-    );
+    return name.replace(/[^\p{L}\p{N}\-_ ]+/gu, '').trim().replace(/\s+/g, '_') || 'tour';
   }
 
-  async function download(t: TourSummary, e: MouseEvent) {
+  async function download(t: ActivitySummary, e: MouseEvent) {
     e.preventDefault(); e.stopPropagation();
-    const s = await getSession();
-    if (!s) return;
+    const s = await getProviderSession(activeProvider);
+    if (!s) { await onAuthFail(); return; }
     downloading = t.id;
     errorMsg = null;
     try {
-      const meta = await getTour(s, t.id);
-      const coords = await getCoordinates(s, t.id, meta.date);
-      const xml = toGpx(
-        { name: meta.name, sport: meta.sport, startTimeIso: meta.date },
-        coords
-      );
-      const filename = safeName(meta.name) + '.gpx';
+      const xml = await provider.getGpx(s, t.id);
+      const filename = safeName(t.name) + '.gpx';
       await saveGpxFile(filename, xml);
       const count = Number(localStorage.getItem(SAVE_COUNT_KEY) ?? '0') + 1;
       localStorage.setItem(SAVE_COUNT_KEY, String(count));
@@ -119,19 +142,15 @@
         void maybeShowInterstitial();
       }
       savedModalFilename = filename;
-      void track(EVENTS.EXPORT_SUCCESS, { source: 'list' });
+      void track(EVENTS.EXPORT_SUCCESS, { provider: activeProvider, source: 'list' });
     } catch (err) {
-      if (err instanceof SaveCancelledError) {
-        errorMsg = null;
+      if (err instanceof SaveCancelledError) { errorMsg = null; return; }
+      if (isAuthError(err)) {
+        void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'auth' });
+        await onAuthFail();
         return;
       }
-      if (err instanceof KomootError && err.status === 401) {
-        void track(EVENTS.EXPORT_FAIL, { reason: 'auth' });
-        await clearSession();
-        await goto('/login', { replaceState: true });
-        return;
-      }
-      void track(EVENTS.EXPORT_FAIL, { reason: 'api' });
+      void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'api' });
       errorMsg = 'Download failed.';
     } finally {
       downloading = null;
@@ -144,48 +163,81 @@
     e_racebike: 'E-Road', e_mtb: 'E-MTB', e_touringbicycle: 'E-Trekking'
   };
   function fmtDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '—'
+      : d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   }
   function fmtDist(m: number): string { return (m / 1000).toFixed(1) + ' km'; }
   function fmtSport(s: string): string { return sportLabel[s] ?? s.replace(/_/g, ' '); }
-  const komootUrl = (id: string) => `https://www.komoot.com/tour/${id}`;
+  function activityUrl(id: string): string {
+    return activeProvider === 'strava'
+      ? `https://www.strava.com/activities/${id}`
+      : `https://www.komoot.com/tour/${id}`;
+  }
 
   onMount(() => {
-    showShareReminder = shouldShowShareReminder();
-    void loadPage(0);
-    void showBanner();
+    void (async () => {
+      connected = await getConnectedProviders();
+      let active = getActiveProvider();
+      if (connected.length > 0 && !connected.includes(active)) active = connected[0];
+      activeProvider = active;
+      if (!provider.capabilities.planned) filter = 'all';
+      showShareReminder = activeProvider === 'komoot' && shouldShowShareReminder();
+      void loadPage(0);
+      void showBanner();
+    })();
     return () => { void hideBanner(); };
   });
 </script>
 
 <section class="intro">
-  <h1>Your tours.</h1>
-  <p class="lede">Every recorded and planned route from your Komoot account — ready to download as GPX.</p>
+  <h1>Your activities.</h1>
+  <p class="lede">Every recorded route from your account — ready to download as GPX.</p>
 </section>
 
-<aside class="hint">
-  <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
-    <circle cx="17" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
-    <circle cx="17" cy="18.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
-    <path d="M8.3 10.8 L14.7 6.9 M8.3 13.2 L14.7 17.1" stroke="currentColor" stroke-width="1.8" />
-  </svg>
-  <p class="hint-text">
-    <strong>Tip:</strong> in the Komoot app, open any tour and tap
-    <strong>Share</strong> → <strong>Export GPX</strong> — it opens right here, ready to save.
-  </p>
-</aside>
+{#if connected.length > 1}
+  <div class="sources" role="tablist" aria-label="Source">
+    {#each connected as p (p)}
+      <button class="source" role="tab" aria-selected={activeProvider === p}
+        class:active={activeProvider === p} onclick={() => setSource(p)}>
+        {getProvider(p).label}
+      </button>
+    {/each}
+  </div>
+{/if}
 
-<div class="filters" role="tablist" aria-label="Filter tours">
-  <button class="chip" role="tab" aria-selected={filter === 'all'} class:active={filter === 'all'} onclick={() => setFilter('all')}>All</button>
-  <button class="chip" role="tab" aria-selected={filter === 'recorded'} class:active={filter === 'recorded'} onclick={() => setFilter('recorded')}>Completed</button>
-  <button class="chip" role="tab" aria-selected={filter === 'planned'} class:active={filter === 'planned'} onclick={() => setFilter('planned')}>Planned</button>
-</div>
+{#if activeProvider === 'strava'}
+  <p class="powered">Powered by Strava</p>
+{/if}
+
+{#if activeProvider === 'komoot'}
+  <aside class="hint">
+    <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <circle cx="17" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <circle cx="17" cy="18.5" r="2.6" stroke="currentColor" stroke-width="1.8" />
+      <path d="M8.3 10.8 L14.7 6.9 M8.3 13.2 L14.7 17.1" stroke="currentColor" stroke-width="1.8" />
+    </svg>
+    <p class="hint-text">
+      <strong>Tip:</strong> in the Komoot app, open any tour and tap
+      <strong>Share</strong> → <strong>Export GPX</strong> — it opens right here, ready to save.
+    </p>
+  </aside>
+{/if}
+
+{#if provider.capabilities.planned}
+  <div class="filters" role="tablist" aria-label="Filter tours">
+    <button class="chip" role="tab" aria-selected={filter === 'all'} class:active={filter === 'all'} onclick={() => setFilter('all')}>All</button>
+    <button class="chip" role="tab" aria-selected={filter === 'recorded'} class:active={filter === 'recorded'} onclick={() => setFilter('recorded')}>Completed</button>
+    <button class="chip" role="tab" aria-selected={filter === 'planned'} class:active={filter === 'planned'} onclick={() => setFilter('planned')}>Planned</button>
+  </div>
+{/if}
 
 {#if errorMsg}<p class="error">{errorMsg}</p>{/if}
 
 {#if !loading && tours.length === 0}
-  <p class="empty">No tours in this view.</p>
+  <p class="empty">No activities in this view.</p>
 {/if}
 
 <ul class="tours">
@@ -207,7 +259,7 @@
             <span class="badge badge-status" class:badge-public={t.status === 'public'}>
               {t.status === 'public' ? 'Public' : 'Private'}
             </span>
-            <span class="badge badge-light">{t.type === 'tour_planned' ? 'Planned' : 'Completed'}</span>
+            <span class="badge badge-light">{t.kind === 'planned' ? 'Planned' : 'Completed'}</span>
           </div>
           <strong class="card-title">{t.name}</strong>
           <div class="card-stats">
@@ -217,8 +269,8 @@
         </div>
       </a>
       <div class="card-actions">
-        <a class="action action-secondary" href={komootUrl(t.id)} target="_blank" rel="noopener noreferrer" onclick={(e) => e.stopPropagation()}>
-          Komoot
+        <a class="action action-secondary" href={activityUrl(t.id)} target="_blank" rel="noopener noreferrer" onclick={(e) => e.stopPropagation()}>
+          {provider.label}
         </a>
         <button class="action action-primary" onclick={(e) => download(t, e)} disabled={downloading === t.id}>
           {downloading === t.id ? 'Saving…' : 'GPX'}
@@ -260,10 +312,21 @@
   .intro { margin-bottom: 2.5rem; max-width: 640px; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 1rem; margin: 0.5rem 0 0; max-width: 56ch; }
 
+  .sources { display: flex; gap: 0.4rem; margin: 0 0 1.25rem; flex-wrap: wrap; }
+  .source { display: inline-flex; align-items: center; height: 36px; padding: 0 1.1rem;
+    font-size: 0.88rem; font-weight: 600; border-radius: var(--radius-full);
+    background: var(--color-bg); color: var(--color-fg-muted);
+    border: 1px solid var(--color-border); cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .source:hover { color: var(--color-fg); border-color: var(--color-fg); }
+  .source.active { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+  .powered { margin: -0.75rem 0 1.25rem; font-size: 0.72rem; color: var(--color-fg-subtle);
+    letter-spacing: 0.02em; text-transform: uppercase; }
+
   .hint {
     display: flex; align-items: flex-start; gap: 0.65rem;
     max-width: 640px;
-    margin: -1.25rem 0 1.75rem;
+    margin: 0 0 1.75rem;
     padding: 0.8rem 0.9rem;
     background: var(--color-bg-soft);
     border: 1px solid var(--color-border);

@@ -1,9 +1,6 @@
 import type { Provider, ProviderSession, ActivityPage, ActivityDetail } from '../provider';
 import { listActivities, getStreamCoordinates, getActivityName, getGpx } from '../strava';
-import { downsample } from '../komoot';
 import { nativeStravaLogin } from '../strava-auth';
-
-const PREVIEW_POINTS = 160;
 
 export const stravaProvider: Provider = {
   id: 'strava',
@@ -29,7 +26,7 @@ export const stravaProvider: Provider = {
     const [coords, name] = await Promise.all([getStreamCoordinates(id), getActivityName(id)]);
     return {
       meta: { id, name: name || `Strava activity ${id}`, sport: '', date: '' },
-      preview: downsample(coords, PREVIEW_POINTS)
+      preview: coords
     };
   },
 
