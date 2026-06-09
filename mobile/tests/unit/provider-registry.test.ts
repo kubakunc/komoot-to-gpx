@@ -25,7 +25,7 @@ describe('provider registry', () => {
   });
 
   it('Strava exposes activities + routes filters', () => {
-    expect(getProvider('strava').capabilities.filters.map((f) => f.id)).toEqual(['activities', 'routes']);
+    expect(getProvider('strava').capabilities.filters.map((f) => f.id)).toEqual(['routes', 'activities']);
   });
 
   it('throws on an unknown provider id', () => {

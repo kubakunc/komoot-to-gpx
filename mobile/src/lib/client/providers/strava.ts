@@ -10,9 +10,11 @@ export const stravaProvider: Provider = {
   id: 'strava',
   label: 'Strava',
   capabilities: {
+    // Routes first → it's the default landing filter (planned routes are the
+    // primary thing you export to navigate on a device).
     filters: [
-      { id: 'activities', label: 'Activities' },
-      { id: 'routes', label: 'Routes' }
+      { id: 'routes', label: 'Routes' },
+      { id: 'activities', label: 'Activities' }
     ]
   },
 
@@ -28,9 +30,9 @@ export const stravaProvider: Provider = {
   },
 
   async listActivities(_session, opts): Promise<ActivityPage> {
-    return (opts.filter ?? 'activities') === 'routes'
-      ? listRoutes(opts.page)
-      : listActivities(opts.page, 'activities');
+    return (opts.filter ?? 'routes') === 'activities'
+      ? listActivities(opts.page, 'activities')
+      : listRoutes(opts.page);
   },
 
   async getActivity(_session, id): Promise<ActivityDetail> {
