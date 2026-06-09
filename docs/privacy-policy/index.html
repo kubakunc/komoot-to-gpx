@@ -35,25 +35,28 @@
 
   <h2>2. What we don't collect</h2>
   <ul>
-    <li>Your name, email, or Komoot password (the password is entered only on Komoot's own login page inside an in-app browser).</li>
+    <li>Your name, email, or Komoot / Strava password (the password is entered only on Komoot's or Strava's own login page inside an in-app browser).</li>
     <li>Your GPS location.</li>
     <li>Your contacts, photos, or any device storage outside files you explicitly export.</li>
-    <li>Your Komoot tour content — routes, coordinates and workouts are never sent to us (see section 9 for the anonymous usage analytics we do collect).</li>
+    <li>Your Komoot or Strava activity content — routes, coordinates and workouts are never sent to us (see section 9 for the anonymous usage analytics we do collect).</li>
   </ul>
 
-  <h2>3. Where your Komoot session lives</h2>
+  <h2>3. Where your Komoot / Strava session lives</h2>
   <p>
-    After you sign in, the app keeps a Komoot session token on your device,
-    encrypted using Android Keystore via Capacitor Preferences. Signing out
-    or clearing the app's data removes it.
+    After you sign in, the app keeps the provider's session on your device:
+    for Komoot a session token stored via Capacitor Preferences, and for Strava
+    the session cookie held in the in-app browser's cookie store. Signing out
+    or clearing the app's data removes it. No portable credential leaves the
+    device.
   </p>
 
   <h2>4. Network connections</h2>
   <p>The app communicates with the following endpoints, and only these:</p>
   <ul>
-    <li><code>api.komoot.de</code> — fetching your tours and GPX coordinates.</li>
-    <li><code>www.komoot.com</code> — the in-app sign-in page.</li>
-    <li><code>tile.openstreetmap.org</code> — map tiles for the tour preview.</li>
+    <li><code>api.komoot.de</code> — fetching your Komoot tours and GPX coordinates.</li>
+    <li><code>www.komoot.com</code> — the in-app Komoot sign-in page.</li>
+    <li><code>www.strava.com</code> — the in-app Strava sign-in page, your activity list and GPX export.</li>
+    <li><code>tile.openstreetmap.org</code> — map tiles for the route preview.</li>
     <li>AdMob ad-serving domains operated by Google (<code>googleads.g.doubleclick.net</code> and related).</li>
   </ul>
 
@@ -69,12 +72,13 @@
     launch.
   </p>
 
-  <h2>6. Komoot</h2>
+  <h2>6. Komoot &amp; Strava</h2>
   <p>
-    "Komoot" is a trademark of komoot GmbH. This app is not affiliated with,
-    endorsed by, or sponsored by komoot GmbH. We are an independent third party
-    that uses your own Komoot credentials, entered on Komoot's official login
-    page, to download your tour data on your behalf.
+    "Komoot" is a trademark of komoot GmbH and "Strava" is a trademark of
+    Strava, Inc. This app is not affiliated with, endorsed by, or sponsored by
+    komoot GmbH or Strava, Inc. We are an independent third party that uses your
+    own credentials, entered on each provider's official login page, to download
+    your own activity data on your behalf.
   </p>
 
   <h2>7. Children</h2>

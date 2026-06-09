@@ -118,3 +118,32 @@ Resulting rating: **Everyone / PEGI 3 / USK 0**.
 
 - **All app functionality available without special access?** No — users need a Komoot account.
 - Provide reviewer credentials: create a throwaway Komoot test account with one private + one planned tour, send login in the "Instructions" field.
+
+---
+
+## Strava addition (2026-06-09)
+
+The app now also exports Strava activities. Per the trademark decision
+(`docs/superpowers/specs/2026-06-09-strava-provider-design.md` §7), **"Strava"
+stays out of the app title** and goes only into the description + keywords.
+
+**Add this paragraph to the full description** (after the "WHAT YOU CAN DO" block):
+
+```
+ALSO WORKS WITH STRAVA
+Sign in with Strava and export your activities as GPX too — handy because the
+Strava mobile app doesn't let you export GPX on the phone. Switch between Komoot
+and Strava with a tap when you're signed in to both.
+```
+
+**Append this disclaimer to the end of the full description:**
+
+```
+Not affiliated with, endorsed by, or sponsored by komoot GmbH or Strava, Inc.
+"Komoot" and "Strava" are trademarks of their respective owners.
+```
+
+Apply the same two additions (translated) to each localized listing
+(`play-store-listing-de/-nl/-fr/-it/-es/-pl.md`). Do **not** add "Strava" to the
+localized app titles. Do not use Strava's logo or orange brand colour in the
+icon or feature graphic.

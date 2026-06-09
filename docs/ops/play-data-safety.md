@@ -95,3 +95,11 @@ All: processed ephemerally = No, optional = No (collected automatically),
 encrypted in transit = Yes, deletion: data auto-expires (Analytics
 retention 14 months); users can reset the device identifier in
 Android settings.
+
+## Update 2026-06-09 — Strava support (no Data Safety change)
+
+Adding Strava introduces **no new data types or sharing**. Like Komoot, the
+Strava session lives only on the device (the session cookie in the in-app
+browser's cookie store) and activity data flows directly between the phone and
+`www.strava.com` — there is no backend and nothing new is collected or shared.
+The existing declarations (AdMob + Firebase Analytics/Crashlytics) are unchanged.
