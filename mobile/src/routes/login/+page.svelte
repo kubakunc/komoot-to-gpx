@@ -67,13 +67,17 @@
   </p>
 
   {#if shareNote}
-    <p class="share-note">
-      You shared a {shareNote.kind} from <strong>{shareNote.label}</strong> — sign in with
-      {shareNote.label} below and it'll open here, ready to export.
-    </p>
+    <div class="share-note" role="status">
+      <svg class="share-note-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3v11m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <p>Your {shareNote.label} {shareNote.kind} is ready to export — <strong>sign in with {shareNote.label}</strong> below to open it.</p>
+    </div>
   {/if}
 
-  <button onclick={() => signIn('komoot')} disabled={busy !== null} class="cta cta-komoot">
+  <button onclick={() => signIn('komoot')} disabled={busy !== null}
+    class="cta cta-komoot" class:cta-highlight={shareNote?.provider === 'komoot'}>
     {#if busy === 'komoot'}
       <span class="spinner" aria-hidden="true"></span>
       Opening Komoot…
@@ -82,7 +86,8 @@
     {/if}
   </button>
 
-  <button onclick={() => signIn('strava')} disabled={busy !== null} class="cta cta-strava">
+  <button onclick={() => signIn('strava')} disabled={busy !== null}
+    class="cta cta-strava" class:cta-highlight={shareNote?.provider === 'strava'}>
     {#if busy === 'strava'}
       <span class="spinner" aria-hidden="true"></span>
       Opening Strava…
@@ -122,11 +127,23 @@
   .auth { max-width: 380px; margin: 3rem auto 0; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 0.95rem; margin: 0.5rem 0 2rem; }
   .share-note {
-    margin: 0 0 1.25rem; padding: 0.8rem 0.9rem;
-    background: var(--color-bg-soft); border: 1px solid var(--color-border);
-    border-radius: var(--radius); font-size: 0.88rem; line-height: 1.5; color: var(--color-fg);
+    display: flex; align-items: center; gap: 0.7rem;
+    margin: 0 0 1.25rem; padding: 0.9rem 1rem;
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+    border: 1px solid var(--color-accent); border-radius: var(--radius);
+    font-size: 0.92rem; line-height: 1.45; color: var(--color-fg);
   }
-  .share-note strong { font-weight: 600; }
+  .share-note p { margin: 0; }
+  .share-note strong { font-weight: 700; }
+  .share-note-icon { flex-shrink: 0; color: var(--color-accent); }
+
+  .cta-highlight {
+    animation: cta-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes cta-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 32%, transparent); }
+    50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--color-accent) 16%, transparent); }
+  }
   .cta {
     width: 100%; height: 48px; padding: 0 1.1rem;
     background: var(--color-fg); color: var(--color-bg);
@@ -136,11 +153,13 @@
     transition: background 0.15s, transform 0.15s;
   }
   .cta + .cta { margin-top: 0.75rem; }
-  .cta:hover { background: var(--color-accent); }
   .cta:active { transform: scale(0.99); }
   .cta:disabled { opacity: 0.65; cursor: progress; }
-  .cta-strava { background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border-strong); }
-  .cta-strava:hover { background: var(--color-bg-soft); }
+  /* Brand colours for the provider sign-in buttons. */
+  .cta.cta-komoot { background: #6aa127; color: #fff; }
+  .cta.cta-komoot:hover { background: #5c8c22; }
+  .cta.cta-strava { background: #fc4c02; color: #fff; border: 0; }
+  .cta.cta-strava:hover { background: #e24402; }
   .spinner {
     width: 14px; height: 14px;
     border: 1.5px solid currentColor; border-right-color: transparent;
