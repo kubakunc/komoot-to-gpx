@@ -30,6 +30,7 @@
   let downloading = $state<string | null>(null);
   let shapes = $state<Record<string, Coordinate[] | 'loading' | 'error'>>({});
   let filter = $state<string>('all');
+  let bootstrapped = $state(false); // false until the active source is reconciled (avoids a wrong-provider flash)
 
   const provider = $derived(getProvider(activeProviderId));
 
@@ -187,9 +188,10 @@
         setActiveProvider(active); // re-enters this effect with the corrected id
         return;
       }
-      if (active === activeProviderId && tours.length > 0) return; // already showing it
+      if (bootstrapped && active === activeProviderId) return; // already showing it
       applyActiveProvider(active);
       showShareReminder = active === 'komoot' && shouldShowShareReminder();
+      bootstrapped = true;
     })();
   });
 </script>
@@ -199,6 +201,7 @@
   <p class="lede">Every recorded route from your account — ready to download as GPX.</p>
 </section>
 
+{#if bootstrapped}
 {#if activeProviderId === 'strava'}
   <p class="powered">Powered by Strava</p>
 {/if}
@@ -274,6 +277,9 @@
     </li>
   {/each}
 </ul>
+{:else}
+  <p class="empty">Loading…</p>
+{/if}
 
 {#if savedModalFilename}
   <SavedModal
