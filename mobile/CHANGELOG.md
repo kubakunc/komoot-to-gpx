@@ -8,7 +8,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - **Strava support.** Sign in with Strava and export your activities as GPX —
   the same one-tap save you already have for Komoot, right from your phone.
-  When you're signed in to both, switch between Komoot and Strava with a tap.
+- **Strava planned Routes.** Switch between **Activities** and **Routes** when
+  Strava is the active source, and export either as GPX.
+- **Source menu in the header.** Tap the source name (top-right) to switch
+  between Komoot and Strava, connect the other account without signing out, or
+  sign out.
+- Strava activities now show **elevation gain**.
 
 ## [1.0.6] — 2026-06-07
 
