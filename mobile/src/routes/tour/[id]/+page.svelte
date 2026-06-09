@@ -6,8 +6,8 @@
   import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
   import type { ProviderId, ActivityMeta } from '$lib/client/provider';
-  import { KomootError, type Coordinate } from '$lib/client/komoot';
-  import { StravaError } from '$lib/client/strava';
+  import { type Coordinate } from '$lib/client/komoot';
+  import { isProviderAuthError } from '$lib/client/auth-errors';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
   import { gpxFilename } from '$lib/client/gpx-filename';
   import SavedModal from '$lib/client/SavedModal.svelte';
@@ -35,10 +35,6 @@
     if (mapEl && coords.length > 0 && !mapInstance) void renderMap(mapEl, coords);
   });
 
-  function isAuthError(e: unknown): boolean {
-    return (e instanceof KomootError && e.status === 401) || (e instanceof StravaError && e.status === 401);
-  }
-
   async function load() {
     // Reconcile the active source against what's actually connected — guards a
     // cold-start deep link landing on the wrong provider.
@@ -56,7 +52,7 @@
       meta = detail.meta;
       coords = detail.preview;
     } catch (e) {
-      if (isAuthError(e)) {
+      if (isProviderAuthError(e)) {
         await clearProviderSession(activeProvider);
         await goto('/login', { replaceState: true });
         return;
@@ -104,7 +100,7 @@
       });
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
-      if (isAuthError(err)) {
+      if (isProviderAuthError(err)) {
         void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'auth' });
         await clearProviderSession(activeProvider);
         await goto('/login', { replaceState: true });

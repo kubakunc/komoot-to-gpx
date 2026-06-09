@@ -5,8 +5,8 @@
   import { getActiveProvider, setActiveProvider, activeProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
   import type { ProviderId, ActivitySummary } from '$lib/client/provider';
-  import { downsample, KomootError, type Coordinate } from '$lib/client/komoot';
-  import { StravaError } from '$lib/client/strava';
+  import { downsample, type Coordinate } from '$lib/client/komoot';
+  import { isProviderAuthError } from '$lib/client/auth-errors';
   import MiniMap from '$lib/client/MiniMap.svelte';
   import SavedModal from '$lib/client/SavedModal.svelte';
   import { saveGpxFile, SaveCancelledError } from '$lib/client/gpx-saver';
@@ -34,10 +34,6 @@
   let bootstrapped = $state(false); // false until the active source is reconciled (avoids a wrong-provider flash)
 
   const provider = $derived(getProvider(activeProviderId));
-
-  function isAuthError(e: unknown): boolean {
-    return (e instanceof KomootError && e.status === 401) || (e instanceof StravaError && e.status === 401);
-  }
 
   async function onAuthFail() {
     await clearProviderSession(activeProviderId);
@@ -82,7 +78,7 @@
       totalPages = data.totalPages;
       page = data.page;
     } catch (e) {
-      if (isAuthError(e)) { await onAuthFail(); return; }
+      if (isProviderAuthError(e)) { await onAuthFail(); return; }
       errorMsg = 'Failed to load activities.';
     } finally {
       loading = false;
@@ -138,7 +134,7 @@
       void track(EVENTS.EXPORT_SUCCESS, { provider: activeProviderId, source: 'list' });
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
-      if (isAuthError(err)) {
+      if (isProviderAuthError(err)) {
         void track(EVENTS.EXPORT_FAIL, { provider: activeProviderId, reason: 'auth' });
         await onAuthFail();
         return;
