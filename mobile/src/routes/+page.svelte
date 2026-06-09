@@ -2,9 +2,9 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { getConnectedProviders, getProviderSession, clearProviderSession } from '$lib/client/session';
-  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
+  import { getActiveProvider, setActiveProvider, activeProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
-  import type { ProviderId, ActivitySummary, ActivityFilter } from '$lib/client/provider';
+  import type { ProviderId, ActivitySummary } from '$lib/client/provider';
   import { downsample, KomootError, type Coordinate } from '$lib/client/komoot';
   import { StravaError } from '$lib/client/strava';
   import MiniMap from '$lib/client/MiniMap.svelte';
@@ -20,7 +20,7 @@
   let savedModalFilename = $state<string | null>(null);
   let showShareReminder = $state(false);
 
-  let activeProvider = $state<ProviderId>('komoot');
+  let activeProviderId = $state<ProviderId>('komoot');
   let connected = $state<ProviderId[]>([]);
   let tours = $state<ActivitySummary[]>([]);
   let page = $state(0);
@@ -29,22 +29,22 @@
   let errorMsg = $state<string | null>(null);
   let downloading = $state<string | null>(null);
   let shapes = $state<Record<string, Coordinate[] | 'loading' | 'error'>>({});
-  let filter = $state<ActivityFilter>('all');
+  let filter = $state<string>('all');
 
-  const provider = $derived(getProvider(activeProvider));
+  const provider = $derived(getProvider(activeProviderId));
 
   function isAuthError(e: unknown): boolean {
     return (e instanceof KomootError && e.status === 401) || (e instanceof StravaError && e.status === 401);
   }
 
   async function onAuthFail() {
-    await clearProviderSession(activeProvider);
+    await clearProviderSession(activeProviderId);
     connected = await getConnectedProviders();
     if (connected.length === 0) {
       await goto('/login', { replaceState: true });
       return;
     }
-    switchTo(connected[0]);
+    setActiveProvider(connected[0]); // the store effect reloads the list
   }
 
   function resetList() {
@@ -54,29 +54,23 @@
     totalPages = 1;
   }
 
-  function switchTo(id: ProviderId) {
-    activeProvider = id;
-    setActiveProvider(id);
-    if (!getProvider(id).capabilities.planned) filter = 'all';
+  function applyActiveProvider(id: ProviderId) {
+    activeProviderId = id;
+    filter = getProvider(id).capabilities.filters[0]?.id ?? 'all';
     resetList();
     void loadPage(0);
   }
 
-  function setSource(id: ProviderId) {
-    if (id === activeProvider) return;
-    switchTo(id);
-  }
-
-  function setFilter(f: ActivityFilter) {
+  function setFilter(f: string) {
     if (f === filter) return;
     filter = f;
-    void track(EVENTS.FILTER_CHANGE, { provider: activeProvider, filter: f });
+    void track(EVENTS.FILTER_CHANGE, { provider: activeProviderId, filter: f });
     resetList();
     void loadPage(0);
   }
 
   async function loadPage(p: number) {
-    const s = await getProviderSession(activeProvider);
+    const s = await getProviderSession(activeProviderId);
     if (!s) { await onAuthFail(); return; }
     loading = true;
     errorMsg = null;
@@ -95,7 +89,7 @@
 
   async function loadShape(id: string) {
     if (shapes[id]) return;
-    const s = await getProviderSession(activeProvider);
+    const s = await getProviderSession(activeProviderId);
     if (!s) return;
     shapes = { ...shapes, [id]: 'loading' };
     try {
@@ -128,7 +122,7 @@
 
   async function download(t: ActivitySummary, e: MouseEvent) {
     e.preventDefault(); e.stopPropagation();
-    const s = await getProviderSession(activeProvider);
+    const s = await getProviderSession(activeProviderId);
     if (!s) { await onAuthFail(); return; }
     downloading = t.id;
     errorMsg = null;
@@ -142,15 +136,15 @@
         void maybeShowInterstitial();
       }
       savedModalFilename = filename;
-      void track(EVENTS.EXPORT_SUCCESS, { provider: activeProvider, source: 'list' });
+      void track(EVENTS.EXPORT_SUCCESS, { provider: activeProviderId, source: 'list' });
     } catch (err) {
       if (err instanceof SaveCancelledError) { errorMsg = null; return; }
       if (isAuthError(err)) {
-        void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'auth' });
+        void track(EVENTS.EXPORT_FAIL, { provider: activeProviderId, reason: 'auth' });
         await onAuthFail();
         return;
       }
-      void track(EVENTS.EXPORT_FAIL, { provider: activeProvider, reason: 'api' });
+      void track(EVENTS.EXPORT_FAIL, { provider: activeProviderId, reason: 'api' });
       errorMsg = 'Download failed.';
     } finally {
       downloading = null;
@@ -171,23 +165,32 @@
   function fmtDist(m: number): string { return (m / 1000).toFixed(1) + ' km'; }
   function fmtSport(s: string): string { return sportLabel[s] ?? s.replace(/_/g, ' '); }
   function activityUrl(id: string): string {
-    return activeProvider === 'strava'
-      ? `https://www.strava.com/activities/${id}`
-      : `https://www.komoot.com/tour/${id}`;
+    if (activeProviderId !== 'strava') return `https://www.komoot.com/tour/${id}`;
+    const raw = id.replace(/^(activity|route)-/, '');
+    return id.startsWith('route-')
+      ? `https://www.strava.com/routes/${raw}`
+      : `https://www.strava.com/activities/${raw}`;
   }
 
   onMount(() => {
+    void showBanner();
+    return () => { void hideBanner(); };
+  });
+
+  $effect(() => {
+    const id = $activeProvider;
     void (async () => {
       connected = await getConnectedProviders();
-      let active = getActiveProvider();
-      if (connected.length > 0 && !connected.includes(active)) active = connected[0];
-      activeProvider = active;
-      if (!provider.capabilities.planned) filter = 'all';
-      showShareReminder = activeProvider === 'komoot' && shouldShowShareReminder();
-      void loadPage(0);
-      void showBanner();
+      let active = id;
+      if (connected.length > 0 && !connected.includes(active)) {
+        active = connected[0];
+        setActiveProvider(active); // re-enters this effect with the corrected id
+        return;
+      }
+      if (active === activeProviderId && tours.length > 0) return; // already showing it
+      applyActiveProvider(active);
+      showShareReminder = active === 'komoot' && shouldShowShareReminder();
     })();
-    return () => { void hideBanner(); };
   });
 </script>
 
@@ -196,22 +199,11 @@
   <p class="lede">Every recorded route from your account — ready to download as GPX.</p>
 </section>
 
-{#if connected.length > 1}
-  <div class="sources" role="tablist" aria-label="Source">
-    {#each connected as p (p)}
-      <button class="source" role="tab" aria-selected={activeProvider === p}
-        class:active={activeProvider === p} onclick={() => setSource(p)}>
-        {getProvider(p).label}
-      </button>
-    {/each}
-  </div>
-{/if}
-
-{#if activeProvider === 'strava'}
+{#if activeProviderId === 'strava'}
   <p class="powered">Powered by Strava</p>
 {/if}
 
-{#if activeProvider === 'komoot'}
+{#if activeProviderId === 'komoot'}
   <aside class="hint">
     <svg class="hint-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
@@ -226,11 +218,12 @@
   </aside>
 {/if}
 
-{#if provider.capabilities.planned}
-  <div class="filters" role="tablist" aria-label="Filter tours">
-    <button class="chip" role="tab" aria-selected={filter === 'all'} class:active={filter === 'all'} onclick={() => setFilter('all')}>All</button>
-    <button class="chip" role="tab" aria-selected={filter === 'recorded'} class:active={filter === 'recorded'} onclick={() => setFilter('recorded')}>Completed</button>
-    <button class="chip" role="tab" aria-selected={filter === 'planned'} class:active={filter === 'planned'} onclick={() => setFilter('planned')}>Planned</button>
+{#if provider.capabilities.filters.length > 1}
+  <div class="filters" role="tablist" aria-label="Filter">
+    {#each provider.capabilities.filters as f (f.id)}
+      <button class="chip" role="tab" aria-selected={filter === f.id} class:active={filter === f.id}
+        onclick={() => setFilter(f.id)}>{f.label}</button>
+    {/each}
   </div>
 {/if}
 
@@ -256,9 +249,11 @@
         <div class="card-body">
           <div class="card-meta">
             <span class="badge">{fmtSport(t.sport)}</span>
-            <span class="badge badge-status" class:badge-public={t.status === 'public'}>
-              {t.status === 'public' ? 'Public' : 'Private'}
-            </span>
+            {#if t.status}
+              <span class="badge badge-status" class:badge-public={t.status === 'public'}>
+                {t.status === 'public' ? 'Public' : 'Private'}
+              </span>
+            {/if}
             <span class="badge badge-light">{t.kind === 'planned' ? 'Planned' : 'Completed'}</span>
           </div>
           <strong class="card-title">{t.name}</strong>
@@ -312,15 +307,7 @@
   .intro { margin-bottom: 2.5rem; max-width: 640px; }
   .lede { color: var(--color-fg-muted); line-height: 1.55; font-size: 1rem; margin: 0.5rem 0 0; max-width: 56ch; }
 
-  .sources { display: flex; gap: 0.4rem; margin: 0 0 1.25rem; flex-wrap: wrap; }
-  .source { display: inline-flex; align-items: center; height: 36px; padding: 0 1.1rem;
-    font-size: 0.88rem; font-weight: 600; border-radius: var(--radius-full);
-    background: var(--color-bg); color: var(--color-fg-muted);
-    border: 1px solid var(--color-border); cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s; }
-  .source:hover { color: var(--color-fg); border-color: var(--color-fg); }
-  .source.active { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
-  .powered { margin: -0.75rem 0 1.25rem; font-size: 0.72rem; color: var(--color-fg-subtle);
+  .powered { margin: 0 0 1.25rem; font-size: 0.72rem; color: var(--color-fg-subtle);
     letter-spacing: 0.02em; text-transform: uppercase; }
 
   .hint {
