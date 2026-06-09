@@ -1,0 +1,52 @@
+{
+  "models": [
+    {
+      "id": 1000000000001,
+      "name": "Sample Morning Ride",
+      "sport_type": "Ride",
+      "display_type": "Ride",
+      "activity_type_display_name": "Ride",
+      "private": false,
+      "visibility": "everyone",
+      "start_time": "2026-06-08T14:38:34+0000",
+      "start_date": "Mon, 6/8/2026",
+      "start_date_local_raw": 1780936714,
+      "distance": "59.29",
+      "distance_raw": 59297.1,
+      "long_unit": "kilometers",
+      "short_unit": "km",
+      "moving_time_raw": 7797,
+      "elapsed_time_raw": 12791,
+      "elevation_gain_raw": 612.0,
+      "has_latlng": true,
+      "trainer": false,
+      "commute": false,
+      "static_map": "https://example-cdn.invalid/v6/maps/SCRUBBED",
+      "activity_url": "https://www.strava.com/activities/1000000000001"
+    },
+    {
+      "id": 1000000000002,
+      "name": "Sample Indoor Workout",
+      "sport_type": "Workout",
+      "display_type": "Workout",
+      "activity_type_display_name": "Workout",
+      "private": true,
+      "visibility": "only_me",
+      "start_time": "2026-06-05T18:10:00+0000",
+      "start_date": "Fri, 6/5/2026",
+      "start_date_local_raw": 1780682200,
+      "distance": "0.00",
+      "distance_raw": 0.0,
+      "long_unit": "kilometers",
+      "short_unit": "km",
+      "moving_time_raw": 3600,
+      "elapsed_time_raw": 3600,
+      "elevation_gain_raw": 0.0,
+      "has_latlng": false,
+      "trainer": true,
+      "commute": false,
+      "static_map": null,
+      "activity_url": "https://www.strava.com/activities/1000000000002"
+    }
+  ]
+}
