@@ -1,7 +1,7 @@
 import { registerPlugin } from '@capacitor/core';
 import type { ActivityPage, ActivityFilter } from './provider';
 import type { Coordinate } from './komoot';
-import { parseActivityList, latlngToCoordinates } from './providers/strava-map';
+import { parseActivityList, streamsToCoordinates } from './providers/strava-map';
 
 interface StravaApiPlugin {
   /** Cookie-replay GET against https://www.strava.com (native adds the session cookie). */
@@ -44,11 +44,11 @@ export async function listActivities(page: number, _filter: ActivityFilter): Pro
 
 export async function getStreamCoordinates(id: string): Promise<Coordinate[]> {
   const { status, body } = await get(
-    `/activities/${encodeURIComponent(id)}/streams?stream_types%5B%5D=latlng`,
+    `/activities/${encodeURIComponent(id)}/streams?stream_types%5B%5D=latlng&stream_types%5B%5D=altitude`,
     'getStreams'
   );
   if (status < 200 || status >= 300) return [];
-  return latlngToCoordinates(body);
+  return streamsToCoordinates(body);
 }
 
 export async function getActivityName(id: string): Promise<string> {

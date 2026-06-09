@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
-  parseActivityList, toActivitySummary, latlngToCoordinates
+  parseActivityList, toActivitySummary, streamsToCoordinates
 } from '../../src/lib/client/providers/strava-map';
 
 const fixture = (name: string) =>
@@ -48,15 +48,27 @@ describe('strava-map.parseActivityList', () => {
   });
 });
 
-describe('strava-map.latlngToCoordinates', () => {
+describe('strava-map.streamsToCoordinates', () => {
   it('maps the streams fixture into coordinates', () => {
-    const coords = latlngToCoordinates(fixture('strava-activity-detail.sample.json'));
+    const coords = streamsToCoordinates(fixture('strava-activity-detail.sample.json'));
     expect(coords).toHaveLength(7);
     expect(coords[0]).toEqual({ lat: 52.25464, lng: 21.073753 });
   });
 
+  it('zips latlng with altitude', () => {
+    const body = JSON.stringify({ latlng: [[1, 2], [3, 4]], altitude: [100, 110] });
+    expect(streamsToCoordinates(body)).toEqual([
+      { lat: 1, lng: 2, alt: 100 },
+      { lat: 3, lng: 4, alt: 110 }
+    ]);
+  });
+
+  it('omits alt when altitude stream is absent', () => {
+    expect(streamsToCoordinates(JSON.stringify({ latlng: [[1, 2]] }))).toEqual([{ lat: 1, lng: 2 }]);
+  });
+
   it('returns empty on malformed JSON or missing latlng', () => {
-    expect(latlngToCoordinates('nope')).toEqual([]);
-    expect(latlngToCoordinates('{}')).toEqual([]);
+    expect(streamsToCoordinates('nope')).toEqual([]);
+    expect(streamsToCoordinates('{}')).toEqual([]);
   });
 });

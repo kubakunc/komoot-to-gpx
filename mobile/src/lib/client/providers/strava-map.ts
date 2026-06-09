@@ -59,15 +59,21 @@ export function parseActivityList(body: string, page: number, perPage: number): 
   return { items, page, totalPages };
 }
 
-/** Parse the streams `{ latlng: [[lat,lng], ...] }` response into Coordinates. */
-export function latlngToCoordinates(body: string): Coordinate[] {
+/** Parse the streams `{ latlng: [[lat,lng],...], altitude?: [m,...] }` response. */
+export function streamsToCoordinates(body: string): Coordinate[] {
   try {
     const d = JSON.parse(body);
     const ll: unknown = d?.latlng;
     if (!Array.isArray(ll)) return [];
+    const alt: unknown = d?.altitude;
+    const altArr = Array.isArray(alt) ? alt : null;
     return ll
       .filter((p): p is [number, number] => Array.isArray(p) && p.length >= 2)
-      .map((p) => ({ lat: Number(p[0]), lng: Number(p[1]) }));
+      .map((p, i) => {
+        const c: Coordinate = { lat: Number(p[0]), lng: Number(p[1]) };
+        if (altArr && altArr[i] != null) c.alt = Number(altArr[i]);
+        return c;
+      });
   } catch {
     return [];
   }
