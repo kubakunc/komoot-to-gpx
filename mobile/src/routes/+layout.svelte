@@ -67,9 +67,11 @@
   });
 
   // Keep the header menu's label in sync whenever the active source changes
-  // (e.g. after signing in on /login, which does not re-run onMount).
+  // (sign-in on /login) or we navigate (e.g. a cleared session → /login should
+  // drop the menu). Both are tracked so the menu never shows a stale state.
   $effect(() => {
     void $activeProvider;
+    void $page.url.pathname;
     void refreshUserLabel();
   });
 </script>
