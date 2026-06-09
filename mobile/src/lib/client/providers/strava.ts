@@ -1,6 +1,10 @@
 import type { Provider, ProviderSession, ActivityPage, ActivityDetail } from '../provider';
-import { listActivities, getStreamCoordinates, getActivityName, getGpx } from '../strava';
+import {
+  listActivities, listRoutes, getStreamCoordinates, getActivityName, getGpx,
+  getRouteDetail, getRouteGpx
+} from '../strava';
 import { nativeStravaLogin } from '../strava-auth';
+import { parseStravaId } from '../strava-id';
 
 export const stravaProvider: Provider = {
   id: 'strava',
@@ -24,18 +28,23 @@ export const stravaProvider: Provider = {
   },
 
   async listActivities(_session, opts): Promise<ActivityPage> {
-    return listActivities(opts.page, opts.filter ?? 'activities');
+    return (opts.filter ?? 'activities') === 'routes'
+      ? listRoutes(opts.page)
+      : listActivities(opts.page, 'activities');
   },
 
   async getActivity(_session, id): Promise<ActivityDetail> {
-    const [coords, name] = await Promise.all([getStreamCoordinates(id), getActivityName(id)]);
-    return {
-      meta: { id, name: name || `Strava activity ${id}`, sport: '', date: '' },
-      preview: coords
-    };
+    const { type, rawId } = parseStravaId(id);
+    if (type === 'route') {
+      const { name, coords } = await getRouteDetail(rawId);
+      return { meta: { id, name: name || `Route ${rawId}`, sport: 'Route', date: '' }, preview: coords };
+    }
+    const [coords, name] = await Promise.all([getStreamCoordinates(rawId), getActivityName(rawId)]);
+    return { meta: { id, name: name || `Strava activity ${rawId}`, sport: '', date: '' }, preview: coords };
   },
 
   async getGpx(_session, id): Promise<string> {
-    return getGpx(id);
+    const { type, rawId } = parseStravaId(id);
+    return type === 'route' ? getRouteGpx(rawId) : getGpx(rawId);
   }
 };

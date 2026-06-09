@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
-  parseActivityList, toActivitySummary, streamsToCoordinates
+  parseActivityList, toActivitySummary, streamsToCoordinates,
+  routeToSummary, parseRouteList
 } from '../../src/lib/client/providers/strava-map';
 
 const fixture = (name: string) =>
@@ -15,7 +16,7 @@ describe('strava-map.toActivitySummary', () => {
       distance_raw: 59297.1, has_latlng: true, private: false, visibility: 'everyone'
     });
     expect(s).toMatchObject({
-      id: '5', name: 'Ride', sport: 'Ride', distance: 59297.1, kind: 'recorded', status: 'public'
+      id: 'activity-5', name: 'Ride', sport: 'Ride', distance: 59297.1, kind: 'recorded', status: 'public'
     });
   });
 
@@ -32,8 +33,8 @@ describe('strava-map.parseActivityList', () => {
   it('parses the training_activities fixture into summaries', () => {
     const page = parseActivityList(fixture('strava-training-activities.sample.json'), 0, 20);
     expect(page.items).toHaveLength(2);
-    expect(page.items[0]).toMatchObject({ id: '1000000000001', kind: 'recorded', status: 'public' });
-    expect(page.items[1]).toMatchObject({ id: '1000000000002', status: 'private' });
+    expect(page.items[0]).toMatchObject({ id: 'activity-1000000000001', kind: 'recorded', status: 'public' });
+    expect(page.items[1]).toMatchObject({ id: 'activity-1000000000002', status: 'private' });
     // 2 rows < perPage(20) ⇒ no further page
     expect(page.totalPages).toBe(1);
   });
@@ -70,5 +71,31 @@ describe('strava-map.streamsToCoordinates', () => {
   it('returns empty on malformed JSON or missing latlng', () => {
     expect(streamsToCoordinates('nope')).toEqual([]);
     expect(streamsToCoordinates('{}')).toEqual([]);
+  });
+});
+
+describe('strava-map routes', () => {
+  it('maps a route node to a planned summary with a preview image', () => {
+    const s = routeToSummary({
+      id: '777', title: 'Lake Loop', length: 59508, elevationGain: 62.8,
+      creationTime: '2026-06-09T14:53:38Z', routeType: 'GravelRide', isPrivate: true,
+      themedMapImages: [{ lightUrl: 'https://cdn/img.png' }]
+    });
+    expect(s).toMatchObject({
+      id: 'route-777', name: 'Lake Loop', sport: 'Gravel', distance: 59508,
+      kind: 'planned', status: 'private', previewImage: 'https://cdn/img.png'
+    });
+  });
+
+  it('parses the routes fixture (me.searchRoutes.nodes) + pagination', () => {
+    const page = parseRouteList(fixture('strava-routes.sample.json'), 0, 20);
+    expect(page.items).toHaveLength(2);
+    expect(page.items[0]).toMatchObject({ id: 'route-3000000000000000001', kind: 'planned', status: 'public' });
+    expect(page.items[1].status).toBe('private');
+    expect(page.totalPages).toBe(2); // fixture has hasNextPage: true
+  });
+
+  it('returns an empty page on malformed JSON', () => {
+    expect(parseRouteList('nope', 0, 20)).toEqual({ items: [], page: 0, totalPages: 1 });
   });
 });

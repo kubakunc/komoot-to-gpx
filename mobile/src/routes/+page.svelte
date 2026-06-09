@@ -90,6 +90,7 @@
 
   async function loadShape(id: string) {
     if (shapes[id]) return;
+    if (tours.find((t) => t.id === id)?.previewImage) return; // routes show a static image, no fetch
     const s = await getProviderSession(activeProviderId);
     if (!s) return;
     shapes = { ...shapes, [id]: 'loading' };
@@ -237,7 +238,9 @@
     <li class="card" style="animation-delay: {Math.min(i, 8) * 30}ms" use:observeCard={t.id}>
       <a class="card-link" href={`/tour/${t.id}`}>
         <div class="card-map">
-          {#if shapes[t.id] && shapes[t.id] !== 'loading' && shapes[t.id] !== 'error'}
+          {#if t.previewImage}
+            <img class="card-img" src={t.previewImage} alt="" loading="lazy" />
+          {:else if shapes[t.id] && shapes[t.id] !== 'loading' && shapes[t.id] !== 'error'}
             <MiniMap coords={shapes[t.id] as Coordinate[]} />
           {:else if shapes[t.id] === 'error'}
             <div class="map-fallback">preview unavailable</div>
@@ -341,6 +344,8 @@
   @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .card-link { display: flex; flex-direction: column; color: inherit; flex: 1; text-decoration: none; }
   .card-map { position: relative; }
+  .card-img { width: 100%; aspect-ratio: 320 / 112; object-fit: cover; display: block;
+    border-bottom: 1px solid var(--color-border); background: var(--color-bg-soft); }
   .map-skeleton { width: 100%; aspect-ratio: 320 / 112;
     background: linear-gradient(90deg, transparent 30%, rgba(0,0,0,0.04) 50%, transparent 70%), var(--color-bg-soft);
     background-size: 200% 100%; animation: shimmer 1.6s ease-in-out infinite;

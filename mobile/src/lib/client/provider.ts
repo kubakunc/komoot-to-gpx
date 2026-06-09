@@ -25,6 +25,7 @@ export interface ActivitySummary {
   date: string;
   kind: 'recorded' | 'planned';
   status?: string; // optional visibility/privacy label for the UI badge
+  previewImage?: string; // static map image URL (Strava routes); when set the card shows it instead of MiniMap
 }
 
 export interface ActivityPage {

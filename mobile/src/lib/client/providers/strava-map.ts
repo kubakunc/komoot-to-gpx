@@ -1,5 +1,6 @@
 import type { ActivitySummary, ActivityPage } from '../provider';
 import type { Coordinate } from '../komoot';
+import { stravaId } from '../strava-id';
 
 /** Subset of the fields Strava's training_activities rows expose. */
 export interface StravaActivityModel {
@@ -32,13 +33,57 @@ export function toActivitySummary(m: StravaActivityModel): ActivitySummary {
       ? 'public'
       : (m.visibility ?? 'private');
   return {
-    id: String(m.id),
+    id: stravaId('activity', String(m.id)),
     name: m.name ?? 'Untitled',
     sport: mapSport(m.sport_type),
     distance: Number(m.distance_raw ?? 0),
     date: m.start_time ?? '',
     kind: 'recorded',
     status
+  };
+}
+
+/** A route node from the `me.searchRoutes.nodes` GraphQL response. */
+export interface StravaRouteNode {
+  id: number | string;
+  title?: string;
+  length?: number;          // meters
+  elevationGain?: number;
+  creationTime?: string;
+  routeType?: string;
+  isPrivate?: boolean;
+  themedMapImages?: { lightUrl?: string }[];
+}
+
+export function routeToSummary(r: StravaRouteNode): ActivitySummary {
+  return {
+    id: stravaId('route', String(r.id)),
+    name: r.title ?? 'Untitled route',
+    sport: mapSport(r.routeType),
+    distance: Number(r.length ?? 0),
+    date: r.creationTime ?? '',
+    kind: 'planned',
+    status: r.isPrivate ? 'private' : 'public',
+    previewImage: r.themedMapImages?.[0]?.lightUrl
+  };
+}
+
+/** Parse a `POST /api/next/data/routes/my-routes` response (`me.searchRoutes`). */
+export function parseRouteList(body: string, page: number, perPage: number): ActivityPage {
+  let nodes: StravaRouteNode[] = [];
+  let hasNext = false;
+  try {
+    const d = JSON.parse(body);
+    const search = d?.me?.searchRoutes;
+    nodes = Array.isArray(search?.nodes) ? search.nodes : [];
+    hasNext = !!search?.pageInfo?.hasNextPage;
+  } catch {
+    nodes = [];
+  }
+  return {
+    items: nodes.map(routeToSummary),
+    page,
+    totalPages: hasNext ? page + 2 : page + 1
   };
 }
 
