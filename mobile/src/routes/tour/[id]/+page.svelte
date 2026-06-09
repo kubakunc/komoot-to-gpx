@@ -2,8 +2,8 @@
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getProviderSession, clearProviderSession } from '$lib/client/session';
-  import { getActiveProvider } from '$lib/client/active-provider';
+  import { getProviderSession, clearProviderSession, getConnectedProviders } from '$lib/client/session';
+  import { getActiveProvider, setActiveProvider } from '$lib/client/active-provider';
   import { getProvider } from '$lib/client/providers/registry';
   import type { ProviderId, ActivityMeta } from '$lib/client/provider';
   import { KomootError, type Coordinate } from '$lib/client/komoot';
@@ -18,8 +18,8 @@
 
   let savedModalFilename = $state<string | null>(null);
 
-  const activeProvider: ProviderId = getActiveProvider();
-  const provider = getProvider(activeProvider);
+  let activeProvider = $state<ProviderId>(getActiveProvider());
+  const provider = $derived(getProvider(activeProvider));
 
   let meta = $state<ActivityMeta | null>(null);
   let coords = $state<Coordinate[]>([]);
@@ -39,6 +39,13 @@
   }
 
   async function load() {
+    // Reconcile the active source against what's actually connected — guards a
+    // cold-start deep link landing on the wrong provider.
+    const connected = await getConnectedProviders();
+    if (connected.length > 0 && !connected.includes(activeProvider)) {
+      activeProvider = connected[0];
+      setActiveProvider(activeProvider);
+    }
     const s = await getProviderSession(activeProvider);
     if (!s) { await goto('/login', { replaceState: true }); return; }
     try {
