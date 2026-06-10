@@ -1,9 +1,9 @@
 # Changelog
 
-User-facing changes to **Export GPX for Komoot** (Android).
+User-facing changes to **Export GPX for Komoot, Strava** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.1.0] — 2026-06-10
 
 ### Changed
 - App launcher name is now **Export GPX** (shorter and source-neutral, so it
