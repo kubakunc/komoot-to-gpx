@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive icon background: "Route divider" duotone — Strava orange (above the
-     route) + Komoot green (below). The green field's top edge is the route path,
-     matching the white line in the foreground. -->
+<!-- Adaptive background: "route divider" duotone zoomed out into a 140 viewport
+     (design in the central ~71%) so the foreground badge clears the circle mask.
+     Strava orange above the route, Komoot green below; colours bleed to the edges. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="100"
-    android:viewportHeight="100">
-    <path android:fillColor="#FC4C02" android:pathData="M0,0h100v100h-100z" />
-    <path android:fillColor="#5E9E2E" android:pathData="M0,57 L22,53 C30,53 33,43 41,45 C47,46 50,59 58,52 C64,47 69,35 77,33 L100,28 L100,100 L0,100 Z" />
+    android:viewportWidth="140"
+    android:viewportHeight="140">
+    <path android:fillColor="#FC4C02" android:pathData="M0,0h140v140h-140z" />
+    <path android:fillColor="#5E9E2E" android:pathData="M0,77 L42,73 C50,73 53,63 61,65 C67,66 70,79 78,72 C84,67 89,55 97,53 L140,44 L140,140 L0,140 Z" />
 </vector>

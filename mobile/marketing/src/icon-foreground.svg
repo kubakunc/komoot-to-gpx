@@ -1,13 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="432" height="432">
-  <!-- Adaptive-icon foreground: white route + end dots + download badge (ink arrow).
-       Same 100-space coords as icon-master so the line sits on the duotone seam. -->
-  <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
-  <circle cx="22" cy="53" r="4.6" fill="#FFFFFF" />
-  <circle cx="77" cy="33" r="4.6" fill="#FFFFFF" />
-  <circle cx="72" cy="73.5" r="14.5" fill="#FFFFFF" />
-  <g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M72 66.5 V76" />
-    <path d="M66.8 71.6 L72 77 L77.2 71.6" />
-    <path d="M66 80.5 H78" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="432" height="432">
+  <!-- Adaptive foreground, zoomed out (design in the central ~71% / 140-space) so
+       the download badge clears the launcher's circular safe zone. Same route as
+       the background seam (both translated +20). -->
+  <g transform="translate(20,20)">
+    <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="22" cy="53" r="4.6" fill="#FFFFFF" />
+    <circle cx="77" cy="33" r="4.6" fill="#FFFFFF" />
+    <circle cx="72" cy="73.5" r="14.5" fill="#FFFFFF" />
+    <g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M72 66.5 V76" /><path d="M66.8 71.6 L72 77 L77.2 71.6" /><path d="M66 80.5 H78" />
+    </g>
   </g>
 </svg>
