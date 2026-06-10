@@ -5,10 +5,12 @@ Paste these verbatim into **Play Console → Main store listing**.
 ## App name (≤ 30 chars)
 
 ```
-Export GPX for Komoot
+Export GPX
 ```
 
-(20 chars — fits.)
+(10 chars. This is the **canonical / default-language** app name — neutral, so
+Strava users searching find it too. The **localized** listings set the title to
+`Export GPX for Komoot, Strava` to surface both brands.)
 
 ## Short description (≤ 80 chars)
 
@@ -127,10 +129,14 @@ Resulting rating: **Everyone / PEGI 3 / USK 0**.
 
 ## Naming decision
 
-- **App title stays `Export GPX for Komoot`** in every locale — "Strava" is NOT
-  in the app name (Strava's brand guidelines forbid it; lowest trademark risk).
-- **"Strava" is added to the short + full description and keywords** here and in
-  every localized listing (de/nl/fr/it/es/pl) so the app is discoverable for
-  Strava searches.
-- Do **not** use Strava's logo or orange brand colour in the app icon or feature
-  graphic.
+- **Canonical app name (default language + the on-device launcher label) =
+  `Export GPX`** — neutral so it isn't pinned to one provider and Strava users
+  can find it. Set in `mobile/android/.../res/values/strings.xml`.
+- **Each localized listing title = `Export GPX for Komoot, Strava`** — both
+  brands in the per-locale title for discoverability (the "for X" compatible-app
+  pattern). Residual trademark risk is the user's accepted call (a competitor
+  with 10k+ installs uses this same neutral-canonical + branded-localized
+  pattern). Strava goes into the localized titles, short + full descriptions, and
+  keywords.
+- Do **not** use Strava's logo in the app icon or feature graphic (the icon's
+  green/orange split is a generic colour split, not a logo).

@@ -1,7 +1,14 @@
 # Play Store listing — Deutsch (de-DE)
 
 Play Console → Main store listing → **Add language → German (Germany)**.
-Titel bleibt englisch (Markenname enthält bereits "GPX" + "Komoot").
+
+## App name (this locale, ≤ 30 chars)
+
+```
+Export GPX for Komoot, Strava
+```
+
+(29 chars — fits. Canonical/default name is `Export GPX`; the localized title adds both brands.)
 
 ## Short description (≤ 80 Zeichen)
 

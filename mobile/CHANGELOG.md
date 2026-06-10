@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- App launcher name is now **Export GPX** (shorter and source-neutral, so it
+  fits both Komoot and Strava).
+
 ### Added
 - **Strava support.** Sign in with Strava and export your activities as GPX —
   the same one-tap save you already have for Komoot, right from your phone.

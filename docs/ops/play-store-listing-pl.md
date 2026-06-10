@@ -1,7 +1,14 @@
 # Play Store listing — Polski (pl-PL)
 
 Play Console → Main store listing → **Add language → Polish (Poland)**.
-Tytuł pozostaje po angielsku (nazwa marki zawiera już „GPX" + „Komoot").
+
+## App name (this locale, ≤ 30 chars)
+
+```
+Export GPX for Komoot, Strava
+```
+
+(29 chars — fits. Canonical/default name is `Export GPX`; the localized title adds both brands.)
 
 ## Short description (≤ 80 znaków)
 

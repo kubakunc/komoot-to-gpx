@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Export GPX for Komoot</string>
-    <string name="title_activity_main">Export GPX for Komoot</string>
+    <string name="app_name">Export GPX</string>
+    <string name="title_activity_main">Export GPX</string>
     <string name="package_name">com.velologiclabs.gpxexporter</string>
     <string name="custom_url_scheme">com.velologiclabs.gpxexporter</string>
     <string name="google_signin_note">Google sign-in doesn\'t work in embedded browsers — use your email and password. Google-only account? Tap "Can\'t log in?" below to set a password.</string>
