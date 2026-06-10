@@ -6,7 +6,7 @@ Titel blijft Engels (merknaam bevat al "GPX" + "Komoot").
 ## Short description (≤ 80 tekens)
 
 ```
-Komoot tochten exporteren als GPX — voor Garmin, Wahoo en elke fietscomputer.
+Komoot & Strava exporteren als GPX — voor Garmin, Wahoo en elke fietscomputer.
 ```
 
 ## Full description (≤ 4000 tekens)
@@ -24,8 +24,11 @@ WAT JE KUNT DOEN
 • Sla een tocht op als standaard .gpx-bestand waar je maar wilt op je telefoon — Downloads, Drive, Dropbox.
 • Laad het GPX-bestand in Garmin Connect, Wahoo, Hammerhead, Bryton, Coros, Suunto, Apple Watch, OsmAnd, Locus Map, Gaia of elke andere app die GPX importeert.
 
+WERKT OOK MET STRAVA
+Log in met Strava en exporteer ook je activiteiten en geplande routes als GPX — handig, want met de Strava-app kun je op je telefoon geen GPX exporteren. Ben je bij allebei ingelogd, dan wissel je met één tik tussen Komoot en Strava.
+
 JOUW ROUTES, ELK APPARAAT
-Een route die je hebt gepland of opgenomen is van jou. Door hem als GPX-bestand te exporteren kun je navigeren met elk apparaat dat je wilt — een Garmin- of Wahoo-fietscomputer, een sporthorloge of een andere kaart-app — terwijl je blijft plannen in Komoot.
+Een route die je hebt gepland of opgenomen is van jou. Door hem als GPX-bestand te exporteren kun je navigeren met elk apparaat dat je wilt — een Garmin- of Wahoo-fietscomputer, een sporthorloge of een andere kaart-app — terwijl je blijft plannen in Komoot of Strava.
 
 PRIVACY
 De app heeft geen eigen server. Het inloggen bij Komoot gebeurt in een in-app browser op komoot.com — wij zien je e-mailadres of wachtwoord nooit. Tochtgegevens gaan rechtstreeks tussen je telefoon en de servers van Komoot; wij sturen ze niet door en slaan ze niet op. Anonieme gebruiksstatistieken en crashrapporten (Google Firebase) helpen ons de app te verbeteren; in de EER vraagt de app eerst om toestemming.
@@ -33,8 +36,8 @@ De app heeft geen eigen server. Het inloggen bij Komoot gebeurt in een in-app br
 ADVERTENTIES
 De app is gratis en toont een kleine banneradvertentie. In de EER vraagt de app om toestemming voordat er gepersonaliseerde advertenties worden getoond (je kunt weigeren en alles blijven gebruiken).
 
-NIET GELIEERD AAN KOMOOT
-Dit is een tool van derden. "Komoot" is een geregistreerd handelsmerk van komoot GmbH. Wij zijn niet gelieerd aan of goedgekeurd door komoot GmbH. De app gebruikt je eigen account om je eigen gegevens op te halen.
+NIET GELIEERD AAN KOMOOT OF STRAVA
+Dit is een tool van derden. "Komoot" en "Strava" zijn handelsmerken van hun respectieve eigenaren (komoot GmbH en Strava, Inc.). Wij zijn niet gelieerd aan, goedgekeurd door of gesponsord door een van beide. De app gebruikt je eigen account om je eigen gegevens op te halen.
 
 ONDERSTEUNING
 Een bug gevonden? Lukt het exporteren van een tocht niet? Mail naar contact@velologic-labs.eu — meestal nog dezelfde dag antwoord.
@@ -44,4 +47,4 @@ Privacybeleid: https://kubakunc.github.io/komoot-to-gpx/privacy-policy/
 
 ## Zoektermen (ter oriëntatie, niet invoerbaar)
 
-komoot gpx exporteren, komoot tocht downloaden, komoot garmin, komoot wahoo, gpx bestand, fietscomputer route
+komoot gpx exporteren, komoot tocht downloaden, komoot garmin, komoot wahoo, gpx bestand, fietscomputer route, strava gpx export, strava route gpx, strava activiteit gpx, strava garmin, strava wahoo

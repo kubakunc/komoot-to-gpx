@@ -6,7 +6,7 @@ Tytuł pozostaje po angielsku (nazwa marki zawiera już „GPX" + „Komoot").
 ## Short description (≤ 80 znaków)
 
 ```
-Eksportuj trasy z Komoot do GPX — na Garmin, Wahoo, licznik rowerowy i zegarek.
+Komoot i Strava jako GPX — na Garmin, Wahoo, licznik rowerowy lub zegarek.
 ```
 
 ## Full description (≤ 4000 znaków)
@@ -24,8 +24,11 @@ CO MOŻESZ ZROBIĆ
 • Zapisz trasę jako standardowy plik .gpx w dowolnym miejscu na telefonie — Pobrane, Drive, Dropbox.
 • Wczytaj plik GPX do Garmin Connect, Wahoo, Hammerhead, Bryton, Coros, Suunto, Apple Watch, OsmAnd, Locus Map, Gaia lub dowolnej innej aplikacji, która importuje GPX.
 
+DZIAŁA TEŻ ZE STRAVĄ
+Zaloguj się przez Stravę i eksportuj swoje aktywności oraz zaplanowane trasy także jako pliki GPX — to wygodne, bo aplikacja Strava nie pozwala eksportować GPX na telefonie. Gdy jesteś zalogowany w obu serwisach, jednym dotknięciem przełączasz się między Komoot a Stravą.
+
 TWOJE TRASY, KAŻDE URZĄDZENIE
-Trasa, którą zaplanowałeś lub zarejestrowałeś, należy do ciebie. Eksportując ją jako plik GPX, możesz nawigować na dowolnym urządzeniu — liczniku rowerowym Garmin lub Wahoo, zegarku sportowym albo w innej aplikacji z mapami — i dalej planować w Komoot.
+Trasa, którą zaplanowałeś lub zarejestrowałeś, należy do ciebie. Eksportując ją jako plik GPX, możesz nawigować na dowolnym urządzeniu — liczniku rowerowym Garmin lub Wahoo, zegarku sportowym albo w innej aplikacji z mapami — i dalej planować w Komoot lub Strava.
 
 PRYWATNOŚĆ
 Aplikacja nie ma własnego serwera. Logowanie do Komoot odbywa się w przeglądarce wbudowanej w aplikację, na komoot.com — nigdy nie widzimy twojego e-maila ani hasła. Dane tras przepływają bezpośrednio między twoim telefonem a serwerami Komoot; nie pośredniczymy w nich ani ich nie przechowujemy. Anonimowe statystyki użycia i raporty błędów (Google Firebase) pomagają nam ulepszać aplikację; w EOG aplikacja najpierw pyta o zgodę.
@@ -33,8 +36,8 @@ Aplikacja nie ma własnego serwera. Logowanie do Komoot odbywa się w przegląda
 REKLAMY
 Aplikacja jest bezpłatna i wyświetla mały baner reklamowy. W EOG aplikacja prosi o zgodę przed wyświetlaniem spersonalizowanych reklam (możesz odmówić i nadal korzystać ze wszystkiego).
 
-BRAK POWIĄZANIA Z KOMOOT
-To narzędzie firmy zewnętrznej. „Komoot" jest zastrzeżonym znakiem towarowym komoot GmbH. Nie jesteśmy powiązani z komoot GmbH ani przez nią wspierani. Aplikacja używa twojego własnego konta, aby pobrać twoje własne dane.
+BRAK POWIĄZANIA Z KOMOOT ANI STRAVĄ
+To narzędzie firmy zewnętrznej. „Komoot" i „Strava" są zastrzeżonymi znakami towarowymi odpowiednich właścicieli (komoot GmbH oraz Strava, Inc.). Nie jesteśmy powiązani z żadną z tych firm, wspierani ani sponsorowani przez nie. Aplikacja używa twojego własnego konta, aby pobrać twoje własne dane.
 
 POMOC
 Znalazłeś błąd? Trasa się nie eksportuje? Napisz na contact@velologic-labs.eu — zwykle odpowiadamy tego samego dnia.
@@ -44,4 +47,4 @@ Polityka prywatności: https://kubakunc.github.io/komoot-to-gpx/privacy-policy/
 
 ## Frazy wyszukiwania (orientacyjnie, nie do wpisania)
 
-komoot gpx eksport, pobierz trasę komoot, komoot garmin, komoot wahoo, plik gpx, licznik rowerowy trasa
+komoot gpx eksport, pobierz trasę komoot, komoot garmin, komoot wahoo, plik gpx, licznik rowerowy trasa, strava gpx eksport, strava trasa gpx, strava aktywność gpx, strava garmin, strava wahoo

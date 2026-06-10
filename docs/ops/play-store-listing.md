@@ -13,10 +13,11 @@ Export GPX for Komoot
 ## Short description (≤ 80 chars)
 
 ```
-Export Komoot tours as GPX — for Garmin, Wahoo, any bike computer or GPS watch.
+Export Komoot & Strava as GPX — for Garmin, Wahoo, any bike computer or watch.
 ```
 
-(79 chars — fits.)
+(78 chars — fits. "Strava" stays out of the app title; it lives here and in the
+full description for discoverability.)
 
 ## Full description (≤ 4000 chars)
 
@@ -33,8 +34,11 @@ WHAT YOU CAN DO
 • Save a tour as a standard .gpx file anywhere on your phone — Downloads, Drive, Dropbox.
 • Load the GPX file into Garmin Connect, Wahoo, Hammerhead, Bryton, Coros, Suunto, Apple Watch, OsmAnd, Locus Map, Gaia, or any other app that imports GPX.
 
+ALSO WORKS WITH STRAVA
+Sign in with Strava and export your activities and planned routes as GPX too — handy because the Strava app doesn't let you export GPX on the phone. When you're signed in to both, switch between Komoot and Strava with one tap.
+
 YOUR ROUTES, ANY DEVICE
-A route you planned or recorded is yours. Exporting it as a GPX file means you can navigate with any device you like — a Garmin or Wahoo bike computer, a sports watch, or another mapping app — while you keep planning in Komoot.
+A route you planned or recorded is yours. Exporting it as a GPX file means you can navigate with any device you like — a Garmin or Wahoo bike computer, a sports watch, or another mapping app — while you keep planning in Komoot or Strava.
 
 PRIVACY
 The app has no backend server. Your Komoot login happens in an in-app browser on komoot.com — we never see your email or password. Tour data flows directly between your phone and Komoot's servers; we don't proxy or store it. Anonymous usage statistics and crash reports (Google Firebase) help us improve the app; in the EEA the app asks for consent first.
@@ -42,8 +46,8 @@ The app has no backend server. Your Komoot login happens in an in-app browser on
 ADS
 The app is free and shows a small banner ad. In the EEA the app asks for consent before serving personalized ads (you can decline and still use everything).
 
-NOT AFFILIATED WITH KOMOOT
-This is a third-party tool. "Komoot" is a registered trademark of komoot GmbH. We are not affiliated with or endorsed by komoot GmbH. The app uses your own account to retrieve your own data.
+NOT AFFILIATED WITH KOMOOT OR STRAVA
+This is a third-party tool. "Komoot" and "Strava" are trademarks of their respective owners (komoot GmbH and Strava, Inc.). We are not affiliated with, endorsed by, or sponsored by either. The app uses your own account to retrieve your own data.
 
 SUPPORT
 Found a bug? Tour not exporting? Email contact@velologic-labs.eu — usually a same-day reply.
@@ -121,29 +125,12 @@ Resulting rating: **Everyone / PEGI 3 / USK 0**.
 
 ---
 
-## Strava addition (2026-06-09)
+## Naming decision
 
-The app now also exports Strava activities. Per the trademark decision
-(`docs/superpowers/specs/2026-06-09-strava-provider-design.md` §7), **"Strava"
-stays out of the app title** and goes only into the description + keywords.
-
-**Add this paragraph to the full description** (after the "WHAT YOU CAN DO" block):
-
-```
-ALSO WORKS WITH STRAVA
-Sign in with Strava and export your activities as GPX too — handy because the
-Strava mobile app doesn't let you export GPX on the phone. Switch between Komoot
-and Strava with a tap when you're signed in to both.
-```
-
-**Append this disclaimer to the end of the full description:**
-
-```
-Not affiliated with, endorsed by, or sponsored by komoot GmbH or Strava, Inc.
-"Komoot" and "Strava" are trademarks of their respective owners.
-```
-
-Apply the same two additions (translated) to each localized listing
-(`play-store-listing-de/-nl/-fr/-it/-es/-pl.md`). Do **not** add "Strava" to the
-localized app titles. Do not use Strava's logo or orange brand colour in the
-icon or feature graphic.
+- **App title stays `Export GPX for Komoot`** in every locale — "Strava" is NOT
+  in the app name (Strava's brand guidelines forbid it; lowest trademark risk).
+- **"Strava" is added to the short + full description and keywords** here and in
+  every localized listing (de/nl/fr/it/es/pl) so the app is discoverable for
+  Strava searches.
+- Do **not** use Strava's logo or orange brand colour in the app icon or feature
+  graphic.
