@@ -95,7 +95,7 @@ Must be live BEFORE you submit for review.
 |---|---|---|
 | App icon | `mobile/marketing/out/icon-hires-512.png` | 512×512 PNG |
 | Feature graphic | `mobile/marketing/out/feature-graphic.png` | 1024×500 PNG |
-| Phone screenshots (≥ 2, ≤ 8) | `mobile/marketing/screenshots/01-sources.png`, `02-strava.png`, `03-export.png`, `04-saved.png` | 1200×2670 PNG |
+| Phone screenshots (≥ 2, ≤ 8) | `mobile/marketing/screenshots/01-sign-in.png`, `02-strava-routes.png`, `03-switch-source.png`, `04-komoot-tours.png`, `05-export.png` | 1280×2450 PNG (real device captures) |
 
 No tablet screenshots needed (Play allows phone-only).
 
