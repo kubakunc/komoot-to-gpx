@@ -79,7 +79,9 @@
   <div class="app-header-inner">
     <a class="brand" href="/">
       <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M2 16 L6 6 L10 12 L14 7 L18 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M4.4 10.6 C6 10.6 6.6 8.6 8.2 9 C9.4 9.2 10 11.8 11.6 10.4 C12.8 9.4 13.8 7 15.4 6.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="4.4" cy="10.6" r="1.4" fill="currentColor" />
+        <circle cx="15.4" cy="6.6" r="1.4" fill="currentColor" />
       </svg>
       <span>Export GPX</span>
     </a>

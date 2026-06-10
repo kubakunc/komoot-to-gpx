@@ -10,6 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   fits both Komoot and Strava).
 - **New app icon** — "route divider": Strava orange above the activity line,
   Komoot green below, with a download badge (from the brand design handoff).
+  The in-app header mark now echoes the same route line.
 
 ### Added
 - **Strava support.** Sign in with Strava and export your activities as GPX —
