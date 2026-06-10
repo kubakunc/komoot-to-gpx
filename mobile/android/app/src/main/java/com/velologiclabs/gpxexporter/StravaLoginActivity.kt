@@ -31,6 +31,11 @@ class StravaLoginActivity : Activity() {
         const val USER_AGENT =
             "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) " +
                 "Chrome/124.0.0.0 Mobile Safari/537.36 ExportGpxForKomoot/0.1"
+        // The rails markup (profile form, athlete id) only renders under a desktop
+        // UA; the mobile UA gets a Next.js shell. Same trick as StravaApiPlugin.
+        private const val DESKTOP_UA =
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
 
     private lateinit var webView: WebView
@@ -117,11 +122,11 @@ class StravaLoginActivity : Activity() {
 
     private fun cookieHeader(): String = CookieManager.getInstance().getCookie(COOKIE_DOMAIN) ?: ""
 
-    private fun httpGetBody(url: String): String {
+    private fun httpGetBody(url: String, userAgent: String = USER_AGENT): String {
         val conn = URL(url).openConnection() as HttpsURLConnection
         conn.requestMethod = "GET"
         conn.setRequestProperty("Cookie", cookieHeader())
-        conn.setRequestProperty("User-Agent", webView.settings.userAgentString)
+        conn.setRequestProperty("User-Agent", userAgent)
         conn.setRequestProperty("Accept", "text/html,application/json")
         conn.connectTimeout = 12_000
         conn.readTimeout = 15_000
@@ -135,37 +140,23 @@ class StravaLoginActivity : Activity() {
     }
 
     private fun fetchAthleteId(): String? {
-        val html = httpGetBody("https://www.strava.com/settings/profile")
+        val html = httpGetBody("https://www.strava.com/settings/profile", DESKTOP_UA)
         return Regex("athleteId\\s*=\\s*(\\d+)").find(html)?.groupValues?.get(1)
             ?: Regex("/athletes/(\\d+)").find(html)?.groupValues?.get(1)
     }
 
     private fun fetchDisplayName(athleteId: String): String {
-        // Most reliable for the signed-in athlete: the first/last name fields on
-        // the settings page. Fall back to the public profile page <title>.
+        // The public profile page <title> ("First Last | Strava") is the reliable
+        // name source — but only under a desktop UA; the mobile UA gets a Next.js
+        // shell whose title is just "Strava".
         return try {
-            val profile = httpGetBody("https://www.strava.com/settings/profile")
-            val first = inputValue(profile, "athlete[first_name]")
-            val last = inputValue(profile, "athlete[last_name]")
-            val full = "$first $last".trim()
-            if (full.isNotEmpty()) return full
-
-            val html = httpGetBody("https://www.strava.com/athletes/$athleteId")
+            val html = httpGetBody("https://www.strava.com/athletes/$athleteId", DESKTOP_UA)
             val title = Regex("<title>([^<]+)</title>", RegexOption.IGNORE_CASE).find(html)?.groupValues?.get(1) ?: ""
             val name = title.replace(Regex("\\s*[|·]\\s*Strava.*$", RegexOption.IGNORE_CASE), "").trim()
-            // A generic "Strava" title is not a name.
             if (name.equals("Strava", ignoreCase = true)) "" else name
         } catch (e: Exception) {
             ""
         }
-    }
-
-    /** Read an HTML <input>'s value by its name attribute (attributes in either order). */
-    private fun inputValue(html: String, fieldName: String): String {
-        val esc = Regex.escape(fieldName)
-        return Regex("""name=["']$esc["'][^>]*\bvalue=["']([^"']*)""").find(html)?.groupValues?.get(1)
-            ?: Regex("""\bvalue=["']([^"']*)["'][^>]*name=["']$esc["']""").find(html)?.groupValues?.get(1)
-            ?: ""
     }
 
     @Suppress("DEPRECATION")
