@@ -8,8 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - App launcher name is now **Export GPX** (shorter and source-neutral, so it
   fits both Komoot and Strava).
-- **New app icon** — a diagonal green/orange split (Komoot green + Strava orange)
-  with the route + export mark.
+- **New app icon** — "route divider": Strava orange above the activity line,
+  Komoot green below, with a download badge (from the brand design handoff).
 
 ### Added
 - **Strava support.** Sign in with Strava and export your activities as GPX —

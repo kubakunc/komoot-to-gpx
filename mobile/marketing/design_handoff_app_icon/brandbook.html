@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brand Book — Ikona aplikacji GPX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --orange:#FC4C02; --green:#5E9E2E; --ink:#15191C; --white:#fff;
+    --paper:#F2EEE6; --card:#FFFFFF; --muted:#6B655B; --hair:rgba(21,25,28,.10);
+    --disp:'Space Grotesk', system-ui, sans-serif;
+    --body:'Hanken Grotesk', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 40px;}
+  section{padding:78px 0;border-top:1px solid var(--hair);}
+  section:first-of-type{border-top:0;}
+  h1,h2,h3{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;margin:0;}
+  .kicker{font-family:var(--disp);font-weight:600;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);}
+  .secnum{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--muted);letter-spacing:.04em;}
+  h2{font-size:30px;margin:6px 0 14px;}
+  p{line-height:1.62;color:#33312c;max-width:62ch;margin:0 0 14px;}
+  .lead{font-size:18px;color:#3c3a34;}
+  .muted{color:var(--muted);}
+  .mono{font-family:'Space Grotesk',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+
+  /* icon tiles */
+  .tile{border-radius:22.37%;overflow:hidden;box-shadow:0 14px 36px rgba(20,25,28,.18),0 1px 0 rgba(0,0,0,.05);position:relative;}
+  .tile::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .tile svg,.flat svg{display:block;width:100%;height:100%;}
+  .flat{overflow:hidden;}
+
+  /* cover */
+  .cover{display:grid;grid-template-columns:300px 1fr;gap:54px;align-items:center;padding-top:96px;}
+  .cover .tile{width:260px;height:260px;}
+  .cover h1{font-size:50px;line-height:1.02;margin:14px 0 0;}
+  .cover .sub{font-size:17px;color:var(--muted);margin-top:18px;max-width:40ch;}
+  .meta{display:flex;gap:26px;margin-top:30px;font-family:var(--disp);font-size:13px;color:var(--muted);}
+  .meta b{display:block;color:var(--ink);font-weight:600;font-size:14px;margin-top:3px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+
+  /* color swatches */
+  .sw{border-radius:16px;overflow:hidden;border:1px solid var(--hair);background:#fff;}
+  .sw .chip{height:128px;}
+  .sw .meta2{padding:14px 16px;}
+  .sw .nm{font-family:var(--disp);font-weight:600;font-size:15px;}
+  .sw .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:7px;}
+  .sw .row span:last-child{color:var(--ink);}
+
+  /* construction */
+  .panel{background:#fff;border:1px solid var(--hair);border-radius:20px;padding:30px;}
+  .label{font-family:var(--disp);font-size:12px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+
+  /* dos & donts */
+  .case{background:#fff;border:1px solid var(--hair);border-radius:16px;padding:20px;text-align:center;}
+  .case .ic{width:96px;height:96px;margin:0 auto 14px;border-radius:22.37%;overflow:hidden;position:relative;}
+  .case .ic::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .case .tag{font-family:var(--disp);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
+  .ok{color:var(--green);} .no{color:var(--orange);}
+  .case p{font-size:12.5px;color:var(--muted);margin:6px auto 0;max-width:22ch;line-height:1.45;}
+
+  /* sizes */
+  .sizes{display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap;}
+  .sizes .item{text-align:center;}
+  .sizes .item .lab{font-family:var(--disp);font-size:11.5px;color:var(--muted);margin-top:10px;}
+  .sizes .ic{border-radius:22.37%;overflow:hidden;display:inline-block;}
+
+  /* code */
+  pre{background:#15191C;color:#E9E6DF;border-radius:14px;padding:22px 24px;overflow:auto;font-family:'Space Grotesk',ui-monospace,monospace;font-size:12.5px;line-height:1.65;}
+  pre .c{color:#8aa37b;} pre .s{color:#FF8A3D;} pre .k{color:#86C53C;}
+  code.inline{background:rgba(21,25,28,.07);padding:1px 6px;border-radius:5px;font-family:'Space Grotesk',monospace;font-size:.92em;}
+
+  .note{display:flex;gap:12px;background:rgba(252,76,2,.07);border:1px solid rgba(252,76,2,.18);border-radius:12px;padding:14px 16px;color:#7a3712;font-size:13.5px;line-height:1.5;}
+  .note b{color:var(--orange);}
+  ul.clean{margin:0;padding-left:18px;color:#33312c;line-height:1.7;font-size:14.5px;}
+
+  footer{padding:50px 0 80px;color:var(--muted);font-size:12.5px;font-family:var(--disp);}
+  @media (max-width:760px){.cover{grid-template-columns:1fr;}.grid2,.grid4{grid-template-columns:1fr 1fr;}.grid3{grid-template-columns:1fr;}}
+  @media print{body{background:#fff;} section{break-inside:avoid;} .tile,.case .ic,.sizes .ic{box-shadow:none;}}
+</style>
+</head>
+<body>
+
+<!-- reusable mark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="#FC4C02"/>
+    <path d="M0 57 L22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33 L100 28 L100 100 L0 100 Z" fill="#5E9E2E"/>
+    <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="22" cy="53" r="4.6" fill="#fff"/>
+    <circle cx="77" cy="33" r="4.6" fill="#fff"/>
+    <circle cx="72" cy="73.5" r="14.5" fill="#fff"/>
+    <g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M72 66.5 V76"/><path d="M66.8 71.6 L72 77 L77.2 71.6"/><path d="M66 80.5 H78"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="wrap">
+
+  <!-- COVER -->
+  <section class="cover">
+    <div class="tile"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div>
+    <div>
+      <div class="kicker">Brand Book · Ikona aplikacji</div>
+      <h1>Eksport tras<br/>GPX</h1>
+      <div class="sub">Jedna aplikacja do eksportu tras dla Strava i Komoot. Symbol łączy obie marki wzdłuż jednej wspólnej trasy.</div>
+      <div class="meta">
+        <div>Wersja<b>1.0</b></div>
+        <div>Koncept<b>Podział wzdłuż trasy</b></div>
+        <div>Format<b>SVG · iOS · Android</b></div>
+      </div>
+      <div class="note" style="margin-top:26px;max-width:46ch;"><div>↗</div><div><b>Nazwa robocza.</b> „Eksport tras GPX" to placeholder — podstaw finalną nazwę aplikacji.</div></div>
+    </div>
+  </section>
+
+  <!-- 01 CONCEPT -->
+  <section>
+    <div class="secnum">01</div>
+    <h2>Znaczenie symbolu</h2>
+    <div class="grid2">
+      <div>
+        <p class="lead">Biała linia to trasa aktywności — i jednocześnie granica między dwiema markami.</p>
+        <p>Nad trasą leży <b style="color:var(--orange)">pomarańcz Stravy</b>, pod nią <b style="color:var(--green)">zieleń Komoot</b>. Aplikacja spina oba światy: ten sam ślad, dwie ekosystemy. <b>Plakietka pobierania</b> (↓) w prawym dolnym rogu jednoznacznie komunikuje główną funkcję — eksport pliku GPX.</p>
+        <ul class="clean">
+          <li>Trasa = aktywność użytkownika</li>
+          <li>Pomarańcz / zieleń = Strava / Komoot</li>
+          <li>Badge ↓ = pobieranie / eksport GPX</li>
+        </ul>
+      </div>
+      <div class="tile" style="width:100%;aspect-ratio:1;"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div>
+    </div>
+  </section>
+
+  <!-- 02 CONSTRUCTION -->
+  <section>
+    <div class="secnum">02</div>
+    <h2>Konstrukcja</h2>
+    <p>Symbol zbudowany jest w siatce <span class="mono">100 × 100</span> jednostek (skaluj ×10,24 do 1024 px). Trasa i górna krawędź zielonego pola dzielą jedną ścieżkę — biała linia (grubość <span class="mono">6,5</span>) leży dokładnie na szwie kolorów.</p>
+    <div class="panel">
+      <div class="label">Siatka 10 jednostek · kluczowe punkty</div>
+      <div style="max-width:460px;margin:0 auto;">
+        <svg viewBox="-4 -4 108 108" style="width:100%;display:block;">
+          <defs>
+            <clipPath id="rg"><rect width="100" height="100" rx="22.37"/></clipPath>
+          </defs>
+          <g clip-path="url(#rg)"><use href="#mark"/></g>
+          <!-- grid -->
+          <g stroke="rgba(21,25,28,.18)" stroke-width="0.3">
+            <path d="M0 10 H100 M0 20 H100 M0 30 H100 M0 40 H100 M0 50 H100 M0 60 H100 M0 70 H100 M0 80 H100 M0 90 H100"/>
+            <path d="M10 0 V100 M20 0 V100 M30 0 V100 M40 0 V100 M50 0 V100 M60 0 V100 M70 0 V100 M80 0 V100 M90 0 V100"/>
+          </g>
+          <rect width="100" height="100" rx="22.37" fill="none" stroke="rgba(21,25,28,.45)" stroke-width="0.6"/>
+          <!-- markers -->
+          <g fill="none" stroke="#15191C" stroke-width="0.6" stroke-dasharray="1.4 1.4">
+            <circle cx="72" cy="73.5" r="14.5"/>
+          </g>
+          <g fill="#15191C" font-family="Space Grotesk" font-size="3.4">
+            <circle cx="22" cy="53" r="1" /><text x="14" y="50">22,53</text>
+            <circle cx="77" cy="33" r="1" /><text x="79" y="31">77,33</text>
+            <text x="55" y="92">badge r14,5 @ 72·73,5</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:22px;">
+      <div class="panel"><div class="label">Trasa / linia</div><p class="muted" style="font-size:13.5px;margin:0;">Stroke <span class="mono">6,5</span> · round cap & join · kolor <span class="mono">#FFFFFF</span>. Kropki końcowe r<span class="mono">4,6</span>.</p></div>
+      <div class="panel"><div class="label">Badge pobierania</div><p class="muted" style="font-size:13.5px;margin:0;">Koło r<span class="mono">14,5</span> @ <span class="mono">72·73,5</span>, białe. Strzałka stroke <span class="mono">3,3</span>, kolor ink.</p></div>
+      <div class="panel"><div class="label">Narożnik</div><p class="muted" style="font-size:13.5px;margin:0;">Maskę zaokrąglenia nakłada system. Master jest <b>full-bleed</b> (bez własnego zaokrąglenia).</p></div>
+    </div>
+  </section>
+
+  <!-- 03 COLOR -->
+  <section>
+    <div class="secnum">03</div>
+    <h2>Kolory</h2>
+    <p>Cztery kolory, bez gradientów. Pomarańcz i zieleń pochodzą z palet Strava i Komoot; ink i biel zapewniają kontrast.</p>
+    <div class="grid4">
+      <div class="sw"><div class="chip" style="background:#FC4C02"></div><div class="meta2"><div class="nm">Strava Orange</div><div class="row"><span>HEX</span><span class="mono">#FC4C02</span></div><div class="row"><span>RGB</span><span class="mono">252 · 76 · 2</span></div></div></div>
+      <div class="sw"><div class="chip" style="background:#5E9E2E"></div><div class="meta2"><div class="nm">Komoot Green</div><div class="row"><span>HEX</span><span class="mono">#5E9E2E</span></div><div class="row"><span>RGB</span><span class="mono">94 · 158 · 46</span></div></div></div>
+      <div class="sw"><div class="chip" style="background:#15191C"></div><div class="meta2"><div class="nm">Ink</div><div class="row"><span>HEX</span><span class="mono">#15191C</span></div><div class="row"><span>RGB</span><span class="mono">21 · 25 · 28</span></div></div></div>
+      <div class="sw"><div class="chip" style="background:#fff;border-bottom:1px solid var(--hair)"></div><div class="meta2"><div class="nm">White</div><div class="row"><span>HEX</span><span class="mono">#FFFFFF</span></div><div class="row"><span>RGB</span><span class="mono">255 · 255 · 255</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- 04 SIZES & CLEARSPACE -->
+  <section>
+    <div class="secnum">04</div>
+    <h2>Skalowanie i czytelność</h2>
+    <p>Symbol pozostaje czytelny w dół do <b>48 px</b>. Poniżej tego rozmiaru rozważ wariant uproszczony (sama trasa, bez badge). Nie umieszczaj symbolu mniejszego niż <b>29 px</b>.</p>
+    <div class="panel">
+      <div class="sizes">
+        <div class="item"><span class="ic" style="width:120px;height:120px"><svg viewBox="0 0 100 100" width="120" height="120"><use href="#mark"/></svg></span><div class="lab">120 px</div></div>
+        <div class="item"><span class="ic" style="width:80px;height:80px"><svg viewBox="0 0 100 100" width="80" height="80"><use href="#mark"/></svg></span><div class="lab">80 px</div></div>
+        <div class="item"><span class="ic" style="width:60px;height:60px"><svg viewBox="0 0 100 100" width="60" height="60"><use href="#mark"/></svg></span><div class="lab">60 px</div></div>
+        <div class="item"><span class="ic" style="width:48px;height:48px"><svg viewBox="0 0 100 100" width="48" height="48"><use href="#mark"/></svg></span><div class="lab">48 px · min</div></div>
+        <div class="item"><span class="ic" style="width:29px;height:29px"><svg viewBox="0 0 100 100" width="29" height="29"><use href="#mark"/></svg></span><div class="lab">29 px</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 PLATFORM -->
+  <section>
+    <div class="secnum">05</div>
+    <h2>Maski platform</h2>
+    <p>Master jest full-bleed — kształt nakłada system. Tak wygląda na różnych maskach:</p>
+    <div class="grid4">
+      <div style="text-align:center"><div class="flat" style="width:100%;aspect-ratio:1;border-radius:22.37%;box-shadow:0 8px 20px rgba(0,0,0,.14)"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div><div class="lab" style="font-family:var(--disp);font-size:11.5px;color:var(--muted);margin-top:10px">iOS · squircle</div></div>
+      <div style="text-align:center"><div class="flat" style="width:100%;aspect-ratio:1;border-radius:50%;box-shadow:0 8px 20px rgba(0,0,0,.14)"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div><div class="lab" style="font-family:var(--disp);font-size:11.5px;color:var(--muted);margin-top:10px">Android · koło</div></div>
+      <div style="text-align:center"><div class="flat" style="width:100%;aspect-ratio:1;border-radius:16%;box-shadow:0 8px 20px rgba(0,0,0,.14)"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div><div class="lab" style="font-family:var(--disp);font-size:11.5px;color:var(--muted);margin-top:10px">Android · zaokr.</div></div>
+      <div style="text-align:center"><div class="flat" style="width:100%;aspect-ratio:1;border-radius:0;box-shadow:0 8px 20px rgba(0,0,0,.14)"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div><div class="lab" style="font-family:var(--disp);font-size:11.5px;color:var(--muted);margin-top:10px">Square / legacy</div></div>
+    </div>
+    <div class="note" style="margin-top:24px;"><div>⚠︎</div><div><b>Android adaptive — strefa bezpieczna.</b> Maska kołowa może przyciąć narożniki. Dla <code class="inline">adaptive-icon</code>: tło = duotone (orange/green), warstwa pierwszego planu = trasa + badge przeskalowane do ~80% i wyśrodkowane, tak by badge mieścił się w centralnym kole 66%. Alternatywnie użyj mastera jako pojedynczej ikony legacy.</div></div>
+  </section>
+
+  <!-- 06 MISUSE -->
+  <section>
+    <div class="secnum">06</div>
+    <h2>Czego nie robić</h2>
+    <div class="grid4">
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100"><use href="#mark"/></svg></div>
+        <div class="tag ok">✓ Poprawnie</div>
+        <p>Oryginalne kolory i proporcje.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="#2A6FDB"/>
+          <path d="M0 57 L22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33 L100 28 L100 100 L0 100 Z" fill="#7A39C9"/>
+          <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="72" cy="73.5" r="14.5" fill="#fff"/><g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round"><path d="M72 66.5 V76"/><path d="M66.8 71.6 L72 77 L77.2 71.6"/><path d="M66 80.5 H78"/></g>
+        </svg></div>
+        <div class="tag no">✗ Nie przebarwiaj</div>
+        <p>Trzymaj się palet marek.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100"><g transform="rotate(15 50 50)"><use href="#mark"/></g></svg></div>
+        <div class="tag no">✗ Nie obracaj</div>
+        <p>Symbol zawsze poziomo.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100"><g transform="translate(50 50) scale(1.35 0.78) translate(-50 -50)"><use href="#mark"/></g></svg></div>
+        <div class="tag no">✗ Nie rozciągaj</div>
+        <p>Zachowaj proporcje 1:1.</p>
+      </div>
+    </div>
+    <div class="grid4" style="margin-top:18px;">
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100">
+          <defs><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".92"/><stop offset=".5" stop-color="#fff" stop-opacity=".15"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+          <use href="#mark"/>
+          <path d="M0 0 H100 V40 Q50 58 0 40 Z" fill="url(#gloss)"/>
+        </svg></div>
+        <div class="tag no">✗ Bez efektów</div>
+        <p>Żadnych cieni, blasków, glossów na symbolu.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="#FC4C02"/>
+          <path d="M0 57 L22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33 L100 28 L100 100 L0 100 Z" fill="#5E9E2E"/>
+          <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="28" cy="30" r="14.5" fill="#fff"/><g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round"><path d="M28 23 V32.5"/><path d="M22.8 28.1 L28 33.5 L33.2 28.1"/><path d="M22 37 H34"/></g>
+        </svg></div>
+        <div class="tag no">✗ Nie przenoś badge</div>
+        <p>Plakietka zostaje w prawym dolnym rogu.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100">
+          <defs><linearGradient id="bad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8A3D"/><stop offset="1" stop-color="#84C53C"/></linearGradient></defs>
+          <rect width="100" height="100" fill="url(#bad)"/>
+          <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="72" cy="73.5" r="14.5" fill="#fff"/><g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round"><path d="M72 66.5 V76"/><path d="M66.8 71.6 L72 77 L77.2 71.6"/><path d="M66 80.5 H78"/></g>
+        </svg></div>
+        <div class="tag no">✗ Bez gradientu tła</div>
+        <p>Duotone jest płaski — dwa pełne kolory.</p>
+      </div>
+      <div class="case">
+        <div class="ic"><svg viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="#FC4C02"/>
+          <path d="M0 57 L22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33 L100 28 L100 100 L0 100 Z" fill="#5E9E2E"/>
+          <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="72" cy="73.5" r="14.5" fill="#fff"/><g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round"><path d="M72 66.5 V76"/><path d="M66.8 71.6 L72 77 L77.2 71.6"/><path d="M66 80.5 H78"/></g>
+        </svg></div>
+        <div class="tag no">✗ Nie pogrubiaj</div>
+        <p>Trzymaj grubość linii 6,5.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 CODE -->
+  <section>
+    <div class="secnum">07</div>
+    <h2>Implementacja</h2>
+    <p>Master to pojedynczy SVG w przestrzeni <span class="mono">100×100</span>. W repo: <code class="inline">assets/icon-master.svg</code> (full-bleed), <code class="inline">assets/icon-rounded.svg</code> (podgląd), <code class="inline">assets/AppIcon.jsx</code> (React).</p>
+    <div class="label">Tokeny</div>
+    <pre><span class="c">// design tokens</span>
+orange: <span class="s">'#FC4C02'</span>  <span class="c">// Strava — tło nad trasą</span>
+green : <span class="s">'#5E9E2E'</span>  <span class="c">// Komoot — pod trasą</span>
+ink   : <span class="s">'#15191C'</span>  <span class="c">// strzałka pobierania</span>
+white : <span class="s">'#FFFFFF'</span>  <span class="c">// trasa + badge</span>
+
+route       <span class="c">// M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33</span>
+stroke-width <span class="k">6.5</span>  cap/join <span class="s">round</span>
+badge       <span class="c">// circle r14.5 @ (72, 73.5)</span></pre>
+    <div class="label" style="margin-top:24px;">React</div>
+    <pre><span class="k">import</span> AppIcon <span class="k">from</span> <span class="s">'./AppIcon'</span>;
+
+<span class="c">// full-bleed (kontener nadaje zaokrąglenie)</span>
+&lt;<span class="k">AppIcon</span> size={<span class="k">64</span>} /&gt;
+<span class="c">// podgląd z zaokrągleniem iOS</span>
+&lt;<span class="k">AppIcon</span> size={<span class="k">64</span>} rounded /&gt;</pre>
+  </section>
+
+  <footer class="wrap" style="padding-left:0;padding-right:0;">
+    Brand Book · Ikona eksportu GPX · v1.0 — koncept „Podział wzdłuż trasy". Pliki źródłowe w katalogu <span class="mono">assets/</span>.
+  </footer>
+
+</div>
+</body>
+</html>
