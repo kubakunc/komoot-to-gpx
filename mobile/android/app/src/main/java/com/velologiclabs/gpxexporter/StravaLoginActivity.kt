@@ -70,24 +70,32 @@ class StravaLoginActivity : Activity() {
         webView.loadUrl(LOGIN_URL)
     }
 
-    /** Logged in once Strava lands on the dashboard / home (not /login or /legal). */
+    /**
+     * Logged in once Strava sets the `strava_remember_id` cookie (only present
+     * after authentication, and it holds the athlete id), or once we navigate
+     * away from the auth pages.
+     */
     private fun checkForLogin(url: String) {
         if (resolved) return
-        val onAuthPage = url.contains("/login") || url.contains("/legal") ||
-            url.contains("/onboarding") || url.contains("accounts.google") ||
-            url.contains("facebook.com") || url.contains("appleid.apple.com")
-        val loggedIn = url.contains("strava.com/dashboard") ||
-            Regex("https://www\\.strava\\.com/?($|\\?)").containsMatchIn(url)
-        if (onAuthPage || !loggedIn) return
+        val cookies = CookieManager.getInstance().getCookie(COOKIE_DOMAIN) ?: ""
+        val rememberId = Regex("strava_remember_id=([^;]+)").find(cookies)?.groupValues?.get(1)
+        val onAuthPage = listOf(
+            "/login", "/legal", "/onboarding", "/auth",
+            "accounts.google", "facebook.com", "appleid.apple.com"
+        ).any { url.contains(it) }
+        val leftAuthPages = url.startsWith("https://www.strava.com") && !onAuthPage
+        if (rememberId.isNullOrBlank() && !leftAuthPages) return
         CookieManager.getInstance().flush()
         resolved = true
         progress.visibility = View.VISIBLE
-        Thread { fetchIdentityAndFinish() }.start()
+        Thread { fetchIdentityAndFinish(rememberId) }.start()
     }
 
-    private fun fetchIdentityAndFinish() {
+    private fun fetchIdentityAndFinish(rememberId: String?) {
         try {
-            val athleteId = fetchAthleteId() ?: throw RuntimeException("athlete id not found")
+            val athleteId = rememberId?.let { Regex("\\d+").find(it)?.value }
+                ?: fetchAthleteId()
+                ?: throw RuntimeException("athlete id not found")
             val name = fetchDisplayName(athleteId)
             Log.d("StravaAuth", "athleteId=$athleteId name_present=${name.isNotEmpty()}")
             runOnUiThread {
