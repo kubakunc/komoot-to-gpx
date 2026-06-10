@@ -95,7 +95,10 @@ Must be live BEFORE you submit for review.
 |---|---|---|
 | App icon | `mobile/marketing/out/icon-hires-512.png` | 512×512 PNG |
 | Feature graphic | `mobile/marketing/out/feature-graphic.png` | 1024×500 PNG |
-| Phone screenshots (≥ 2, ≤ 8) | `mobile/marketing/screenshots/01-sign-in.png`, `02-strava-routes.png`, `03-switch-source.png`, `04-komoot-tours.png`, `05-export.png` | 1280×2450 PNG (real device captures) |
+| Phone screenshots (≥ 2, ≤ 8) | `mobile/marketing/screenshots/01-sign-in.png`, `02-strava-routes.png`, `03-komoot-tours.png`, `04-export.png` | 1280×2450 PNG (real device captures) |
+
+(The source-switcher menu screenshot was dropped because the dropdown shows the
+signed-in account's name and email — PII we don't want in a public listing.)
 
 No tablet screenshots needed (Play allows phone-only).
 
