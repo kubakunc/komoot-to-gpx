@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 2670" width="1200" height="2670" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif">
+  <!-- Play screenshot 1/4: two providers, one export. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafafa" /><stop offset="100%" stop-color="#eef0f0" />
+    </linearGradient>
+    <linearGradient id="phoneBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#fbfbfb" />
+    </linearGradient>
+    <filter id="phoneShadow" x="-15%" y="-8%" width="130%" height="120%">
+      <feDropShadow dx="0" dy="24" stdDeviation="34" flood-color="rgba(0,0,0,0.16)" />
+    </filter>
+    <clipPath id="appiconClip"><rect width="100" height="100" rx="22.37" ry="22.37" /></clipPath>
+    <symbol id="appicon" viewBox="0 0 100 100">
+      <g clip-path="url(#appiconClip)">
+        <rect width="100" height="100" fill="#FC4C02" />
+        <path d="M0 57 L22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33 L100 28 L100 100 L0 100 Z" fill="#5E9E2E" />
+        <path d="M22 53 C 30 53, 33 43, 41 45 C 47 46, 50 59, 58 52 C 64 47, 69 35, 77 33" fill="none" stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="22" cy="53" r="4.6" fill="#FFFFFF" /><circle cx="77" cy="33" r="4.6" fill="#FFFFFF" />
+        <circle cx="72" cy="73.5" r="14.5" fill="#FFFFFF" />
+        <g fill="none" stroke="#15191C" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M72 66.5 V76" /><path d="M66.8 71.6 L72 77 L77.2 71.6" /><path d="M66 80.5 H78" />
+        </g>
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="1200" height="2670" fill="url(#bg)" />
+  <polygon points="0,0 1200,0 1200,150 0,420" fill="#FC4C02" opacity="0.07" />
+
+  <!-- Headline -->
+  <g transform="translate(100 230)">
+    <use href="#appicon" x="0" y="-90" width="84" height="84" />
+    <text x="0" y="70" font-size="72" font-weight="700" fill="#15191C" letter-spacing="-2">Komoot <tspan fill="#5E9E2E">&amp;</tspan> Strava.</text>
+    <text x="0" y="158" font-size="72" font-weight="700" fill="#15191C" letter-spacing="-2">One export.</text>
+    <text x="0" y="232" font-size="34" fill="#525252">Sign in with either — your rides, ready as GPX.</text>
+  </g>
+
+  <!-- Phone -->
+  <g transform="translate(220 560)">
+    <rect width="760" height="1880" rx="64" fill="url(#phoneBg)" stroke="#e4e4e7" stroke-width="2" filter="url(#phoneShadow)" />
+    <rect x="22" y="22" width="716" height="1836" rx="46" fill="#ffffff" />
+    <!-- status bar -->
+    <text x="60" y="78" font-size="26" font-weight="600" fill="#15191C">9:03</text>
+    <g transform="translate(700 70)" fill="#15191C"><rect x="-44" y="-16" width="34" height="18" rx="3" /></g>
+    <!-- app header -->
+    <use href="#appicon" x="60" y="118" width="42" height="42" />
+    <text x="118" y="150" font-size="32" font-weight="700" fill="#15191C">Export GPX</text>
+    <line x1="22" y1="186" x2="738" y2="186" stroke="#eee" stroke-width="2" />
+
+    <!-- body -->
+    <text x="60" y="320" font-size="48" font-weight="700" fill="#15191C" letter-spacing="-1">Export your tours</text>
+    <text x="60" y="378" font-size="48" font-weight="700" fill="#15191C" letter-spacing="-1">as GPX.</text>
+    <text x="60" y="440" font-size="27" fill="#737373">A secure login opens inside the app —</text>
+    <text x="60" y="476" font-size="27" fill="#737373">we never see your password.</text>
+
+    <!-- Komoot button -->
+    <rect x="60" y="540" width="640" height="100" rx="18" fill="#6AA127" />
+    <text x="380" y="602" text-anchor="middle" font-size="32" font-weight="600" fill="#ffffff">Sign in with Komoot</text>
+    <!-- Strava button -->
+    <rect x="60" y="664" width="640" height="100" rx="18" fill="#FC4C02" />
+    <text x="380" y="726" text-anchor="middle" font-size="32" font-weight="600" fill="#ffffff">Sign in with Strava</text>
+
+    <!-- tip box -->
+    <rect x="60" y="822" width="640" height="190" rx="20" fill="#f6f6f7" stroke="#e7e7ea" stroke-width="2" />
+    <g transform="translate(104 884)" fill="none" stroke="#737373" stroke-width="3" stroke-linecap="round">
+      <circle cx="-14" cy="0" r="9" /><circle cx="14" cy="-15" r="9" /><circle cx="14" cy="15" r="9" />
+      <line x1="-6" y1="-5" x2="6" y2="-11" /><line x1="-6" y1="5" x2="6" y2="11" />
+    </g>
+    <text x="150" y="880" font-size="25" fill="#525252"><tspan font-weight="700" fill="#15191C">Tip:</tspan> share a tour, route or activity</text>
+    <text x="150" y="916" font-size="25" fill="#525252">from the Komoot or Strava app —</text>
+    <text x="150" y="952" font-size="25" fill="#525252">it opens here, ready to save.</text>
+
+    <!-- two map cards hint -->
+    <rect x="60" y="1064" width="305" height="300" rx="20" fill="#f4f4f5" />
+    <path d="M 110 1300 C 170 1210, 220 1280, 260 1180 S 320 1110, 340 1090" fill="none" stroke="#6AA127" stroke-width="7" stroke-linecap="round" />
+    <circle cx="110" cy="1300" r="11" fill="#fff" stroke="#6AA127" stroke-width="5" /><circle cx="340" cy="1090" r="11" fill="#6AA127" />
+    <rect x="84" y="1300" width="150" height="20" rx="6" fill="#d4d4d8" />
+
+    <rect x="395" y="1064" width="305" height="300" rx="20" fill="#f4f4f5" />
+    <path d="M 445 1300 C 505 1190, 560 1290, 600 1170 S 660 1130, 680 1100" fill="none" stroke="#FC4C02" stroke-width="7" stroke-linecap="round" />
+    <circle cx="445" cy="1300" r="11" fill="#fff" stroke="#FC4C02" stroke-width="5" /><circle cx="680" cy="1100" r="11" fill="#FC4C02" />
+    <rect x="419" y="1300" width="150" height="20" rx="6" fill="#d4d4d8" />
+
+    <rect x="60" y="1410" width="640" height="22" rx="8" fill="#ececef" />
+    <rect x="60" y="1454" width="430" height="22" rx="8" fill="#f1f1f3" />
+    <rect x="60" y="1560" width="640" height="22" rx="8" fill="#ececef" />
+    <rect x="60" y="1604" width="500" height="22" rx="8" fill="#f1f1f3" />
+  </g>
+</svg>
