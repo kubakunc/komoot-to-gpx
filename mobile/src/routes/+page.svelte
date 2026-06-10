@@ -73,17 +73,40 @@
     if (!s) { await onAuthFail(); return; }
     loading = true;
     errorMsg = null;
+    const requestFilter = filter; // guard against a filter switch mid-load
     try {
-      const data = await provider.listActivities(s, { page: p, filter });
+      const data = await listWithRetry(s, p, requestFilter);
+      if (requestFilter !== filter) return; // a newer load supersedes this one
       tours = p === 0 ? data.items : [...tours, ...data.items];
       totalPages = data.totalPages;
       page = data.page;
     } catch (e) {
       if (isProviderAuthError(e)) { await onAuthFail(); return; }
-      errorMsg = 'Failed to load activities.';
+      if (requestFilter === filter) errorMsg = 'Failed to load activities.';
     } finally {
-      loading = false;
+      if (requestFilter === filter) loading = false;
     }
+  }
+
+  /**
+   * The first page can hit a transient failure — e.g. Strava routes need a CSRF
+   * token the native layer scrapes on demand, which isn't ready on the very
+   * first request right after sign-in. Retry non-auth failures a few times
+   * before surfacing an error. Auth failures (401) are never retried.
+   */
+  async function listWithRetry(s: import('$lib/client/provider').ProviderSession, p: number, f: string) {
+    const attempts = p === 0 ? 3 : 1;
+    let lastErr: unknown;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await provider.listActivities(s, { page: p, filter: f });
+      } catch (e) {
+        if (isProviderAuthError(e)) throw e;
+        lastErr = e;
+        if (i < attempts - 1) await new Promise((r) => setTimeout(r, 700));
+      }
+    }
+    throw lastErr;
   }
 
   async function loadShape(id: string) {
@@ -218,7 +241,20 @@
 
 {#if errorMsg}<p class="error">{errorMsg}</p>{/if}
 
-{#if !loading && tours.length === 0}
+{#if loading && tours.length === 0}
+  <ul class="tours" aria-hidden="true">
+    {#each Array(4) as _, i (i)}
+      <li class="card skeleton">
+        <div class="card-map"><div class="map-skeleton"></div></div>
+        <div class="card-body">
+          <div class="sk-line sk-40"></div>
+          <div class="sk-line sk-85"></div>
+          <div class="sk-stats"><div class="sk-line sk-30"></div><div class="sk-line sk-30"></div></div>
+        </div>
+      </li>
+    {/each}
+  </ul>
+{:else if !errorMsg && tours.length === 0}
   <p class="empty">No activities in this view.</p>
 {/if}
 
@@ -386,4 +422,11 @@
   .chip:hover { color: var(--color-fg); border-color: var(--color-fg); }
   .chip.active { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
   .empty { color: var(--color-fg-subtle); text-align: center; padding: 2rem 0; }
+  /* Loading skeleton cards */
+  .skeleton { animation: none; }
+  .sk-line { height: 12px; border-radius: var(--radius-full);
+    background: linear-gradient(90deg, transparent 30%, rgba(0,0,0,0.05) 50%, transparent 70%), var(--color-bg-soft);
+    background-size: 200% 100%; animation: shimmer 1.6s ease-in-out infinite; margin-top: 0.6rem; }
+  .sk-40 { width: 40%; } .sk-85 { width: 85%; } .sk-30 { width: 30%; }
+  .sk-stats { display: flex; gap: 1.2rem; margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px solid var(--color-border); }
 </style>

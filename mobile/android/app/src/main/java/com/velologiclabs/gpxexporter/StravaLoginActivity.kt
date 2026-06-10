@@ -141,13 +141,31 @@ class StravaLoginActivity : Activity() {
     }
 
     private fun fetchDisplayName(athleteId: String): String {
+        // Most reliable for the signed-in athlete: the first/last name fields on
+        // the settings page. Fall back to the public profile page <title>.
         return try {
+            val profile = httpGetBody("https://www.strava.com/settings/profile")
+            val first = inputValue(profile, "athlete[first_name]")
+            val last = inputValue(profile, "athlete[last_name]")
+            val full = "$first $last".trim()
+            if (full.isNotEmpty()) return full
+
             val html = httpGetBody("https://www.strava.com/athletes/$athleteId")
             val title = Regex("<title>([^<]+)</title>", RegexOption.IGNORE_CASE).find(html)?.groupValues?.get(1) ?: ""
-            title.replace(Regex("\\s*[|·]\\s*Strava\\s*$", RegexOption.IGNORE_CASE), "").trim()
+            val name = title.replace(Regex("\\s*[|·]\\s*Strava.*$", RegexOption.IGNORE_CASE), "").trim()
+            // A generic "Strava" title is not a name.
+            if (name.equals("Strava", ignoreCase = true)) "" else name
         } catch (e: Exception) {
             ""
         }
+    }
+
+    /** Read an HTML <input>'s value by its name attribute (attributes in either order). */
+    private fun inputValue(html: String, fieldName: String): String {
+        val esc = Regex.escape(fieldName)
+        return Regex("""name=["']$esc["'][^>]*\bvalue=["']([^"']*)""").find(html)?.groupValues?.get(1)
+            ?: Regex("""\bvalue=["']([^"']*)["'][^>]*name=["']$esc["']""").find(html)?.groupValues?.get(1)
+            ?: ""
     }
 
     @Suppress("DEPRECATION")

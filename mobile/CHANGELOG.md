@@ -26,6 +26,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   login screen tells you what's waiting, and it opens right after you sign in
   to Strava.
 
+### Fixed
+- The activity list now shows loading placeholders while it fetches, instead
+  of looking empty for a few seconds.
+- Strava's list now loads reliably on the first open — the routes view no
+  longer shows a brief "failed to load".
+- Strava now shows your real name instead of "Strava athlete".
+
 ## [1.0.6] — 2026-06-07
 
 ### Added
