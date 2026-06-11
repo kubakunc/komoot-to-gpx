@@ -21,7 +21,6 @@ class LoginActivity : Activity() {
         const val EXTRA_EMAIL = "email"
         private const val LOGIN_URL = "https://www.komoot.com/signin"
         private const val COOKIE_DOMAIN = "https://www.komoot.com"
-        private const val ACCOUNT_URL = "https://api.komoot.de/v006/account/"
         // Komoot sets these cookies once the user is authenticated.
         // koa_at = OAuth access token, koa_re = refresh token.
         private val POST_LOGIN_COOKIE_KEYS = listOf("koa_at", "koa_re", "fresh_signin")
@@ -78,7 +77,7 @@ class LoginActivity : Activity() {
             return
         }
         resolved = true
-        Log.d("KomootAuth", "login complete; calling /v006/account/ in background")
+        Log.d("KomootAuth", "login complete; extracting identity in background")
         progress.visibility = View.VISIBLE
         Thread { fetchAccountAndFinish(cookies) }.start()
     }
