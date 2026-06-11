@@ -6,6 +6,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Fixed
+- Sharing a tour or activity from Komoot/Strava now opens it reliably even
+  when the app was fully closed.
 - You now stay signed in to Komoot — the app refreshes your session
   automatically instead of asking you to sign in again after a while.
 - Signing in to one of Komoot/Strava no longer signs you out of the other.
