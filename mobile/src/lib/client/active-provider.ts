@@ -4,8 +4,11 @@ import type { ProviderId } from './provider';
 const KEY = 'gpx-exporter:active-provider';
 
 function read(): ProviderId {
-  if (typeof sessionStorage === 'undefined') return 'komoot';
-  const v = sessionStorage.getItem(KEY);
+  // localStorage (not sessionStorage): the choice must survive the WebView
+  // process being killed, otherwise a Strava-first user resets to Komoot on
+  // every cold start.
+  if (typeof localStorage === 'undefined') return 'komoot';
+  const v = localStorage.getItem(KEY);
   return v === 'strava' || v === 'komoot' ? v : 'komoot';
 }
 
@@ -19,9 +22,9 @@ export function getActiveProvider(): ProviderId {
 
 export function setActiveProvider(id: ProviderId): void {
   try {
-    sessionStorage.setItem(KEY, id);
+    localStorage.setItem(KEY, id);
   } catch {
-    /* sessionStorage unavailable — fall back to the default on next read */
+    /* localStorage unavailable — fall back to the default on next read */
   }
   activeProvider.set(id);
 }

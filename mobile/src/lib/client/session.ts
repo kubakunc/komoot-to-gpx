@@ -16,8 +16,14 @@ function isValid(s: Partial<ProviderSession> | null): s is ProviderSession {
   return !!s && !!s.provider && !!s.userId && !!s.token;
 }
 
-/** One-time migration of the old single-session key into the Komoot slot. */
+let legacyMigrated = false;
+
+/** One-time migration of the old single-session key into the Komoot slot.
+ *  Runs at most once per process (every getProviderSession call would
+ *  otherwise hit Preferences for the legacy key). */
 async function migrateLegacy(): Promise<void> {
+  if (legacyMigrated) return;
+  legacyMigrated = true;
   const { value } = await Preferences.get({ key: LEGACY_KEY });
   if (!value) return;
   try {

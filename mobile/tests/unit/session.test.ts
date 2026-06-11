@@ -37,7 +37,11 @@ describe('multi-provider session store', () => {
 
   it('migrates a legacy Komoot session on first read', async () => {
     store.set('gpx-exporter:session', JSON.stringify({ email: 'old@b.c', userId: '42', token: 'OLD' }));
-    const s = await getProviderSession('komoot');
+    // Migration runs once per process; earlier tests already triggered it on the
+    // shared module instance, so import a fresh one for this case.
+    vi.resetModules();
+    const { getProviderSession: freshGet } = await import('../../src/lib/client/session');
+    const s = await freshGet('komoot');
     expect(s).toMatchObject({ provider: 'komoot', userId: '42', displayName: 'old@b.c', token: 'OLD' });
     expect(store.has('gpx-exporter:session')).toBe(false); // legacy key removed
   });
