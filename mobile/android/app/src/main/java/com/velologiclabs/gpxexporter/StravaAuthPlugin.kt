@@ -19,6 +19,12 @@ class StravaAuthPlugin : Plugin() {
         startActivityForResult(call, intent, "onLoginResult")
     }
 
+    @PluginMethod
+    fun logout(call: PluginCall) {
+        CookieUtil.clearFor("https://www.strava.com", ".strava.com")
+        call.resolve()
+    }
+
     @ActivityCallback
     private fun onLoginResult(call: PluginCall, result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) {

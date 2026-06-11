@@ -69,7 +69,10 @@
 
   async function signOut() {
     open = false;
-    for (const p of await getConnectedProviders()) await clearProviderSession(p);
+    for (const p of await getConnectedProviders()) {
+      await getProvider(p).logout?.();
+      await clearProviderSession(p);
+    }
     onSignedOut();
   }
 </script>

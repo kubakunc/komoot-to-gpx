@@ -8,9 +8,19 @@ export interface NativeLoginResult {
 
 interface KomootAuthPlugin {
   login(): Promise<NativeLoginResult>;
+  logout(): Promise<void>;
 }
 
 const KomootAuth = registerPlugin<KomootAuthPlugin>('KomootAuth');
+
+export async function nativeLogout(): Promise<void> {
+  if (Capacitor.getPlatform() !== 'android') return;
+  try {
+    await KomootAuth.logout();
+  } catch {
+    /* best effort — Preferences are cleared regardless */
+  }
+}
 
 export class AuthCancelledError extends Error {
   readonly name = 'AuthCancelledError';

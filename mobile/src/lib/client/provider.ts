@@ -57,4 +57,6 @@ export interface Provider {
   ): Promise<ActivityPage>;
   getActivity(session: ProviderSession, id: string): Promise<ActivityDetail>;
   getGpx(session: ProviderSession, id: string): Promise<string>;
+  /** Clear native session state (cookies) for this provider, if any. */
+  logout?(): Promise<void>;
 }

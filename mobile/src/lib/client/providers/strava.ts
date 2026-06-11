@@ -3,7 +3,7 @@ import {
   listActivities, listRoutes, getStreamCoordinates, getActivityName, getGpx,
   getRouteDetail, getRouteGpx
 } from '../strava';
-import { nativeStravaLogin } from '../strava-auth';
+import { nativeStravaLogin, nativeLogout } from '../strava-auth';
 import { parseStravaId } from '../strava-id';
 
 export const stravaProvider: Provider = {
@@ -48,5 +48,9 @@ export const stravaProvider: Provider = {
   async getGpx(_session, id): Promise<string> {
     const { type, rawId } = parseStravaId(id);
     return type === 'route' ? getRouteGpx(rawId) : getGpx(rawId);
+  },
+
+  async logout(): Promise<void> {
+    await nativeLogout();
   }
 };

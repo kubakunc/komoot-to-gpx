@@ -8,9 +8,19 @@ export interface NativeStravaLoginResult {
 
 interface StravaAuthPlugin {
   login(): Promise<NativeStravaLoginResult>;
+  logout(): Promise<void>;
 }
 
 const StravaAuth = registerPlugin<StravaAuthPlugin>('StravaAuth');
+
+export async function nativeLogout(): Promise<void> {
+  if (Capacitor.getPlatform() !== 'android') return;
+  try {
+    await StravaAuth.logout();
+  } catch {
+    /* best effort — Preferences are cleared regardless */
+  }
+}
 
 export class AuthCancelledError extends Error {
   readonly name = 'AuthCancelledError';

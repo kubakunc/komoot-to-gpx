@@ -2,7 +2,7 @@ import type {
   Provider, ProviderSession, ActivityPage, ActivityDetail, ActivitySummary
 } from '../provider';
 import { listTours, getTour, getCoordinates, type TourSummary, type TourFilter } from '../komoot';
-import { nativeLogin } from '../komoot-auth';
+import { nativeLogin, nativeLogout } from '../komoot-auth';
 import { toGpx } from '../gpx';
 
 function toSummary(t: TourSummary): ActivitySummary {
@@ -59,5 +59,9 @@ export const komootProvider: Provider = {
     const meta = await getTour(auth, id);
     const coords = await getCoordinates(auth, id, meta.date);
     return toGpx({ name: meta.name, sport: meta.sport, startTimeIso: meta.date }, coords);
+  },
+
+  async logout(): Promise<void> {
+    await nativeLogout();
   }
 };
