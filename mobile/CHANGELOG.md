@@ -3,6 +3,8 @@
 User-facing changes to **Export GPX for Komoot, Strava** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
 ## [1.1.0] — 2026-06-11
 
 ### Changed
