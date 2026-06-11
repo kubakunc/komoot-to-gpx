@@ -6,7 +6,7 @@ import {
   AdmobConsentStatus
 } from '@capacitor-community/admob';
 import { AD_UNITS, PHASE2 } from './ad-config';
-import { applyAnalyticsConsent, decideAnalyticsConsent } from './analytics';
+import { applyAnalyticsConsent, decideAnalyticsConsent, recordError } from './analytics';
 
 const isAndroid = () => Capacitor.getPlatform() === 'android';
 
@@ -27,6 +27,10 @@ export async function initAds(): Promise<void> {
     }
     void applyAnalyticsConsent(decideAnalyticsConsent(consentInfo.status));
   } catch (e) {
+    // If the consent flow itself failed (e.g. AdMob messaging misconfigured),
+    // deny analytics consent rather than leaving it unset — safer in the EEA.
+    void applyAnalyticsConsent(false);
+    void recordError(e, 'admob-init');
     console.warn('AdMob init failed:', e);
   }
 }
