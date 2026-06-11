@@ -1,6 +1,9 @@
+import { Preferences } from '@capacitor/preferences';
 import type { ProviderId } from './provider';
 
 const PENDING_KEY = 'gpx-exporter:pending-share-tour';
+/** Written by the native share handler (MainActivity) — the cold-start-safe channel. */
+const NATIVE_TOKEN_KEY = 'gpx-exporter:native-share-token';
 const TOUR_REGEX = /komoot\.(?:com|de)\/(?:[^/?#\s]+\/)?tour\/(\d+)/i;
 
 /** A shared item to open: which provider, and the (namespaced for Strava) id. */
@@ -21,6 +24,37 @@ export function readShareHash(hash: string): ShareTarget | null {
   const legacy = /^#share-tour=(\d+)$/.exec(hash);
   if (legacy) return { provider: 'komoot', id: legacy[1] };
   return null;
+}
+
+function parseShareToken(token: string): ShareTarget | null {
+  const m = /^(komoot|strava):([A-Za-z0-9-]+)$/.exec(token);
+  return m ? { provider: m[1] as ProviderId, id: m[2] } : null;
+}
+
+/**
+ * Read (and clear) the share token the native layer persisted to Preferences.
+ * This is the cold-start-safe path: unlike a URL hash, it survives the WebView
+ * finishing its load and SvelteKit normalising the URL.
+ */
+export async function consumeNativeShareToken(): Promise<ShareTarget | null> {
+  let value: string | null = null;
+  try {
+    value = (await Preferences.get({ key: NATIVE_TOKEN_KEY })).value;
+  } catch {
+    return null;
+  }
+  if (!value) return null;
+  await clearNativeShareToken();
+  return parseShareToken(value);
+}
+
+/** Clear the native token so it can't replay on a later cold start. */
+export async function clearNativeShareToken(): Promise<void> {
+  try {
+    await Preferences.remove({ key: NATIVE_TOKEN_KEY });
+  } catch {
+    /* best effort */
+  }
 }
 
 export function setPendingShare(target: ShareTarget): void {

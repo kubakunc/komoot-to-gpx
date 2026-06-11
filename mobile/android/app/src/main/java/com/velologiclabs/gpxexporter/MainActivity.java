@@ -19,6 +19,11 @@ public class MainActivity extends BridgeActivity {
         Pattern.compile("strava\\.com/(activities|routes)/(\\d+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern STRAVA_BRANCH =
         Pattern.compile("https?://strava\\.app\\.link/[A-Za-z0-9]+", Pattern.CASE_INSENSITIVE);
+    // Capacitor Preferences store + key the web app reads on startup. This is the
+    // cold-start-safe channel: a hash injected into a still-loading WebView can be
+    // lost when the document finishes loading or SvelteKit normalises the URL.
+    private static final String CAP_PREFS = "CapacitorStorage";
+    private static final String NATIVE_SHARE_KEY = "gpx-exporter:native-share-token";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,22 +54,43 @@ public class MainActivity extends BridgeActivity {
         if (text == null) return;
 
         Matcher k = KOMOOT_TOUR.matcher(text);
-        if (k.find()) { injectShare("komoot:" + k.group(1)); return; }
+        if (k.find()) { deliverShare("komoot:" + k.group(1)); return; }
 
         Matcher sd = STRAVA_DIRECT.matcher(text);
-        if (sd.find()) { injectShare("strava:" + stravaItem(sd.group(1), sd.group(2))); return; }
+        if (sd.find()) { deliverShare("strava:" + stravaItem(sd.group(1), sd.group(2))); return; }
 
         Matcher sb = STRAVA_BRANCH.matcher(text);
         if (sb.find()) {
             final String link = sb.group();
             new Thread(() -> {
                 String item = resolveStravaBranch(link);
-                if (item != null) injectShare("strava:" + item);
+                if (item != null) deliverShare("strava:" + item);
                 else Log.d("ShareIntent", "could not resolve strava branch link");
             }).start();
             return;
         }
         Log.d("ShareIntent", "received SEND text without a recognised URL");
+    }
+
+    /**
+     * Deliver a share over two channels: a persistent Preferences token the web
+     * app reads on startup (cold-start safe), and an immediate hash injection
+     * (handled right away when the app is already running). The web side clears
+     * the token once handled, so only one of the two actually opens the tour.
+     */
+    private void deliverShare(String token) {
+        savePendingShare(token);
+        injectShare(token);
+    }
+
+    private void savePendingShare(String token) {
+        try {
+            // commit() (not apply()) so it's on disk before the web app boots and reads it.
+            getSharedPreferences(CAP_PREFS, MODE_PRIVATE).edit().putString(NATIVE_SHARE_KEY, token).commit();
+            Log.d("ShareIntent", "saved pending share " + token);
+        } catch (Exception e) {
+            Log.w("ShareIntent", "savePendingShare failed: " + e.getMessage());
+        }
     }
 
     private static String stravaItem(String kind, String id) {
@@ -76,9 +102,11 @@ public class MainActivity extends BridgeActivity {
             Log.w("ShareIntent", "bridge/webview not ready for " + token);
             return;
         }
+        Log.d("ShareIntent", "injecting hash for " + token);
         bridge.getWebView().post(() ->
             bridge.getWebView().evaluateJavascript(
-                "window.location.hash='share=" + token + "'", null
+                "window.location.hash='share=" + token + "'",
+                value -> Log.d("ShareIntent", "hash set for " + token)
             )
         );
     }

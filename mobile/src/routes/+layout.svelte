@@ -5,7 +5,8 @@
   import { getConnectedProviders, getProviderSession } from '$lib/client/session';
   import { getActiveProvider, setActiveProvider, activeProvider, resolveActiveProvider } from '$lib/client/active-provider';
   import { initAds } from '$lib/client/ad-banner';
-  import { readShareHash, setPendingShare, markViaShare } from '$lib/client/share-intent';
+  import { readShareHash, setPendingShare, markViaShare,
+    consumeNativeShareToken, clearNativeShareToken, type ShareTarget } from '$lib/client/share-intent';
   import { track, EVENTS } from '$lib/client/analytics';
   import SourceMenu from '$lib/client/SourceMenu.svelte';
   import '../app.css';
@@ -26,9 +27,8 @@
     userLabel = s?.displayName ?? null;
   }
 
-  async function handleShareHash() {
-    const target = readShareHash(window.location.hash);
-    if (!target) return false;
+  async function routeToTarget(target: ShareTarget) {
+    await clearNativeShareToken(); // handled — don't let the persistent token replay later
     history.replaceState(null, '', window.location.pathname + window.location.search);
     setActiveProvider(target.provider);
     const s = await getProviderSession(target.provider);
@@ -40,14 +40,33 @@
       setPendingShare(target);
       await goto('/login', { replaceState: true });
     }
+  }
+
+  /** Warm-start path: the native layer injected a #share=… hash into the running app. */
+  async function handleShareHash() {
+    const target = readShareHash(window.location.hash);
+    if (!target) return false;
+    await routeToTarget(target);
+    return true;
+  }
+
+  /** Cold-start path: read the token the native layer persisted to Preferences. */
+  async function handleNativeShare() {
+    const target = await consumeNativeShareToken();
+    if (!target) return false;
+    await routeToTarget(target);
     return true;
   }
 
   onMount(async () => {
     try {
+      // Warm start: the native layer injects a #share hash into the running app.
+      window.addEventListener('hashchange', () => { void handleShareHash(); });
       void initAds();
       const connected = await getConnectedProviders();
-      const handled = await handleShareHash();
+      // Try the hash (if it survived boot), then the persistent native token
+      // (cold-start safe — survives the WebView load and SvelteKit URL reset).
+      const handled = (await handleShareHash()) || (await handleNativeShare());
       if (!handled) {
         const path = $page.url.pathname;
         if (connected.length === 0 && path !== '/login') {
@@ -56,7 +75,6 @@
           await goto('/', { replaceState: true });
         }
       }
-      window.addEventListener('hashchange', () => { void handleShareHash(); });
     } catch (e) {
       const err = e as Error;
       bootError = `${err?.name ?? 'Error'}: ${err?.message ?? String(e)}\n${err?.stack ?? ''}`;
