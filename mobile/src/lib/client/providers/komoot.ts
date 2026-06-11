@@ -1,8 +1,9 @@
 import type {
   Provider, ProviderSession, ActivityPage, ActivityDetail, ActivitySummary
 } from '../provider';
-import { listTours, getTour, getCoordinates, type TourSummary, type TourFilter } from '../komoot';
+import { listTours, getTour, getCoordinates, onTokenRefreshed, type TourSummary, type TourFilter } from '../komoot';
 import { nativeLogin, nativeLogout } from '../komoot-auth';
+import { setProviderSession } from '../session';
 import { toGpx } from '../gpx';
 
 function toSummary(t: TourSummary): ActivitySummary {
@@ -16,6 +17,15 @@ function toSummary(t: TourSummary): ActivitySummary {
     status: t.status
   };
 }
+
+// Persist the refreshed token against the session whose call triggered it.
+let currentSession: ProviderSession | null = null;
+onTokenRefreshed((token) => {
+  if (currentSession) {
+    currentSession = { ...currentSession, token };
+    void setProviderSession(currentSession);
+  }
+});
 
 export const komootProvider: Provider = {
   id: 'komoot',
@@ -34,6 +44,7 @@ export const komootProvider: Provider = {
   },
 
   async listActivities(session, opts): Promise<ActivityPage> {
+    currentSession = session;
     const filter = (opts.filter ?? 'all') as TourFilter;
     const data = await listTours(
       { email: session.displayName, token: session.token },
@@ -43,6 +54,7 @@ export const komootProvider: Provider = {
   },
 
   async getActivity(session, id): Promise<ActivityDetail> {
+    currentSession = session;
     const auth = { email: session.displayName, token: session.token };
     const meta = await getTour(auth, id);
     const coords = await getCoordinates(auth, id, meta.date);
@@ -55,6 +67,7 @@ export const komootProvider: Provider = {
   },
 
   async getGpx(session, id): Promise<string> {
+    currentSession = session;
     const auth = { email: session.displayName, token: session.token };
     const meta = await getTour(auth, id);
     const coords = await getCoordinates(auth, id, meta.date);

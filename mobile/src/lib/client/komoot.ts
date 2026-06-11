@@ -1,7 +1,7 @@
 import { registerPlugin } from '@capacitor/core';
 
 interface KomootApiPlugin {
-  get(opts: { path: string; token: string }): Promise<{ status: number; body: string }>;
+  get(opts: { path: string; token: string }): Promise<{ status: number; body: string; newToken?: string }>;
 }
 
 const KomootApi = registerPlugin<KomootApiPlugin>('KomootApi');
@@ -21,8 +21,20 @@ export interface KomootAuth {
   token: string;
 }
 
-async function apiGet<T>(path: string, token: string, label: string): Promise<T> {
-  const { status, body } = await KomootApi.get({ path, token });
+type TokenHook = (token: string) => void;
+let tokenHook: TokenHook | null = null;
+/** Register (or clear, with null) a callback fired when the native layer
+ *  refreshes the Komoot token. The provider uses it to persist the session. */
+export function onTokenRefreshed(hook: TokenHook | null): void {
+  tokenHook = hook;
+}
+
+async function apiGet<T>(path: string, auth: KomootAuth, label: string): Promise<T> {
+  const { status, body, newToken } = await KomootApi.get({ path, token: auth.token });
+  if (newToken && newToken !== auth.token) {
+    auth.token = newToken; // reused by the next sequential call (no second refresh)
+    tokenHook?.(newToken);
+  }
   if (status < 200 || status >= 300) {
     const mapped = status >= 500 ? 502 : status;
     throw new KomootError(`${label} failed (komoot returned ${status})`, mapped);
@@ -86,7 +98,7 @@ export async function listTours(
   });
   const body = await apiGet<ToursResponse>(
     `/v007/users/${encodeURIComponent(opts.userId)}/tours/?${qs}`,
-    auth.token,
+    auth,
     'listTours'
   );
   return {
@@ -106,7 +118,7 @@ export interface TourMetadata {
 export async function getTour(auth: KomootAuth, tourId: string): Promise<TourMetadata> {
   const raw = await apiGet<Record<string, unknown>>(
     `/v007/tours/${encodeURIComponent(tourId)}`,
-    auth.token,
+    auth,
     'getTour'
   );
   return {
@@ -131,7 +143,7 @@ export async function getCoordinates(
 ): Promise<Coordinate[]> {
   const body = await apiGet<{ items?: Array<Record<string, unknown>> }>(
     `/v007/tours/${encodeURIComponent(tourId)}/coordinates`,
-    auth.token,
+    auth,
     'getCoordinates'
   );
   if (!body.items) return [];

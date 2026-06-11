@@ -1,15 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { listTours, getTour, getCoordinates, nativeLogin, toGpx } = vi.hoisted(() => ({
+const { listTours, getTour, getCoordinates, nativeLogin, nativeLogout, toGpx, setProviderSession } = vi.hoisted(() => ({
   listTours: vi.fn(), getTour: vi.fn(), getCoordinates: vi.fn(),
-  nativeLogin: vi.fn(), toGpx: vi.fn()
+  nativeLogin: vi.fn(), nativeLogout: vi.fn(), toGpx: vi.fn(), setProviderSession: vi.fn()
 }));
 
 vi.mock('../../src/lib/client/komoot', () => ({
   listTours, getTour, getCoordinates,
+  onTokenRefreshed: () => {},
   downsample: <T>(a: T[]) => a
 }));
-vi.mock('../../src/lib/client/komoot-auth', () => ({ nativeLogin }));
+vi.mock('../../src/lib/client/komoot-auth', () => ({ nativeLogin, nativeLogout }));
+vi.mock('../../src/lib/client/session', () => ({ setProviderSession }));
 vi.mock('../../src/lib/client/gpx', () => ({ toGpx }));
 
 import { komootProvider } from '../../src/lib/client/providers/komoot';

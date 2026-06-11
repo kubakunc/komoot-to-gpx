@@ -12,7 +12,8 @@ import {
   listTours,
   getTour,
   getCoordinates,
-  KomootError
+  KomootError,
+  onTokenRefreshed
 } from '../../src/lib/client/komoot';
 
 const fixture = (name: string) =>
@@ -101,3 +102,33 @@ describe('komoot.getCoordinates', () => {
 });
 
 void KomootError;
+
+describe('komoot token refresh propagation', () => {
+  beforeEach(() => mockGet.mockReset());
+
+  it('mutates the auth object and fires the hook when newToken is returned', async () => {
+    const refreshed: string[] = [];
+    onTokenRefreshed((t) => refreshed.push(t));
+    mockGet.mockResolvedValueOnce({ status: 200, body: fixture('tours-page.json'), newToken: 'FRESH' });
+
+    const auth = { email: 'a@b.c', token: 'STALE' };
+    await listTours(auth, { userId: '1', page: 0 });
+
+    expect(auth.token).toBe('FRESH');
+    expect(refreshed).toEqual(['FRESH']);
+    onTokenRefreshed(null);
+  });
+
+  it('does not fire the hook when no newToken is returned', async () => {
+    const refreshed: string[] = [];
+    onTokenRefreshed((t) => refreshed.push(t));
+    mockGet.mockResolvedValueOnce({ status: 200, body: fixture('tours-page.json') });
+
+    const auth = { email: 'a@b.c', token: 'STALE' };
+    await listTours(auth, { userId: '1', page: 0 });
+
+    expect(auth.token).toBe('STALE');
+    expect(refreshed).toEqual([]);
+    onTokenRefreshed(null);
+  });
+});

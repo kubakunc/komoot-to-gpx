@@ -6,9 +6,11 @@ vi.mock('@capacitor/core', () => ({
   Capacitor: { getPlatform: () => 'web' }
 }));
 vi.mock('../../src/lib/client/komoot', () => ({
-  listTours: vi.fn(), getTour: vi.fn(), getCoordinates: vi.fn(), downsample: <T>(a: T[]) => a
+  listTours: vi.fn(), getTour: vi.fn(), getCoordinates: vi.fn(),
+  onTokenRefreshed: () => {}, downsample: <T>(a: T[]) => a
 }));
-vi.mock('../../src/lib/client/komoot-auth', () => ({ nativeLogin: vi.fn() }));
+vi.mock('../../src/lib/client/komoot-auth', () => ({ nativeLogin: vi.fn(), nativeLogout: vi.fn() }));
+vi.mock('../../src/lib/client/session', () => ({ setProviderSession: vi.fn() }));
 vi.mock('../../src/lib/client/gpx', () => ({ toGpx: vi.fn() }));
 
 import { getProvider, availableProviders } from '../../src/lib/client/providers/registry';
