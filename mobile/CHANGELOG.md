@@ -3,18 +3,7 @@
 User-facing changes to **Export GPX for Komoot, Strava** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
-
-### Fixed
-- Sharing a tour or activity from Komoot/Strava now opens it reliably even
-  when the app was fully closed.
-- You now stay signed in to Komoot — the app refreshes your session
-  automatically instead of asking you to sign in again after a while.
-- Signing in to one of Komoot/Strava no longer signs you out of the other.
-- Sign out now fully clears the in-app browser session for both services.
-- Your chosen source (Komoot or Strava) is remembered across app restarts.
-
-## [1.1.0] — 2026-06-10
+## [1.1.0] — 2026-06-11
 
 ### Changed
 - App launcher name is now **Export GPX** (shorter and source-neutral, so it
@@ -43,6 +32,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Strava's list now loads reliably on the first open — the routes view no
   longer shows a brief "failed to load".
 - Strava now shows your real name instead of "Strava athlete".
+- Sharing a tour or activity from Komoot/Strava now opens it reliably even
+  when the app was fully closed.
+- You now stay signed in to Komoot — the app refreshes your session
+  automatically instead of asking you to sign in again after a while.
+- Signing in to one of Komoot/Strava no longer signs you out of the other.
+- Sign out now fully clears the in-app browser session for both services.
+- Your chosen source (Komoot or Strava) is remembered across app restarts.
 
 ## [1.0.6] — 2026-06-07
 
