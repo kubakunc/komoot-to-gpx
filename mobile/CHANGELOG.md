@@ -3,6 +3,15 @@
 User-facing changes to **Export GPX for Komoot, Strava** (Android).
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+- You now stay signed in to Komoot — the app refreshes your session
+  automatically instead of asking you to sign in again after a while.
+- Signing in to one of Komoot/Strava no longer signs you out of the other.
+- Sign out now fully clears the in-app browser session for both services.
+- Your chosen source (Komoot or Strava) is remembered across app restarts.
+
 ## [1.1.0] — 2026-06-10
 
 ### Changed
