@@ -59,15 +59,16 @@ Privacy policy: https://kubakunc.github.io/komoot-to-gpx/privacy-policy/
 
 Approximate character count: ~2100 / 4000. Plenty of room if you want to add anything.
 
-## What's new (≤ 500 chars) — first release
+## What's new (≤ 500 chars) — 1.1.0
 
 ```
-First release.
-• Sign in with your own Komoot account (we never see your password).
-• Browse every recorded and planned tour on your account.
-• Preview each route on a real map.
-• Filter by Completed or Planned.
-• Export any tour as a standard .gpx file.
+Now works with Strava too! Sign in with Strava and export your activities and planned routes as GPX — switch between Komoot and Strava with one tap, or share straight from either app.
+
+Also in this update:
+• A fresh app icon and a simpler name — Export GPX.
+• Stay signed in to Komoot — no more re-login after a while.
+• Sharing a tour now opens reliably, even from a closed app.
+• Strava activities show elevation gain.
 ```
 
 ## Category

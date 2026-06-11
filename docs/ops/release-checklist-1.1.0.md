@@ -45,10 +45,11 @@ Play Console → your app → **Release**.
 ```
 Now works with Strava too! Sign in with Strava and export your activities and planned routes as GPX — switch between Komoot and Strava with one tap, or share straight from either app.
 
-Also new:
+Also in this update:
 • A fresh app icon and a simpler name — Export GPX.
+• Stay signed in to Komoot — no more re-login after a while.
+• Sharing a tour now opens reliably, even from a closed app.
 • Strava activities show elevation gain.
-• A source menu in the header to switch or connect accounts without signing out.
 ```
 
 ---
