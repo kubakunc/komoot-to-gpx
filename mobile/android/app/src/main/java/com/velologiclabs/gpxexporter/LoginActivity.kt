@@ -40,8 +40,8 @@ class LoginActivity : Activity() {
         val cm = CookieManager.getInstance()
         cm.setAcceptCookie(true)
         cm.setAcceptThirdPartyCookies(webView, true)
-        cm.removeAllCookies(null)
-        cm.flush()
+        // Clear only Komoot's cookies — must not wipe a connected Strava session.
+        CookieUtil.clearFor(COOKIE_DOMAIN, ".komoot.com")
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
