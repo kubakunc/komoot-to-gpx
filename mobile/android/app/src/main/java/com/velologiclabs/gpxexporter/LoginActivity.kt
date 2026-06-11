@@ -103,7 +103,7 @@ class LoginActivity : Activity() {
             // If it fails we still return userId+jwt; UI will show a placeholder.
             val (display, email) = fetchProfile(userId, jwt)
 
-            Log.d("KomootAuth", "userId=$userId jwt.length=${jwt.length} display=$display email_present=${email.isNotEmpty()}")
+            Log.d("KomootAuth", "userId=$userId jwt.length=${jwt.length} display_present=${display.isNotEmpty()} email_present=${email.isNotEmpty()}")
             runOnUiThread {
                 val data = Intent()
                     .putExtra(EXTRA_USER_ID, userId)

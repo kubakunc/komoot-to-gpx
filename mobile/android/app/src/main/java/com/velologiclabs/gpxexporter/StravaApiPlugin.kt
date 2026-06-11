@@ -83,9 +83,7 @@ class StravaApiPlugin : Plugin() {
                 return token
             }
             val idx = html.indexOf("csrf")
-            Log.d("StravaApi", "csrf miss $path htmlLen=${html.length} hasCsrf=${idx >= 0} ctx=${
-                if (idx >= 0) html.substring(idx, minOf(idx + 90, html.length)).replace("\n", " ") else "-"
-            }")
+            Log.d("StravaApi", "csrf miss $path htmlLen=${html.length} hasCsrf=${idx >= 0}")
         }
         // Don't poison the cache with an empty token — leave it so the next call re-scrapes.
         return ""
