@@ -1,7 +1,7 @@
 import type {
-  Provider, ProviderSession, ActivityPage, ActivityDetail, ActivitySummary
+  Provider, ProviderSession, ActivityPage, ActivityDetail, ActivityMeta, ActivitySummary
 } from '../provider';
-import { listTours, getTour, getCoordinates, onTokenRefreshed, type TourSummary, type TourFilter } from '../komoot';
+import { listTours, getTour, getCoordinates, onTokenRefreshed, type Coordinate, type TourSummary, type TourFilter } from '../komoot';
 import { nativeLogin, nativeLogout } from '../komoot-auth';
 import { setProviderSession } from '../session';
 import { toGpx } from '../gpx';
@@ -17,6 +17,10 @@ function toSummary(t: TourSummary): ActivitySummary {
     status: t.status
   };
 }
+
+// Cache of the last activity detail, so an export straight after viewing it
+// doesn't re-fetch the tour + coordinates.
+let lastDetail: { id: string; meta: ActivityMeta; coords: Coordinate[] } | null = null;
 
 // Persist the refreshed token against the session whose call triggered it.
 let currentSession: ProviderSession | null = null;
@@ -60,14 +64,19 @@ export const komootProvider: Provider = {
     const coords = await getCoordinates(auth, id, meta.date);
     // Full-resolution track; the list downsamples for the card thumbnail, the
     // detail screen uses the full set for the map and distance/elevation stats.
-    return {
-      meta: { id: meta.id, name: meta.name, sport: meta.sport, date: meta.date },
-      preview: coords
-    };
+    const detailMeta = { id: meta.id, name: meta.name, sport: meta.sport, date: meta.date };
+    lastDetail = { id, meta: detailMeta, coords }; // reused by getGpx (export from detail)
+    return { meta: detailMeta, preview: coords };
   },
 
   async getGpx(session, id): Promise<string> {
     currentSession = session;
+    // Exporting from the detail screen immediately follows getActivity for the
+    // same id — reuse that fetch instead of hitting the API twice.
+    if (lastDetail && lastDetail.id === id) {
+      const m = lastDetail.meta;
+      return toGpx({ name: m.name, sport: m.sport, startTimeIso: m.date }, lastDetail.coords);
+    }
     const auth = { email: session.displayName, token: session.token };
     const meta = await getTour(auth, id);
     const coords = await getCoordinates(auth, id, meta.date);
